@@ -1,0 +1,52 @@
+/* ProductFormPage.css */
+.container {
+    padding: 20px;
+    background-color: #f0f2f5; /* Màu nền nhẹ */
+    border-radius: 8px;
+  }
+  
+  .card {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+    padding: 20px;
+    background-color: #ffffff; /* Màu nền trắng cho Card */
+  }
+  
+  .form-item-label {
+    font-weight: 600; /* In đậm cho nhãn */
+    color: #333; /* Màu chữ */
+  }
+  
+  .input-file {
+    margin-top: 10px;
+  }
+  
+  .input-preview {
+    width: 100%;
+    margin-top: 10px;
+    border: 1px dashed #ccc; /* Viền gạch cho hình ảnh preview */
+    border-radius: 4px; /* Bo góc cho viền */
+  }
+  
+  .input-preview img {
+    width: 100%; /* Đảm bảo hình ảnh vừa khung */
+    height: auto; /* Tự động điều chỉnh chiều cao */
+  }
+  
+  .button-submit {
+    width: 100%; /* Nút gửi chiếm toàn bộ chiều rộng */
+    background-color: #1890ff; /* Màu nền cho nút */
+    color: #fff; /* Màu chữ trắng */
+    border: none; /* Bỏ viền */
+    border-radius: 4px; /* Bo góc cho nút */
+    height: 40px; /* Chiều cao cho nút */
+  }
+  
+  .button-submit:hover {
+    background-color: #40a9ff; /* Màu nền khi hover */
+  }
+  
+  .button-submit:focus {
+    outline: none; /* Bỏ outline khi nút được chọn */
+  }
+  

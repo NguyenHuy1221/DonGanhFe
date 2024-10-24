@@ -1,0 +1,50 @@
+.hovered-row {
+    background-color: #f0f0f0; 
+  }
+  
+  .expanded-row-actions {
+    text-align: left;
+    padding: 10px 50px;
+    font-size: 16px;
+  }
+  
+  .expanded-row-actions a {
+    margin: 0 5px;
+    color: #1890ff;
+    cursor: pointer;
+  }
+  
+  .expanded-row-actions a:hover {
+    text-decoration: underline;
+  }
+  
+
+  .filter-section {
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 16px; 
+  }
+  
+  .filter-section .ant-select,
+  .filter-section .ant-input-search {
+    margin-left: 16px; 
+  }
+  
+  .custom-search {
+    display: flex;
+    align-items: center; 
+  }
+  
+  .custom-search .ant-input-search {
+    border-radius: 4px; 
+    padding: 4px 12px; 
+    transition: border-color 0.3s; 
+  }
+  
+ 
+  .custom-search .ant-input-search:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); 
+  }
+  
+  

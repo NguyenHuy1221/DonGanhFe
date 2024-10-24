@@ -1,0 +1,242 @@
+.pd {
+  width: 50%;
+  // background-color: rebeccapurple;
+  margin: 20px;
+  button {
+    background-color: rebeccapurple;
+  }
+}
+
+/* Button styling */
+button {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  margin: 10px 0;
+}
+
+button:hover {
+  background-color: #1565c0;
+}
+   
+ .product-list {
+  flex: 2;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  h3 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .cart-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 16px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+      color: #333;
+      font-weight: 500;
+    }
+
+    td {
+      font-size: 16px;
+      color: #555;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .cart-item-variation {
+      font-size: 14px;
+      color: #888;
+    }
+
+    .cart-item-image {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+  }
+}
+
+
+.checkout-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px;
+  gap: 20px;
+  flex-direction: column; 
+}
+
+.shipping-details, .cart-summary, .order-notes, .place-order {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%; 
+}
+
+.cart-summary ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.cart-summary ul li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.cart-total {
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+  font-weight: bold;
+}
+
+.order-notes textarea {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+}
+
+.place-order button {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.place-order button:hover {
+  background-color: #218838;
+}
+
+@media (min-width: 768px) {
+  .checkout-container {
+    flex-direction: row; 
+  }
+
+  .shipping-details, .cart-summary {
+    flex: 1;
+    min-width: 300px;
+  }
+}
+
+
+
+.shipping-details form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px; 
+}
+
+.shipping-details .form-group.full-width {
+  grid-column: span 2;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box; 
+}
+
+.shipping-details select {
+  height: 40px;
+}
+
+.shipping-details textarea {
+  resize: none;
+}
+
+@media (max-width: 768px) {
+  .shipping-details form {
+    grid-template-columns: 1fr; 
+  }
+}
+
+.payment-content {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: flex-start; /* Align items to the start */
+  border-top: 1px solid #ddd;
+  padding-top: 20px; /* Increased padding at the top */
+  padding-left: 20px; /* Add padding on the left */
+  padding-right: 20px; /* Add padding on the right */
+}
+
+.total-amount {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+/* Dialog styles */
+.MuiDialog-paper {
+  padding: 20px;
+  margin: 0 20px; /* Add margin for spacing */
+}
+
+.MuiDialogTitle-root {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.MuiFormControlLabel-root {
+  margin: 10px 0;
+}
+
+/* Address display section */
+.displayed-address {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}

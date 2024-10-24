@@ -1,0 +1,30 @@
+@use "sass:map";
+@import "../../../style/pages/theme";
+@import "../../../style/pages/responsive";
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    padding: 15px 0 15px;
+
+    .breadcrumb__text {
+        
+        ul {
+            display: flex;
+            list-style: none;
+            column-gap: 10px;
+
+            li {
+                text-decoration: none;
+                
+                a {
+                    text-decoration: none;
+                }
+
+                a:hover {
+                    color: red;
+                }
+            }
+        }
+    }
+}

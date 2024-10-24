@@ -1,0 +1,87 @@
+@use "sass:map";
+@import "../../../style/pages/theme";
+@import "../../../style/pages/responsive";
+
+.products__list p {
+    margin-top: 20px;
+    color: red;
+}
+
+.col-md-12,
+.col-sm-12,
+.col-xs-12 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+.tag {
+  cursor: pointer;
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  display: inline-block;
+  &.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+}
+
+
+.background {
+    background-color: #fdf3e5;
+}
+.sidebar {
+    margin-bottom: 20px;
+
+    h2 {
+        color: rgb(28,28,28);
+        font-weight: 700;
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+
+    .price__ranger__wrap {
+        display: flex;
+        flex-direction: column;
+        row-gap: 10px;
+    }
+
+    .tags {
+        display: flex;
+        // gap: 10px;
+        flex-wrap: wrap;
+
+        .tag {
+            font-size: 12px;
+            color: #6f6f6f;
+            display: inline-block;
+            padding: 8px 25px 6px;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            margin-bottom: 0;
+            
+            &:hover, &:active {
+               background-color: #126644; 
+                color: #ffffff
+            }
+
+            
+        }
+        
+    }
+    ul li {
+        list-style: none;
+        
+        a {
+            text-decoration: none;
+            line-height: 30px;
+            color: map.get($theme-color, "nomal-text");
+
+            &:hover {
+            color: map.get($theme-color, "text-main");
+
+            }
+        }
+    }
+}

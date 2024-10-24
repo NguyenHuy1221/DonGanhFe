@@ -1,0 +1,143 @@
+.hoa-don-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  thead {
+    background-color: #4caf50;
+    color: white;
+
+    th {
+      padding: 10px;
+      text-align: left; 
+    }
+
+    .actions-column {
+      text-align: right; 
+      padding-right: 50px;
+    }
+  }
+
+  tbody {
+    tr {
+      &:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+
+        .status {
+          display: inline-block;
+          padding: 5px 10px;
+          border-radius: 4px;
+
+          &.paid {
+            background-color: #4caf50;
+            color: white;
+          }
+
+          &.unpaid {
+            background-color: #ff9800;
+            color: white;
+          }
+        }
+
+        .actions-cell {
+          display: flex;
+          justify-content: flex-end; // Đẩy các nút về bên phải
+          gap: 10px;
+        }
+
+        .btn {
+          padding: 5px 15px;
+          margin-right: 5px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+
+          &.delete {
+            background-color: #f44336;
+            color: white;
+
+            &:hover {
+              background-color: #d32f2f;
+            }
+          }
+
+          &.detail {
+            background-color: #2196f3;
+            color: white;
+
+            &:hover {
+              background-color: #1976d2;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.actions-cell {
+  display: flex;
+  justify-content: flex-end; // Đẩy các nút về bên phải
+  gap: 10px;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-weight: bold;
+  display: inline-block;
+  text-align: center;
+}
+
+/* Màu cho từng trạng thái */
+.pending-approval {
+  background-color: #f0ad4e; /* Màu cam */
+  color: white;
+}
+
+.paid {
+  background-color: #5cb85c; /* Màu xanh lá */
+  color: white;
+}
+
+.pending-payment {
+  background-color: #0275d8; /* Màu xanh dương */
+  color: white;
+}
+
+.failed {
+  background-color: #d9534f; /* Màu đỏ */
+  color: white;
+}
+
+.canceled {
+  background-color: #6c757d; /* Màu xám */
+  color: white;
+}
+
+.payment-status {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+
+  &.cash-payment {
+    background-color: #4caf50; // Màu xanh lá cho thanh toán tiền mặt
+    color: white;
+  }
+
+  &.canceled {
+    background-color: #f44336; // Màu đỏ cho trạng thái hủy
+    color: white;
+  }
+
+  &.card-payment {
+    background-color: #2196f3; // Màu xanh cho thanh toán qua thẻ ngân hàng
+    color: white;
+  }
+}
