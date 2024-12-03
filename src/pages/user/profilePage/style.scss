@@ -1,0 +1,68 @@
+/* Container for the entire profile page */
+.container_profile {
+  display: flex;
+  margin: 20px auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Sidebar styles */
+.sidebar {
+  width: 200px;
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+
+.sidebar li {
+  // padding: 10px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 4px;
+  text-align: left;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar li:hover {
+  // background-color: #ff7a00;
+  color: #fff;
+}
+
+.sidebar li.active {
+  // background-color: #ff7a00;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Content area styles */
+.content {
+  flex: 1;
+  padding: 20px;
+  background-color: #fafafa;
+}
+
+/* Profile header */
+.container_profile h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.container_profile p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}

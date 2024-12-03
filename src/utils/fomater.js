@@ -4,3 +4,7 @@ export const formatter = (number) => {
     currency: "VND",
   }).format(number);
 };
+
+export const numberFormatter = (number) => {
+  return new Intl.NumberFormat("vi-VN").format(number);
+};

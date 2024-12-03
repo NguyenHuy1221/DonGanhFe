@@ -1,0 +1,153 @@
+.danh-sach-danh-gia {
+    max-width: 1000px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  .filter-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-section select,
+  .filter-section input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .review-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .review-table thead {
+    background-color: #f5f5f5;
+  }
+  
+  .review-table th,
+  .review-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  /* Giới hạn chiều rộng cho các cột nội dung dài */
+  .review-table td:nth-child(5),
+  .review-table td:nth-child(6) {
+    max-width: 200px; /* Điều chỉnh kích thước phù hợp */
+    word-wrap: break-word; /* Ngắt từ để xuống dòng */
+    white-space: pre-wrap; /* Giữ nguyên khoảng cách */
+  }
+  
+  /* CSS cho các ngôi sao đánh giá */
+  .review-table td:nth-child(4) {
+    color: #ffb400;
+    
+    // font-size: 18px;
+  }
+  
+  /* CSS cho nút phản hồi */
+  .review-table button {
+    padding: 8px 12px;
+    // background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .review-table button:hover {
+    background-color: #0056b3;
+  }
+  
+
+  .product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+
+  .modal-phan-hoi {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Nền mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Đảm bảo modal luôn nằm trên các phần tử khác */
+  }
+  
+  /* Modal content */
+  .modal-content-phan-hoi {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    height: 60vh;
+    max-width: 90%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+
+    textarea {
+      height: 40vh;
+    }
+  }
+  
+  /* Các nút trong modal */
+  .modal-content-phan-hoi button {
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 10px;
+  }
+  
+  .modal-content button:hover {
+    background-color: #0056b3;
+  }
+  
+  .feedback-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .feedback-item {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .feedback-comment {
+    margin-bottom: 10px;
+    word-wrap: break-word;  
+    word-break: break-word; 
+    white-space: normal;     
+    overflow-wrap: break-word; 
+
+  }
+  
+  .truncated-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px; 
+  }
+
+  .feedback-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+  }
+  

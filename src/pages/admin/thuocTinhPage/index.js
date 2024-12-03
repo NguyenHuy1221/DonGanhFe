@@ -31,13 +31,16 @@ const ThuocTinhPage = () => {
 
   const fetchData = async () => {
     try {
-      const data = await layDanhSachThuocTinh();
-      setDuLieu(data);
+      const userId = localStorage.getItem("userId");
+      const data = await layDanhSachThuocTinh(userId);
+      const filteredData = data.filter((item) => !item.isDeleted); 
+      setDuLieu(filteredData);
     } catch (error) {
       message.error("Lấy thuộc tính thất bại");
-      console.error("Error during data fetch:", error); // Thêm dòng này để debug
+      console.error("Error during data fetch:", error);
     }
   };
+  
 
   const themThuocTinhHandler = () => {
     setIsEditing(false);
@@ -77,18 +80,25 @@ const ThuocTinhPage = () => {
         message.error("Mã thuộc tính đã tồn tại!");
         return;
       }
+      const userId = localStorage.getItem("userId");
 
       if (isEditing) {
-        await suaThuocTinh({ ...values, ThuocTinhID: editRecord.ThuocTinhID });
+        await suaThuocTinh({
+          _id: editRecord._id, // Truyền _id
+          ThuocTinhID: values.ThuocTinhID, // Truyền cả ThuocTinhID
+          TenThuocTinh: values.TenThuocTinh,
+        },userId);
         message.success("Cập nhật thuộc tính thành công");
       } else {
-        await themThuocTinh(values);
+        await themThuocTinh(values,userId);
         message.success("Thêm thuộc tính thành công");
       }
       setIsModalVisible(false);
       fetchData();
     } catch (error) {
       console.log("Xác thực không thành công:", error);
+      message.error("Thuộc tính đã tồn tại.");
+
     }
   };
 
@@ -121,11 +131,13 @@ const ThuocTinhPage = () => {
       title: "Hành động",
       key: "actions",
       align: "right",
+
       render: (_, record) => (
         <Space size="middle">
           <Button
             icon={<EditOutlined />}
             onClick={() => suaThuocTinhHandler(record)}
+            style={{ marginRight: 8 }}
           />
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa thuộc tính này không?"

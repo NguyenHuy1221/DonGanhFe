@@ -1,0 +1,37 @@
+.mb-4 {
+  display: flex;
+  flex-wrap: wrap; /* Để đảm bảo không bị tràn trên màn hình nhỏ */
+  align-items: center;
+  justify-content: space-between; /* Giãn đều các phần tử */
+  gap: 10px;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.mb-4 .form-label {
+  font-weight: 600;
+  margin-right: 10px;
+  white-space: nowrap; /* Tránh xuống dòng chữ */
+}
+
+.mb-4 input,
+.mb-4 select {
+  flex: 1; /* Để các thành phần co giãn đồng đều */
+  min-width: 150px;
+}
+
+.mb-4 button {
+  flex: 0 0 auto; /* Không để nút tự giãn */
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mb-4 button:hover {
+  background-color: #0056b3;
+}

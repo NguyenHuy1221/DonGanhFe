@@ -35,7 +35,7 @@
 
 
 .products__container {
-  background-color: #fdf3e5;
+  background-color: #EEEEEE;
 }
 
 .products__text {
@@ -304,3 +304,219 @@
     }
   }
 }
+
+/* Background section */
+.quote-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-image: url('../../../image/Homebn.jpg'); /* Replace with your image URL */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+}
+
+/* Overlay */
+.quote-section .overlay {
+  position: absolute; /* Đảm bảo overlay phủ trên ảnh nền */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Để tạo hiệu ứng mờ, có thể điều chỉnh 0.5 theo ý thích */
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+.dl_text {
+  max-width: 600px;
+  margin-left: 350px;
+  margin-top: 20px;
+}
+
+/* Headings */
+.quote-section h3 {
+  color: #8bc34a;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.quote-section h1 {
+  font-size: 48px;
+  color: #a4e757;
+
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Description */
+.quote-section p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Form styling */
+.quote-section .email-form {
+  display: flex;
+  gap: 10px;
+}
+
+.quote-section .email-form input[type="email"] {
+  padding: 10px;
+  flex: 1;
+  border: none;
+  border-radius: 5px;
+}
+
+.quote-section .email-form button {
+  padding: 10px 20px;
+  background-color: #8bc34a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.quote-section .email-form button:hover {
+  background-color: #76a334;
+}
+
+
+/* Background section */
+.about-section {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  background-image: url('../../../image/homebnn.jpg'); 
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 50px; 
+}
+
+/* Overlay */
+.about-section .overlay {
+  padding: 20px;
+  text-align: left;
+  color: #fff;
+  max-width: 600px;
+  border-radius: 10px;
+}
+
+/* Headings */
+.about-section h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.about-section h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Description */
+.about-section p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Button styling */
+.about-button {
+  padding: 10px 20px;
+  background-color: #8bc34a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.about-button:hover {
+  background-color: #76a334;
+}
+
+
+/* Section styling */
+/* Section styling */
+.info-section {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.info-section h2 {
+  color: #8bc34a;
+  font-size: 20px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.info-section h1 {
+  font-size: 36px;
+  margin-bottom: 40px;
+}
+
+/* Grid layout */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Individual card styling */
+.info-card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.info-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.info-card h3 {
+  color: #8bc34a;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.info-card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Button styling */
+.info-button {
+  padding: 10px 20px;
+  background-color: #8bc34a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.info-button:hover {
+  background-color: #76a334;
+}
+
+
+
+

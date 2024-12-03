@@ -1,5 +1,17 @@
 import axios from "axios";
 
+export const fetchProductListAdmin = async (userId) => {
+  try {
+    const response = await axios.get(
+      `api/sanpham/getlistSanPhamAdmin/${userId}`
+    );
+    return response.data; // Trả về danh sách sản phẩm
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+    throw error; // Ném lỗi để component có thể xử lý
+  }
+};
+
 export const fetchProductsById = async (_id) => {
   try {
     const response = await axios.get(`/api/sanpham/findSanPhambyID/${_id}`);
@@ -39,9 +51,7 @@ export const fetchProductsByDanhMuc = async (IDDanhMuc) => {
 
 export const fetchBienThe = async (id) => {
   try {
-    const response = await axios.get(
-      `/api/sanpham/getlistBienThe/${id}`
-    );
+    const response = await axios.get(`/api/sanpham/getlistBienThe/${id}`);
     return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error("Error fetching product variants:", error);
@@ -109,6 +119,67 @@ export const sapXepSanPhamCoGiamGia = async () => {
     return response.data;
   } catch (error) {
     console.error("Error products:", error);
+    throw error;
+  }
+};
+
+export const createProduct = async (formData) => {
+  try {
+    const response = await axios.post("/api/sanpham/createSanPham", formData);
+    return response.data; // Trả về dữ liệu của sản phẩm mới tạo
+  } catch (error) {
+    console.error("Lỗi khi tạo sản phẩm mới:", error);
+    throw error; // Ném lỗi để component có thể xử lý
+  }
+};
+
+export const updateProduct = async (productId, formData) => {
+  try {
+    const response = await axios.put(
+      `/api/sanpham/updateSanPham/${productId}`,
+      formData
+    );
+    return response.data; // Trả về dữ liệu của sản phẩm sau khi cập nhật
+  } catch (error) {
+    console.error("Lỗi khi cập nhật sản phẩm:", error);
+    throw error; // Ném lỗi để component có thể xử lý
+  }
+};
+
+export const deleteProduct = async (productId) => {
+  try {
+    const response = await axios.put(`/api/sanpham/deleteSanPham/${productId}`);
+    return response.data; // Trả về phản hồi từ API
+  } catch (error) {
+    console.error("Lỗi khi xóa sản phẩm:", error);
+    throw error; // Ném lỗi để component có thể xử lý
+  }
+};
+
+// Cập nhật thuộc tính cho sản phẩm
+export const updateThuocTinh = async (sanPhamId, data) => {
+  try {
+    const response = await axios.put(
+      `/api/sanpham/updateThuocTinhForSanPham/${sanPhamId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật thuộc tính:", error);
+    throw error;
+  }
+};
+
+// Thêm thuộc tính cho sản phẩm
+export const addThuocTinh = async (sanPhamId, data) => {
+  try {
+    const response = await axios.post(
+      `/api/sanpham/addThuocTinhForSanPham/${sanPhamId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi thêm thuộc tính:", error);
     throw error;
   }
 };

@@ -1,3 +1,19 @@
+.box_l_ct {
+  display: flex;
+  align-items: center;
+  position: relative;
+  h1 {
+    margin-top: 20px;
+    position: absolute;
+  left: 50%;
+  transform: translateX(-50%); /* Căn giữa tiêu đề */
+  }
+}
+
+.btn-back {
+  margin-left: 0 !important;
+}
+
 .chi-tiet-hoa-don-container {
   width: 80%;
   margin: 0 auto;
@@ -14,6 +30,7 @@
   }
 
   .order-info, .address-info {
+    margin-top: 20px;
     margin-bottom: 20px;
     p {
       font-size: 16px;
@@ -130,4 +147,38 @@
 .canceled {
   background-color: #6c757d; /* Màu xám */
   color: white;
+}
+
+/* Trạng thái chung */
+.status {
+  padding: 5px 10px;
+  font-weight: bold;
+  border-radius: 4px;
+  color: white;
+  text-transform: capitalize;
+}
+
+/* Trạng thái Đặt hàng */
+.status.ordered {
+  background-color: #f39c12; /* Màu vàng */
+}
+
+/* Trạng thái Đóng gói */
+.status.packaging {
+  background-color: #3498db; /* Màu xanh dương */
+}
+
+/* Trạng thái Bắt đầu giao */
+.status.shipping {
+  background-color: #1abc9c; /* Màu xanh lá */
+}
+
+/* Trạng thái Hoàn thành đơn hàng */
+.status.completed {
+  background-color: #2ecc71; /* Màu xanh lá cây */
+}
+
+/* Trạng thái Hủy */
+.status.canceled {
+  background-color: #e74c3c; /* Màu đỏ */
 }

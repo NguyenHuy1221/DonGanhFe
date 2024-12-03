@@ -26,26 +26,35 @@ const GiaTriThuocTinhPage = () => {
   const [editRecord, setEditRecord] = useState(null);
   const [form] = Form.useForm();
 
+
+  const fetchData = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      const [data, thuocTinhData] = await Promise.all([
+        layDanhSachThuocTinhGiaTri(userId),
+        layDanhSachThuocTinh(userId),
+      ]);
+  
+      // Lọc dữ liệu để chỉ hiển thị các bản ghi chưa bị xóa
+      const filteredData = data.filter((item) => !item.isDeleted);
+      const filteredThuocTinh = thuocTinhData.filter((item) => !item.isDeleted);
+  
+      setDuLieu(filteredData);
+      setThuocTinhList(filteredThuocTinh);
+    } catch (error) {
+      console.error(error.message);
+      message.error(
+        "Lấy danh sách thuộc tính giá trị và thuộc tính thất bại"
+      );
+    }
+  };
+  
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [data, thuocTinhData] = await Promise.all([
-          layDanhSachThuocTinhGiaTri(),
-          layDanhSachThuocTinh(),
-        ]);
-        setDuLieu(data);
-        setThuocTinhList(thuocTinhData);
-      } catch (error) {
-        console.error(error.message);
-        message.error(
-          "Lấy danh sách thuộc tính giá trị và thuộc tính thất bại"
-        );
-      }
-    };
-
-    fetchData();
+    fetchData(); // Gọi khi component được mount
   }, []);
+  
 
+  
   const themGiaTriHandler = () => {
     setIsEditing(false);
     form.resetFields();
@@ -68,32 +77,31 @@ const GiaTriThuocTinhPage = () => {
   const xoaGiaTriHandler = async (id) => {
     try {
       await xoaThuocTinhGiaTri(id);
-      const data = await layDanhSachThuocTinhGiaTri();
-      setDuLieu(data);
       message.success("Xóa thuộc tính giá trị thành công");
+      fetchData(); // Gọi lại fetchData sau khi xóa
     } catch (error) {
       console.error(error.message);
       message.error("Xóa thuộc tính giá trị thất bại");
     }
   };
+  
 
   const xacNhanHandler = async () => {
     try {
       const values = await form.validateFields();
-
+  
       // Kiểm tra trùng ID
       const isIDTrung = duLieu.some(
         (item) =>
           item.IDGiaTriThuocTinh === values.IDGiaTriThuocTinh &&
-          (!isEditing ||
-            item.IDGiaTriThuocTinh !== editRecord.IDGiaTriThuocTinh)
+          (!isEditing || item.IDGiaTriThuocTinh !== editRecord.IDGiaTriThuocTinh)
       );
-
+  
       if (isIDTrung) {
         message.error("ID Giá trị thuộc tính đã tồn tại!");
-        return; // Ngăn không thực hiện tiếp nếu ID bị trùng
+        return;
       }
-
+  
       if (isEditing) {
         await suaThuocTinhGiaTri({
           ...values,
@@ -104,14 +112,56 @@ const GiaTriThuocTinhPage = () => {
         await themThuocTinhGiaTri(values);
         message.success("Thêm thuộc tính giá trị thành công");
       }
-
+  
       setIsModalVisible(false);
-      const data = await layDanhSachThuocTinhGiaTri();
-      setDuLieu(data);
+      fetchData(); // Gọi lại fetchData sau khi thêm/sửa
     } catch (error) {
-      console.log("Xác thực không thành công:", error);
+      console.error("Xác thực không thành công:", error);
+      if (error.response?.data?.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error("Đã xảy ra lỗi. Vui lòng thử lại!");
+      }
     }
   };
+  
+  
+
+  // const xacNhanHandler = async () => {
+  //   try {
+  //     const values = await form.validateFields();
+
+  //     // Kiểm tra trùng ID
+  //     const isIDTrung = duLieu.some(
+  //       (item) =>
+  //         item.IDGiaTriThuocTinh === values.IDGiaTriThuocTinh &&
+  //         (!isEditing ||
+  //           item.IDGiaTriThuocTinh !== editRecord.IDGiaTriThuocTinh)
+  //     );
+
+  //     if (isIDTrung) {
+  //       message.error("ID Giá trị thuộc tính đã tồn tại!");
+  //       return; // Ngăn không thực hiện tiếp nếu ID bị trùng
+  //     }
+
+  //     if (isEditing) {
+  //       await suaThuocTinhGiaTri({
+  //         ...values,
+  //         IDGiaTriThuocTinh: editRecord.IDGiaTriThuocTinh,
+  //       });
+  //       message.success("Cập nhật thuộc tính giá trị thành công");
+  //     } else {
+  //       await themThuocTinhGiaTri(values);
+  //       message.success("Thêm thuộc tính giá trị thành công");
+  //     }
+
+  //     setIsModalVisible(false);
+  //     const data = await layDanhSachThuocTinhGiaTri();
+  //     setDuLieu(data);
+  //   } catch (error) {
+  //     console.log("Xác thực không thành công:", error);
+  //   }
+  // };
 
   const huyHandler = () => {
     setIsModalVisible(false);
@@ -146,7 +196,7 @@ const GiaTriThuocTinhPage = () => {
           />
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa giá trị này không?"
-            onConfirm={() => xoaGiaTriHandler(record.IDGiaTriThuocTinh)}
+            onConfirm={() => xoaGiaTriHandler(record._id)}
           >
             <Button icon={<DeleteOutlined />} />
           </Popconfirm>

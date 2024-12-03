@@ -14,20 +14,27 @@ import {
   Space,
   Popconfirm,
   Modal,
+  InputNumber,
 } from "antd";
 
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { layDanhSachThuocTinh } from "../../../api/thuocTinhService";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import Column from "antd/es/table/Column";
+import { getDanhMucList } from "../../../api/danhMucService";
+import {
+  fetchProductsById,
+  updateProduct,
+  createProduct,
+} from "../../../api/productService";
+
+import { getGiaTriThuocTinh } from "../../../api/giaTriThuocTinhService";
+
+import { formatter, numberFormatter } from "../../../utils/fomater";
 
 const { Option } = Select;
 
-const ProductFormPage = () => {
+const ProductFormPage = ({ onQuayLaiProduct }) => {
   const [form] = Form.useForm();
-  const [isModalVisible, setIsModalVisible] = useState(false); // Trạng thái modal
-  const [isEditing, setIsEditing] = useState(false); // Xác định thêm hay sửa
   const { _id } = useParams();
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
@@ -47,22 +54,6 @@ const ProductFormPage = () => {
 
   const [luachon, setLuachon] = useState(0);
   const [variants, setVariants] = useState([]);
-
-  const [thuocTinhGiaTriBienThe, setThuocTinhGiaTriBienThe] = useState([]);
-  const [selectedBienThe, setSelectedBienThe] = useState([
-    { thuocTinhBienThe: null, giaTriBienThe: null },
-  ]); // Khởi tạo với 2 thuộc tính
-
-  const onThuocTinhSelectBienThe = async (value, index) => {
-    // Cập nhật thuộc tính đã chọn
-    const updatedAttributes = [...selectedAttributes];
-    updatedAttributes[index].thuocTinhBienThe = value;
-    setSelectedBienThe(updatedAttributes);
-    setThuocTinhGiaTriBienThe([]);
-
-    // Gọi hàm để lấy giá trị thuộc tính tương ứng
-    await fetchGiaTriThuocTinh(value);
-  };
 
   const onThuocTinhSelect = async (value, index) => {
     // Cập nhật thuộc tính đã chọn
@@ -92,16 +83,6 @@ const ProductFormPage = () => {
     setSelectedAttributes(newSelectedAttributes);
   };
 
-  const handleAttributeChangeBienThe = (index, thuocTinhBienThe, values) => {
-    const newSelectedAttributes = [...selectedBienThe];
-    newSelectedAttributes[index] = {
-      ...newSelectedAttributes[index],
-      thuocTinhBienThe,
-      giaTriBienThe: values,
-    };
-    setSelectedAttributes(newSelectedAttributes);
-  };
-
   const getAvailableAttributes = (currentIndex) => {
     // Lọc thuộc tính đã được chọn
     return thuocTinhList.filter((thuocTinh, index) =>
@@ -112,26 +93,25 @@ const ProductFormPage = () => {
     );
   };
 
-  const getAvailableAttributesBienThe = () => {
-    if (!product || !product.DanhSachThuocTinh) return [];
-  
-    return product.DanhSachThuocTinh.map((attribute) => {
-      const thuocTinhId = attribute.thuocTinh._id; // Lấy đúng _id từ thuộc tính bên trong
-      return {
-        thuocTinhId: thuocTinhId,
-        TenThuocTinh: attribute.thuocTinh.TenThuocTinh,
-        giaTriThuocTinh: attribute.giaTriThuocTinh,
-      };
-    });
+  const removeAttribute = (index) => {
+    if (index === 0) {
+      return;
+    }
+
+    const updatedAttributes = selectedAttributes.filter(
+      (attribute, idx) => idx !== index
+    );
+    setSelectedAttributes(updatedAttributes);
   };
-  
 
   useEffect(() => {
     // Lấy danh mục và thuộc tính khi form được mở
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("api/danhmuc/getlistDanhMuc");
-        setCategories(response.data);
+        // const response = await axios.get("api/danhmuc/getlistDanhMuc");
+        // setCategories(response.data);
+        const categories = await getDanhMucList();
+        setCategories(categories);
       } catch (error) {
         message.error("Lỗi khi lấy danh mục");
       }
@@ -139,10 +119,12 @@ const ProductFormPage = () => {
 
     const fetchThuocTinh = async () => {
       try {
-        const data = await layDanhSachThuocTinh();
+        const userId = localStorage.getItem("userId");
+        const data = await layDanhSachThuocTinh(userId);
         setThuocTinhList(data);
       } catch (error) {
-        message.error("Lỗi khi lấy danh sách thuộc tính");
+        // message.error("Lỗi khi lấy danh sách thuộc tính");
+        console.log("Lỗi khi lấy danh sách thuộc tính");
       }
     };
 
@@ -155,15 +137,23 @@ const ProductFormPage = () => {
   // Hàm gọi API để lấy danh sách giá trị thuộc tính theo ID
   const fetchGiaTriThuocTinh = async (id) => {
     try {
-      const response = await axios.get(
-        `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}`
-      );
-      setThuocTinhGiaTri(response.data); // Cập nhật state với dữ liệu từ API
-      setThuocTinhGiaTriBienThe(response.data);
+      // const response = await axios.get(
+      //   `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}`
+      // );
+      // setThuocTinhGiaTri(response.data); // Cập nhật state với dữ liệu từ API
+      const giaTri = await getGiaTriThuocTinh(id);
+      setThuocTinhGiaTri(giaTri);
     } catch (error) {
       message.error("Lỗi khi tải giá trị thuộc tính!");
     }
   };
+
+  useEffect(() => {
+    const selectedCategory = categories.find(
+      (category) => category._id === form.getFieldValue("IDDanhMuc")
+    );
+    setSubCategories(selectedCategory?.DanhMucCon || []);
+  }, [form.getFieldValue("IDDanhMuc")]);
 
   const fetchProduct = async () => {
     const productId = localStorage.getItem("productId"); // Lấy _id từ localStorage
@@ -172,16 +162,16 @@ const ProductFormPage = () => {
 
     if (productId) {
       setIsEditMode(true);
-      fetchProductVariants(productId);
     } else {
       setIsEditMode(false);
     }
 
     try {
-      const response = await axios.get(
-        `/api/sanpham/findSanPhambyID/${productId}`
-      );
-      const productData = response.data;
+      // const response = await axios.get(
+      //   `/api/sanpham/findSanPhambyID/${productId}`
+      // );
+      // const productData = response.data;
+      const productData = await fetchProductsById(productId);
       console.log("vaclcl ", productData);
 
       // Set hình ảnh chính và hình ảnh bổ sung
@@ -225,7 +215,15 @@ const ProductFormPage = () => {
 
   const handleExtraFileChange = (e) => {
     const files = Array.from(e.target.files);
+
+    // Kiểm tra nếu số lượng ảnh phụ vượt quá 4
+    if (files.length > 4) {
+      message.error("Bạn chỉ có thể chọn tối đa 4 ảnh phụ.");
+      return;
+    }
+
     if (files.length > 0) {
+      // Cập nhật lại danh sách ảnh phụ và ảnh preview
       setExtraImages(files);
       const previewUrls = files.map((file) => URL.createObjectURL(file));
       setExtraImagePreviews(previewUrls);
@@ -238,11 +236,46 @@ const ProductFormPage = () => {
     setLoading(true);
     const productId = product ? product._id : null;
 
+    // if (!imageFile) {
+    //   message.error("Vui lòng chọn ảnh chính.");
+    //   setLoading(false);
+    //   return;
+    // }
+
+    // if (extraImages.length === 0) {
+    //   message.error("Vui lòng chọn ít nhất một ảnh phụ.");
+    //   setLoading(false);
+    //   return;
+    // }
+
+    if (luachon === 1) {
+      for (let i = 0; i < selectedAttributes.length; i++) {
+        const attribute = selectedAttributes[i];
+
+        if (
+          !attribute.thuocTinhSKU ||
+          !Array.isArray(attribute.giaTri) ||
+          attribute.giaTri.length === 0
+        ) {
+          message.error(
+            `Vui lòng chọn thuộc tính và giá trị cho biến thể sản phẩm ${i + 1}`
+          );
+          return;
+        }
+      }
+    }
+
     try {
       const values = await form.validateFields();
       console.log("Form values before sending:", values);
+      const storedUserId = localStorage.getItem("userId");
+      if (!storedUserId) {
+        message.error("Bạn chưa đăng nhập");
+        return;
+      }
 
       const formData = new FormData();
+      formData.append("userId", storedUserId);
       formData.append("IDSanPham", values.IDSanPham);
       formData.append("TenSanPham", values.TenSanPham);
       formData.append("DonGiaNhap", values.DonGiaNhap);
@@ -282,6 +315,21 @@ const ProductFormPage = () => {
         });
       }
 
+      if (productId) {
+      } else {
+        if (!imageFile) {
+          message.error("Vui lòng chọn ảnh chính.");
+          setLoading(false);
+          return;
+        }
+
+        if (extraImages.length === 0) {
+          message.error("Vui lòng chọn ít nhất một ảnh phụ.");
+          setLoading(false);
+          return;
+        }
+      }
+
       console.log("Form data to be sent:");
       for (const [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
@@ -293,107 +341,46 @@ const ProductFormPage = () => {
       });
 
       let response;
+      // if (productId) {
+      //   response = await axios.put(
+      //     `/api/sanpham/updateSanPham/${productId}`,
+      //     formData
+      //   );
+      //   message.success("Cập nhật sản phẩm thành công");
+      //   onQuayLaiProduct();
+      // } else {
+      //   response = await axios.post("/api/sanpham/createSanPham", formData);
+      //   message.success("Thêm sản phẩm mới thành công");
+      //   onQuayLaiProduct();
+      //   const newProductId = response.data._id;
+      // }
+
       if (productId) {
-        response = await axios.put(
-          `/api/sanpham/updateSanPham/${productId}`,
-          formData
-        );
+        // Nếu có productId, gọi API cập nhật sản phẩm
+        response = await updateProduct(productId, formData);
         message.success("Cập nhật sản phẩm thành công");
       } else {
-        response = await axios.post("/api/sanpham/createSanPham", formData);
+        // Nếu không có productId, gọi API thêm mới sản phẩm
+        response = await createProduct(formData);
         message.success("Thêm sản phẩm mới thành công");
-
-        const newProductId = response.data._id;
-        fetchProductVariants(newProductId);
       }
+
+      // Quay lại danh sách sản phẩm
+      onQuayLaiProduct();
+
+      // Lưu ID của sản phẩm mới tạo
+      const newProductId = response._id;
+      localStorage.setItem("productId", newProductId);
     } catch (error) {
       console.error(
         "Error during form submission:",
         error.response?.data || error.message
       );
-      message.error("Form submission failed");
+      message.error("Trùng Id sản phẩm.");
     } finally {
       setLoading(false);
     }
   };
-
-  // Fetch product variants from API
-  const fetchProductVariants = async (productId) => {
-    setLoading(true); // Bắt đầu hiển thị trạng thái tải
-    try {
-      const response = await axios.get(
-        `/api/sanpham/getlistBienThe/${productId}`
-      );
-      console.log("Danh sách biến thể:", response.data); // Ghi log danh sách biến thể
-
-      setVariants(response.data); // Cập nhật state với dữ liệu biến thể
-      message.success(`Đã tải ${response.data.length} biến thể thành công!`);
-    } catch (error) {
-      console.error("Lỗi khi tải danh sách biến thể:", error);
-      message.error("Không thể tải danh sách biến thể.");
-    } finally {
-      setLoading(false); // Dừng trạng thái tải
-    }
-  };
-
-  const [isModalVisibleBienThe, setIsModalVisibleBienThe] = useState(false); // Trạng thái modal
-  const [isEditingBienThe, setIsEditingBienThe] = useState(false); // Xác định thêm hay sửa
-  const [editingRecord, setEditingRecord] = useState(null); // Biến thể đang chỉnh sửa
-  const [formBienThe] = Form.useForm(); // Đối tượng form để quản lý biểu mẫu
-
-  const openBienTheModal = () => {
-    setIsModalVisibleBienThe(true);
-    setIsEditingBienThe(false); // Đặt mặc định là thêm mới, không phải sửa
-    setEditingRecord(null); // Xóa dữ liệu đang chỉnh sửa
-  };
-
-  const closeBienTheModal = () => {
-    setIsModalVisibleBienThe(false);
-  };
-
-  const cotDuLieu = [
-    {
-      title: "SKU",
-      dataIndex: "sku",
-      key: "sku",
-    },
-    {
-      title: "Giá",
-      dataIndex: "gia",
-      key: "gia",
-    },
-    {
-      title: "Số lượng",
-      dataIndex: "soLuong",
-      key: "soLuong",
-    },
-    {
-      title: "Biến thể",
-      key: "variants",
-      render: (text, record) => (
-        <>
-          {record.KetHopThuocTinh.map((variant) => (
-            <div key={variant.IDGiaTriThuocTinh._id}>
-              {variant.IDGiaTriThuocTinh.GiaTri}
-            </div>
-          ))}
-        </>
-      ),
-    },
-    {
-      title: "Hành động",
-      key: "actions",
-      align: "right",
-      render: (_, record) => (
-        <Space size="middle">
-          <Button icon={<EditOutlined />} />
-          <Popconfirm title="Bạn có chắc chắn muốn xóa biến thể này không?">
-            <Button icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
 
   return (
     <div style={{ padding: "20px", backgroundColor: "#f0f2f5" }}>
@@ -520,7 +507,12 @@ const ProductFormPage = () => {
                 label="Giá Bán"
                 rules={[{ required: true, message: "Vui lòng nhập giá bán!" }]}
               >
-                <Input type="number" min={0} />
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  formatter={numberFormatter}
+                  parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -529,7 +521,12 @@ const ProductFormPage = () => {
                 label="Giá Nhập"
                 rules={[{ required: true, message: "Vui lòng nhập giá nhập!" }]}
               >
-                <Input type="number" min={0} />
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  formatter={numberFormatter}
+                  parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -550,7 +547,12 @@ const ProductFormPage = () => {
                 label="Số Lượng Nhập"
                 rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
               >
-                <Input type="number" min={0} />
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  formatter={numberFormatter}
+                  parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -567,12 +569,22 @@ const ProductFormPage = () => {
                   },
                 ]}
               >
-                <Input type="number" min={0} />
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  formatter={numberFormatter}
+                  parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="PhanTramGiamGia" label="Phần Trăm Giảm Giá">
-                <Input type="number" min={0} />
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  formatter={numberFormatter}
+                  parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -594,12 +606,14 @@ const ProductFormPage = () => {
             </Col>
           </Row>
 
-          <Select value={luachon} onChange={setLuachon}>
-            <Option value={0}>Sản Phẩm Đơn Giản</Option>
-            <Option value={1}>Tổ Hợp Biến Thể</Option>
-          </Select>
+          {!isEditMode && (
+            <Select value={luachon} onChange={setLuachon}>
+              <Option value={0}>Sản Phẩm Đơn Giản</Option>
+              <Option value={1}>Tổ Hợp Biến Thể</Option>
+            </Select>
+          )}
 
-          {luachon === 1 && (
+          {luachon === 1 && !isEditMode && (
             <Card>
               <h1>Biến Thể Sản Phẩm</h1>
               <Row gutter={16}>
@@ -618,7 +632,12 @@ const ProductFormPage = () => {
                     label="Giá"
                     rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
                   >
-                    <Input type="number" min={0} />
+                    <InputNumber
+                      min={0}
+                      style={{ width: "100%" }}
+                      formatter={numberFormatter}
+                      parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -629,15 +648,31 @@ const ProductFormPage = () => {
                       { required: true, message: "Vui lòng nhập số lượng!" },
                     ]}
                   >
-                    <Input type="number" min={0} />
+                    <InputNumber
+                      min={0}
+                      style={{ width: "100%" }}
+                      formatter={numberFormatter}
+                      parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
 
               {selectedAttributes.map((attribute, index) => (
                 <Row gutter={16} key={index}>
-                  <Col span={12}>
-                    <Form.Item label="Chọn Thuộc Tính">
+                  <Col span={11}>
+                    <Form.Item
+                      label="Chọn Thuộc Tính"
+                      name={`thuocTinhSKU_${index}`}
+                      rules={[
+                        {
+                          required: true,
+                          message: `Vui lòng chọn thuộc tính cho biến thể ${
+                            index + 1
+                          }`,
+                        },
+                      ]}
+                    >
                       <Select
                         value={attribute.thuocTinhSKU}
                         onChange={(value) => onThuocTinhSelect(value, index)}
@@ -650,8 +685,19 @@ const ProductFormPage = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col span={12}>
-                    <Form.Item label="Giá Trị">
+                  <Col span={11}>
+                    <Form.Item
+                      label="Giá Trị"
+                      name={`giaTri_${index}`}
+                      rules={[
+                        {
+                          required: true,
+                          message: `Vui lòng chọn giá trị cho thuộc tính ${
+                            attribute.thuocTinhSKU ? attribute.thuocTinhSKU : ""
+                          }`,
+                        },
+                      ]}
+                    >
                       <Select
                         mode="multiple"
                         value={attribute.giaTri}
@@ -672,6 +718,21 @@ const ProductFormPage = () => {
                       </Select>
                     </Form.Item>
                   </Col>
+
+                  {index !== 0 && (
+                    <Col span={2}>
+                      <Button
+                        type="danger"
+                        onClick={() => removeAttribute(index)}
+                        style={{
+                          width: "100%",
+                          marginTop: 30,
+                        }}
+                      >
+                        Xóa
+                      </Button>
+                    </Col>
+                  )}
                 </Row>
               ))}
 
@@ -704,96 +765,6 @@ const ProductFormPage = () => {
           </Form.Item>
         </Form>
       </Card>
-
-      {/* Hiển thị danh sách biến thể */}
-      <h1>Quản lý biến thể </h1>
-
-      <Button type="primary" onClick={openBienTheModal}>
-        Thêm Biến Thể
-      </Button>
-
-      {/* Table */}
-      <Table columns={cotDuLieu} dataSource={variants} pagination={false} />
-
-      {/* Modal */}
-      <Modal
-        title={isEditingBienThe ? "Sửa biến thể" : "Thêm biến thể"}
-        visible={isModalVisibleBienThe}
-        onCancel={closeBienTheModal}
-        okText={isEditingBienThe ? "Cập nhật" : "Thêm"}
-      >
-        <Form form={form} layout="vertical" name="thuoc_tinh_form">
-          <Form.Item
-            name="sku"
-            label="SKU"
-            rules={[{ required: true, message: "Vui lòng nhập SKU!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="gia"
-            label="Giá"
-            rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            name="soLuong"
-            label="Số lượng"
-            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
-          >
-            <Input type="number" />
-          </Form.Item>
-
-          {selectedBienThe.map((attribute, index) => (
-            <Row gutter={16} key={index}>
-              <Col span={12}>
-                {getAvailableAttributesBienThe().map((attribute, index) => (
-                  <Form.Item
-                    key={attribute.thuocTinhId}
-                    label={`Thuộc Tính:`}
-                  >
-                    <Select
-                      value={
-                        selectedAttributes[index]?.thuocTinhBienThe || null
-                      }
-                      disabled // Tắt tính năng chọn
-                    >
-                      <Option
-                        value={selectedAttributes[index]?.thuocTinhBienThe}
-                      >
-                        {attribute.TenThuocTinh} {/* Hiển thị TenThuocTinh */}
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                ))}
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Giá Trị">
-                  <Select
-                    mode="multiple"
-                    value={attribute.giaTriBienThe || []} // Giá trị hiện tại
-                    onChange={(value) =>
-                      handleAttributeChangeBienThe(
-                        index,
-                        attribute.thuocTinhBienThe,
-                        value
-                      )
-                    }
-                    disabled={!attribute.thuocTinhBienThe} // Tắt nếu không có thuộc tính
-                  >
-                    {thuocTinhGiaTriBienThe.map((item) => (
-                      <Option key={item._id} value={item._id}>
-                        {item.GiaTri} {/* Hiển thị giá trị */}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-          ))}
-        </Form>
-      </Modal>
     </div>
   );
 };

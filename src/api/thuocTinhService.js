@@ -3,9 +3,9 @@ import axios from "axios";
 const API_BASE_URL = "/api/thuoctinh";
 
 // Lấy danh sách thuộc tính
-export const layDanhSachThuocTinh = async () => {
+export const layDanhSachThuocTinh = async (userId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getlistThuocTinh`);
+    const response = await axios.get(`${API_BASE_URL}/getlistThuocTinh/${userId}`);
     return response.data;
   } catch (error) {
     throw new Error("Lỗi khi lấy danh sách thuộc tính");
@@ -13,9 +13,9 @@ export const layDanhSachThuocTinh = async () => {
 };
 
 // Thêm thuộc tính
-export const themThuocTinh = async (data) => {
+export const themThuocTinh = async (data,userId) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createThuocTinh`, data);
+    const response = await axios.post(`${API_BASE_URL}/createThuocTinh/${userId}`, data);
     return response.data;
   } catch (error) {
     throw new Error("Lỗi khi thêm thuộc tính");
@@ -23,14 +23,18 @@ export const themThuocTinh = async (data) => {
 };
 
 // Cập nhật thuộc tính
-export const suaThuocTinh = async (data) => {
+export const suaThuocTinh = async (data,userId) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateThuocTinh`, data);
+    const response = await axios.put(
+      `${API_BASE_URL}/updateThuocTinh/${data._id}/${userId}`, // Truyền _id
+      { ThuocTinhID: data.ThuocTinhID, TenThuocTinh: data.TenThuocTinh } // Truyền cả hai trường
+    );
     return response.data;
   } catch (error) {
     throw new Error("Lỗi khi cập nhật thuộc tính");
   }
 };
+
 
 // Xóa thuộc tính
 export const xoaThuocTinh = async (id) => {

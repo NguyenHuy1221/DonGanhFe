@@ -147,7 +147,7 @@ const Header = () => {
                 onMouseEnter={() => setIsMenuVisible(true)}
                 onMouseLeave={() => setIsMenuVisible(false)}
               >
-                <Link to="/tai-khoan">
+                <Link to="/profile">
                   <AiOutlineUser />
                   <p>Tài khoản</p>
                 </Link>
@@ -155,7 +155,7 @@ const Header = () => {
                   <div className="user-menu-dropdown">
                     {user ? (
                       <>
-                        <Link to="#">Trang cá nhân</Link>
+                        <Link to="/profile">Trang cá nhân</Link>
                         <button onClick={handleLogout}>Đăng xuất</button>
                       </>
                     ) : (

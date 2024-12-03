@@ -15,11 +15,17 @@ import axios from "axios";
 import moment from "moment";
 import "./style.scss";
 import { fetchCategories } from "../../../api/categoriesService";
+import {
+  fetchProductListAdmin,
+  deleteProduct,
+} from "../../../api/productService";
+
 import { DeleteOutlined } from "@ant-design/icons";
+import { formatter, numberFormatter } from "../../../utils/fomater";
 
 const { Option } = Select;
 
-const ProductsPage = ({ onAddProduct ,onUpdateProduct}) => {
+const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
   const [products, setProducts] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -31,7 +37,11 @@ const ProductsPage = ({ onAddProduct ,onUpdateProduct}) => {
   const pageSize = 10;
 
   const handleEdit = (productId) => {
-    onUpdateProduct(productId); // Gọi hàm xử lý với ID sản phẩm
+    onUpdateProduct(productId);
+  };
+
+  const handleClickBienThe = (productId) => {
+    onClickBT(productId);
   };
 
   useEffect(() => {
@@ -41,9 +51,13 @@ const ProductsPage = ({ onAddProduct ,onUpdateProduct}) => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("api/sanpham/getlistSanPham");
-      const productsWithKeys = response.data
-        .filter((product) => product.TinhTrang !== "Đã xóa") 
+      const userId = localStorage.getItem("userId");
+      // const response = await axios.get(
+      //   `api/sanpham/getlistSanPhamAdmin/${userId}`
+      // );
+      const products = await fetchProductListAdmin(userId);
+      const productsWithKeys = products
+        .filter((product) => product.TinhTrang !== "Đã xóa")
         .map((product) => ({
           ...product,
           key: product._id,
@@ -69,11 +83,11 @@ const ProductsPage = ({ onAddProduct ,onUpdateProduct}) => {
     console.log("Danh mục đã chọn:", value);
   };
 
-
   const deleteProductHandler = async (id) => {
     console.log("ID sản phẩm để xóa:", id);
     try {
-      await axios.put(`/api/sanpham/deleteSanPham/${id}`);
+      // await axios.put(`/api/sanpham/deleteSanPham/${id}`);
+      await deleteProduct(id);
       fetchProducts();
       message.success("Xóa sản phẩm thành công");
     } catch (error) {
@@ -101,8 +115,6 @@ const ProductsPage = ({ onAddProduct ,onUpdateProduct}) => {
     setIsModalVisible(false);
   };
 
-
-
   const expandedRowRender = (record) => {
     return (
       <div className="expanded-row-actions">
@@ -110,14 +122,15 @@ const ProductsPage = ({ onAddProduct ,onUpdateProduct}) => {
         <a onClick={() => handleEdit(record)}>Chỉnh sửa</a> |
         <a href={`/detail/${record._id}`} rel="noopener noreferrer">
           Xem thử
-        </a>| 
-        <a onClick={() => message.info("Sao chép ID")}>Sao chép</a> |
+        </a>
+        |<a onClick={() => message.info("Sao chép ID")}>Sao chép</a> |
+        <a onClick={() => handleClickBienThe(record)}>Xem biến thể</a> |
         <Popconfirm
-            title="Bạn có chắc chắn muốn xóa sản phẩm này không?"
-            onConfirm={() => deleteProductHandler(record._id)}
-          >
-            <Button icon={<DeleteOutlined />} style={{ marginLeft: '8px' }} />
-          </Popconfirm>
+          title="Bạn có chắc chắn muốn xóa sản phẩm này không?"
+          onConfirm={() => deleteProductHandler(record._id)}
+        >
+          <Button icon={<DeleteOutlined />} style={{ marginLeft: "8px" }} />
+        </Popconfirm>
       </div>
     );
   };
@@ -159,11 +172,13 @@ const ProductsPage = ({ onAddProduct ,onUpdateProduct}) => {
       title: "Giá bán",
       dataIndex: "DonGiaBan",
       key: "DonGiaBan",
+      render: (value) => formatter(value),
     },
     {
       title: "Số lượng hiện tại",
       dataIndex: "SoLuongHienTai",
       key: "SoLuongHienTai",
+      render: (value) => numberFormatter(value),
     },
     {
       title: "Tình trạng",

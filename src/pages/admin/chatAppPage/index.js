@@ -1,149 +1,347 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./style.scss";
 import { FaPaperPlane, FaSmile, FaImage } from "react-icons/fa";
 import axios from "axios";
 import { io } from "socket.io-client";
+import {
+  getListConversations,
+  createConversation,
+  getListConversationsForCurrentUser,
+  uploadFile,
+} from "../../../api/chatSocket";
 
 const ChatApp = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
   const [socket, setSocket] = useState(null);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [notification, setNotification] = useState("");
+  const fileInputRef = useRef(null);
+  const messageEndRef = useRef(null);
 
-  // Kết nối với server Socket.IO khi component được mount
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const getUserIdFromToken = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.data;
+    }
+    return null;
+  };
+
+  const currentUserId = getUserIdFromToken();
+
   useEffect(() => {
-    const newSocket = io("https://peacock-wealthy-vaguely.ngrok-free.app");
-
-    newSocket.on("connect", () => {
-      console.log("Connected to Socket.IO server"); // Log khi kết nối thành công
+    const chatUserId = localStorage.getItem("userId");
+    const newSocket = io("http://localhost:5000", {
+      transports: ["websocket"],
+      auth: { token: localStorage.getItem("token") },
     });
 
     setSocket(newSocket);
 
-    return () => {
-      newSocket.close(); // Đóng kết nối khi component unmount
-    };
-  }, []);
+    newSocket.on("connect", () => {
+      console.log("Socket đã kết nối thành công");
 
-  // Gọi API lấy danh sách người dùng khi component được render
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("/api/user/showAllUser");
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách người dùng:", error);
+      if (chatUserId) {
+        // Kiểm tra nếu cuộc trò chuyện với người dùng này đã tồn tại
+        fetchConversations(currentUserId).then((conversations = []) => {
+          const existingConversation = conversations.find(
+            (conv) =>
+              (conv.sender_id._id === currentUserId &&
+                conv.receiver_id._id === chatUserId) ||
+              (conv.receiver_id._id === currentUserId &&
+                conv.sender_id._id === chatUserId)
+          );
+
+          if (!existingConversation) {
+            // Tạo cuộc trò chuyện nếu chưa có
+            createConversation(currentUserId, chatUserId).then(() => {
+              fetchConversations(currentUserId); // Cập nhật lại danh sách người dùng sau khi tạo
+            });
+          } else {
+            // Đã tồn tại cuộc trò chuyện, chỉ cần cập nhật danh sách người dùng
+            fetchConversations(currentUserId);
+          }
+        });
+      } else {
+        // Lấy danh sách cuộc trò chuyện nếu không có userId
+        fetchConversations(currentUserId);
       }
-    };
-
-    fetchUsers();
-  }, []);
-
-  // Lắng nghe sự kiện tin nhắn từ server
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("chat message", (msg) => {
-      console.log("Received message:", msg); // Log tin nhắn nhận được
-      setMessages((prevMessages) => [...prevMessages, msg]);
     });
 
     return () => {
-      socket.off("chat message"); // Hủy lắng nghe khi component unmount
+      newSocket.close();
     };
-  }, [socket]);
+  }, []);
 
-  // Xử lý chọn người dùng và lấy cuộc hội thoại
-  const handleUserSelect = async (user) => {
-    try {
-      setSelectedUser(user);
-      const response = await axios.post("/api/chatsocket/Createconversation", {
-        sender_id: "66e25844ba1b7282d0163d33", // Thay bằng ID của người dùng hiện tại
-        receiver_id: user.id,
-      });
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-      const conversation = response.data;
-      console.log("Cuộc hội thoại:", conversation); // Log cuộc hội thoại
-
-      if (conversation.messages) {
-        setMessages(conversation.messages);
-      } else {
-        setMessages([]);
-      }
-      setError(null);
-    } catch (err) {
-      console.error("Lỗi khi tạo cuộc hội thoại:", err);
-      setError("Không thể tạo hoặc tìm cuộc hội thoại.");
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFilePreview(URL.createObjectURL(file));
     }
-
-    await fetchConversations(user._id);
   };
 
-  // Gọi API lấy danh sách cuộc hội thoại
-  const fetchConversations = async (sender_id) => {
+  const fetchConversations = async (userId) => {
     try {
-      const response = await axios.get(
-        `/api/chatsocket/getlistconversation12/${sender_id}`
-      );
-      console.log("Dữ liệu cuộc hội thoại:", response.data); // Log dữ liệu cuộc hội thoại
+      // const response = await axios.get(
+      //   `/api/chatsocket/getlistconversation12/${userId}`
+      // );
+      // const conversations = response.data || [];
 
-      if (response.data.length > 0) {
-        const conversationMessages = response.data[0].messages;
-        setMessages(conversationMessages);
+      const conversations = await getListConversations(userId);
+
+      if (Array.isArray(conversations)) {
+        setNotification(
+          conversations.length === 0 ? "Không có cuộc hội thoại nào." : ""
+        );
+
+        const uniqueUsers = conversations
+          .map((conv) =>
+            conv.sender_id._id === userId ? conv.receiver_id : conv.sender_id
+          )
+          .filter(
+            (user, index, self) =>
+              user._id !== userId &&
+              index === self.findIndex((u) => u._id === user._id)
+          );
+
+        setUsers(uniqueUsers); // Cập nhật danh sách người dùng
       } else {
-        setMessages([]);
+        console.error("Dữ liệu hội thoại không phải là mảng");
+        setNotification("Chưa có hội thoại nào.");
       }
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách cuộc hội thoại:", error);
+      console.error("Lỗi khi lấy hội thoại:", error);
+      setNotification("Chưa có hội thoại nào.");
     }
   };
 
-  // Xử lý gửi tin nhắn
-  const handleSend = () => {
-    if (input.trim() === "" || !selectedUser) return;
-
-    const message = { text: input, sender: "You", receiver: selectedUser.id };
-
-    // Gửi tin nhắn tới server
-    socket.emit("chat message", message);
-
-    // Cập nhật tin nhắn vào state
-    setMessages([...messages, message]);
-    setInput("");
-
-    // Mô phỏng phản hồi sau 1 giây
-    setTimeout(() => {
-      const responseMessage = {
-        text: "Xin chào! Bạn khỏe không?",
-        sender: "Other",
-      };
-      setMessages((prev) => [...prev, responseMessage]);
-    }, 1000);
+  const createConversation = async (senderId, receiverId) => {
+    try {
+      // const response = await axios.post("/api/chatsocket/Createconversation", {
+      //   sender_id: senderId,
+      //   receiver_id: receiverId,
+      // });
+      // return response.data;
+      const conversation = await createConversation(senderId, receiverId);
+      console.log("Cuộc trò chuyện mới:", conversation);
+    } catch (error) {
+      console.error("Lỗi khi tạo hội thoại:", error);
+    }
   };
+
+  const handleUserSelect = async (user) => {
+    const token = localStorage.getItem("token");
+    if (selectedUser && selectedUser._id === user._id) return;
+
+    console.log("Người dùng được chọn:", user);
+    setSelectedUser(user);
+
+    console.log("ID người dùng hiện tại:", currentUserId);
+
+    try {
+      // const response = await axios.get(
+      //   `/api/chatsocket/getlistconversation12/${currentUserId}`
+      // );
+      // console.log("Phản hồi từ API:", response.data);
+
+      // const conversation = response.data.find(
+      //   (conv) =>
+      //     (conv.sender_id._id === currentUserId &&
+      //       conv.receiver_id._id === user._id) ||
+      //     (conv.receiver_id._id === currentUserId &&
+      //       conv.sender_id._id === user._id)
+      // );
+
+      const conversations = await getListConversationsForCurrentUser(
+        currentUserId
+      );
+      const conversation = conversations.find(
+        (conv) =>
+          (conv.sender_id._id === currentUserId &&
+            conv.receiver_id._id === user._id) ||
+          (conv.receiver_id._id === currentUserId &&
+            conv.sender_id._id === user._id)
+      );
+
+      if (conversation) {
+        console.log("Hội thoại tìm thấy:", conversation);
+        setSelectedConversationId(conversation._id);
+        setMessages(conversation.messages);
+
+        // Kiểm tra nếu socket đã được kết nối
+        if (socket && socket.connected) {
+          socket.emit("join", { conversationId: conversation._id, token });
+        } else {
+          console.error("Socket chưa được kết nối.");
+        }
+      } else {
+        console.log("Không tìm thấy hội thoại với người này, tạo mới...");
+        await createConversation(currentUserId, user._id);
+        await fetchConversations(currentUserId); // Cập nhật lại danh sách người dùng
+      }
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm hội thoại:", error);
+    }
+  };
+
+  const handleSend = async () => {
+    if (input.trim() === "" && !selectedFile) return;
+
+    let message = {
+      text: input,
+      msgByUserId: currentUserId,
+      receiver: selectedUser,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (selectedFile) {
+      const formData = new FormData();
+      if (selectedFile.type.startsWith("image/")) {
+        formData.append("image", selectedFile);
+      } else if (selectedFile.type.startsWith("video/")) {
+        formData.append("video", selectedFile);
+      }
+
+      try {
+        // const uploadResponse = await axios.post(
+        //   "/api/user/upload_ImageOrVideo",
+        //   formData,
+        //   {
+        //     headers: {
+        //       "Content-Type": "multipart/form-data",
+        //     },
+        //   }
+        // );
+
+        // const { imageUrl, videoUrl } = uploadResponse.data;
+
+        const uploadResponse = await uploadFile(selectedFile);
+        const { imageUrl, videoUrl } = uploadResponse;
+
+        if (imageUrl) {
+          message.imageUrl = imageUrl;
+        }
+        if (videoUrl) {
+          message.videoUrl = videoUrl;
+        }
+
+        setSelectedFile(null);
+        setFilePreview(null);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        return;
+      }
+    }
+
+    const token = localStorage.getItem("token");
+
+    socket.emit(
+      "sendMessage",
+      {
+        conversationId: selectedConversationId,
+        ...message,
+        token, // Truyền thêm token vào dữ liệu gửi đi
+      },
+      (response) => {
+        if (response.success) {
+          setMessages((prevMessages) => [...prevMessages, message]);
+        } else {
+          console.error("Gửi tin nhắn không thành công:", response.message);
+        }
+      }
+    );
+
+    setInput("");
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSend();
+    }
+  };
+
+  useEffect(() => {
+    if (!socket || !selectedConversationId) return;
+    const handleMessage = (msg) => {
+      console.log("Tin nhắn nhận được:", msg);
+      if (msg.conversationId === selectedConversationId) {
+        setMessages((prevMessages) => [...prevMessages, msg.message]);
+      }
+    };
+    socket.on("message", handleMessage);
+    return () => {
+      socket.off("message", handleMessage);
+    };
+  }, [socket, selectedConversationId]);
 
   return (
     <div className="fb-chat-container">
       <div className="fb-user-list">
         <h3>Danh sách người dùng</h3>
+        {notification && <p className="notification">{notification}</p>}{" "}
+        {/* Hiển thị thông báo */}
         <ul>
-          {users.map((user) => (
-            <li key={user._id} onClick={() => handleUserSelect(user)}>
-              <img src="https://via.placeholder.com/40" alt={user.anhDaiDien} />
-              <span>{user.tenNguoiDung}</span>
+          {users.map((user, index) => (
+            <li
+              key={`${user._id}-${index}`}
+              onClick={() => handleUserSelect(user)}
+            >
+              <img
+                src={
+                  user.anhDaiDien
+                    ? user.anhDaiDien
+                    : "https://via.placeholder.com/40"
+                }
+                alt={user.tenNguoiDung || "Người dùng không có tên"}
+              />
+              <span>{user.tenNguoiDung || "Người dùng không xác định"}</span>{" "}
             </li>
           ))}
         </ul>
       </div>
 
       <div className="fb-chat-box">
+        {selectedUser && (
+          <div className="fb-user-info">
+            <img
+              src={
+                selectedUser.anhDaiDien
+                  ? selectedUser.anhDaiDien
+                  : "https://via.placeholder.com/40"
+              }
+              alt={selectedUser.tenNguoiDung || "Người dùng không xác định"}
+            />
+            <h4>{selectedUser.tenNguoiDung || "Người dùng không xác định"}</h4>
+            {selectedUser.soDienThoai && (
+              <>
+                <span className="separator">|</span>
+                <p className="user-phone">{selectedUser.soDienThoai}</p>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="fb-message-list">
           {messages.map((msg, index) => (
             <div
               key={index}
               className={`fb-message ${
-                msg.sender === "You" ? "right" : "left"
+                msg.msgByUserId === currentUserId ? "right" : "left"
               }`}
             >
               {msg.text && <span>{msg.text}</span>}
@@ -151,28 +349,38 @@ const ChatApp = () => {
               {msg.videoUrl && (
                 <video controls>
                   <source src={msg.videoUrl} type="video/mp4" />
-                  Your browser does not support the video tag.
+                  Trình duyệt của bạn không hỗ trợ thẻ video.
                 </video>
               )}
             </div>
           ))}
+          <div ref={messageEndRef} />
         </div>
 
         <div className="fb-input-container">
-          <button className="icon-btn">
-            <FaSmile />
-          </button>
-          <button className="icon-btn">
-            <FaImage />
-          </button>
+          {filePreview && (
+            <div className="file-preview">
+              <img src={filePreview} alt="File Preview" />
+              <button onClick={() => setSelectedFile(null)}>Xóa</button>
+            </div>
+          )}
           <input
             type="text"
-            placeholder="Aa"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Nhập tin nhắn..."
+            onKeyDown={handleKeyDown} // Thêm sự kiện ở đây
           />
-          <button className="send-btn" onClick={handleSend}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+          <button onClick={handleImageClick}>
+            <FaImage />
+          </button>
+          <button onClick={handleSend}>
             <FaPaperPlane />
           </button>
         </div>

@@ -1,0 +1,188 @@
+// .user-detail {
+//   font-family: 'Arial', sans-serif;
+//   max-width: 800px;
+//   margin: 0 auto;
+//   padding: 20px;
+//   background-color: #f9f9f9;
+//   border-radius: 10px;
+//   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+// }
+
+
+// .user-detail-info {
+//   display: flex;
+//   // align-items: center;
+//   margin-top: 15px;
+//   justify-content: space-between;
+//   background-color: #fff;
+//   padding: 20px;
+//   border-radius: 8px;
+//   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+// }
+
+// .user-avatar {
+//   border-radius: 50%;
+//   object-fit: cover;
+//   margin-right: 20px;
+//   transition: transform 0.3s ease-in-out;
+// }
+
+// .user-avatar:hover {
+//   transform: scale(1.1);
+// }
+
+// .user-info {
+//   flex: 1;
+// }
+
+// .user-info p {
+//   font-size: 16px;
+//   line-height: 1.6;
+//   color: #555;
+//   margin-bottom: 10px;
+// }
+
+// .user-info strong {
+//   color: #333;
+// }
+
+// .user-info p:last-child {
+//   margin-bottom: 0;
+// }
+
+// .error-message {
+//   color: #d9534f;
+//   text-align: center;
+//   font-size: 18px;
+// }
+
+// .loading-message {
+//   text-align: center;
+//   font-size: 18px;
+//   color: #5bc0de;
+// }
+
+// .parent-checkbox {
+//   display: flex;
+//   align-items: center;
+//   margin-bottom: 20px;
+//   font-weight: bold;
+//   input {
+//     width: 20px;
+//     margin-right: 10px;
+//   }
+// }
+
+// .child-checkboxes {
+//   display: flex; /* Giữ các checkbox con nằm ngang */
+//   align-items: center; /* Căn giữa checkbox và text theo chiều dọc */
+//   gap: 15px; /* Tăng khoảng cách giữa các checkbox con */
+// }
+
+// .child-checkbox {
+//   display: flex;
+//   align-items: center; /* Căn giữa checkbox và text */
+// }
+
+// .child-checkbox input[type="checkbox"] {
+//   width: 20px;
+//   height: 20px;
+//   margin-right: 8px; /* Tạo khoảng cách giữa checkbox và text */
+//   cursor: pointer;
+//   transition: all 0.2s ease;
+//   border: 2px solid #ddd;
+//   border-radius: 4px;
+//   background-color: white;
+// }
+
+// .checkbox-group {
+//   margin-top: 20px;
+// }
+
+// const userId = localStorage.getItem("userIdDetail");
+
+
+.user-detail {
+
+    .user-detail-info {
+        margin-top: 15px;
+    }
+    .permission-group {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f4f4f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    .permission-group h3 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+  
+    .permission-group label {
+      display: inline-block;
+      margin-right: 15px;
+      font-size: 16px;
+      color: #555;
+    }
+  
+    .permission-group input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+      margin-right: 5px;
+      transform: scale(1.2);
+    }
+  
+    .permission-group input[type="checkbox"]:checked {
+      background-color: #4caf50;
+      border-color: #4caf50;
+    }
+  
+    .permission-group input[type="checkbox"]:focus {
+      outline: none;
+      box-shadow: 0 0 3px rgba(66, 133, 244, 0.5);
+    }
+  
+    button {
+      margin-top: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+  
+      &:hover {
+        background-color: #0056b3;
+      }
+  
+      &:active {
+        background-color: #003f7f;
+      }
+    }
+  
+    .btn-back {
+      background-color: #f1f1f1;
+      color: #333;
+      border: 1px solid #ddd;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+  
+      &:hover {
+        background-color: #ddd;
+      }
+  
+      &:active {
+        background-color: #bbb;
+      }
+    }
+  }
+  

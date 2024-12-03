@@ -11,7 +11,15 @@ import {
 } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
-
+import {
+  getDanhMucList,
+  deleteDanhMucCha,
+  deleteDanhMucCon,
+  updateDanhMucCha,
+  createDanhMucCha,
+  updateDanhMucCon,
+  createDanhMucCon,
+} from "../../../api/danhMucService";
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -21,17 +29,19 @@ const CategoriesPage = () => {
   const [editRecord, setEditRecord] = useState(null);
   const [isSubCategoryModalVisible, setIsSubCategoryModalVisible] =
     useState(false);
-    const [isEditingSubCategory, setIsEditingSubCategory] = useState(false);
-    const [currentSubCategoryId, setCurrentSubCategoryId] = useState(null);
+  const [isEditingSubCategory, setIsEditingSubCategory] = useState(false);
+  const [currentSubCategoryId, setCurrentSubCategoryId] = useState(null);
 
-    const [subCategoryForm] = Form.useForm();
+  const [subCategoryForm] = Form.useForm();
   const [form] = Form.useForm();
 
   // Fetch categories from API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/api/danhmuc/getlistDanhMuc");
-      setCategories(response.data);
+      // const response = await axios.get("/api/danhmuc/getlistDanhMuc");
+      // setCategories(response.data);
+      const data = await getDanhMucList();
+      setCategories(data);
     } catch (error) {
       console.error("Lỗi khi lấy danh mục:", error);
       message.error("Lấy danh mục thất bại");
@@ -45,7 +55,8 @@ const CategoriesPage = () => {
   // Handle delete category
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/danhmuc/deleteDanhMucCha/${id}`);
+      // await axios.delete(`/api/danhmuc/deleteDanhMucCha/${id}`);
+      await deleteDanhMucCha(id);
       message.success("Xóa danh mục thành công");
       fetchCategories();
     } catch (error) {
@@ -57,10 +68,10 @@ const CategoriesPage = () => {
   // Handle subcategory deletion
   const deleteSubCategoryHandler = async (parentRecord, subCategoryId) => {
     try {
-      const response = await axios.delete(
-        `/api/danhmuc/deleteDanhMucCon/${parentRecord._id}/${subCategoryId}`
-      );
-      console.log("Response:", response); // kiểm tra phản hồi từ API
+      // const response = await axios.delete(
+      //   `/api/danhmuc/deleteDanhMucCon/${parentRecord._id}/${subCategoryId}`
+      // );
+      await deleteDanhMucCon(parentRecord._id, subCategoryId);
       message.success("Xóa danh mục con thành công");
 
       // Fetch updated categories after deletion
@@ -71,12 +82,11 @@ const CategoriesPage = () => {
     }
   };
 
-  // Show modal to add/edit category
-  // Show modal to add/edit category
   const showModal = (category = null) => {
     if (category) {
       setIsEditing(true);
       setCurrentCategoryId(category._id); // Set the current category ID
+      setEditRecord(category); // Cập nhật editRecord với dữ liệu danh mục hiện tại
       form.setFieldsValue({
         IDDanhMuc: category.IDDanhMuc,
         TenDanhMuc: category.TenDanhMuc,
@@ -86,6 +96,7 @@ const CategoriesPage = () => {
       setImagePreview(category.AnhDanhMuc);
     } else {
       setIsEditing(false);
+      setEditRecord(null); // Đặt lại editRecord để đảm bảo không giữ lại dữ liệu cũ
       form.resetFields();
       setImagePreview(null); // Clear the image preview when adding new category
     }
@@ -123,22 +134,24 @@ const CategoriesPage = () => {
       }
 
       if (isEditing) {
-        await axios.put(
-          `/api/danhmuc/updateDanhMucCha/${currentCategoryId}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        // await axios.put(
+        //   `/api/danhmuc/updateDanhMucCha/${currentCategoryId}`,
+        //   formData,
+        //   {
+        //     headers: {
+        //       "Content-Type": "multipart/form-data",
+        //     },
+        //   }
+        // );
+        await updateDanhMucCha(currentCategoryId, formData);
         message.success("Cập nhật danh mục thành công");
       } else {
-        await axios.post("/api/danhmuc/createDanhMucCha", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        // await axios.post("/api/danhmuc/createDanhMucCha", formData, {
+        //   headers: {
+        //     "Content-Type": "multipart/form-data",
+        //   },
+        // });
+        await createDanhMucCha(formData);
         message.success("Thêm danh mục thành công");
       }
 
@@ -153,13 +166,14 @@ const CategoriesPage = () => {
   };
 
   const showSubCategoryModal = (categoryId) => {
-    setCurrentCategoryId(categoryId); // Set the current category ID for the subcategory
+    setCurrentCategoryId(categoryId);
+    setIsEditingSubCategory(false); // Đảm bảo modal ở trạng thái thêm mới
     setIsSubCategoryModalVisible(true);
-    subCategoryForm.resetFields(); // Reset form when opening subcategory modal
+    subCategoryForm.resetFields(); // Reset form khi mở modal thêm danh mục con
   };
 
-   // Hiển thị modal chỉnh sửa danh mục con
-   const showEditSubCategoryModal = (categoryId,subCategory) => {
+  // Hiển thị modal chỉnh sửa danh mục con
+  const showEditSubCategoryModal = (categoryId, subCategory) => {
     setCurrentCategoryId(categoryId);
     setIsEditingSubCategory(true);
     setCurrentSubCategoryId(subCategory._id); // Ensure this is the right value
@@ -171,63 +185,69 @@ const CategoriesPage = () => {
     setIsSubCategoryModalVisible(true);
   };
 
-    // Xử lý gửi danh mục con đã chỉnh sửa
-    const handleEditSubCategory = async () => {
-      try {
-        const values = await subCategoryForm.validateFields();
-        const { IDDanhMucCon, TenDanhMucCon, MieuTa } = values;
-    
-        console.log('Editing subcategory with values:', values); // Log the values to check
-        console.log('Current Subcategory ID:', currentSubCategoryId); // Log the ID
-        console.log('Current category ID:', currentCategoryId); // Log the ID
+  // Xử lý gửi danh mục con đã chỉnh sửa
+  const handleEditSubCategory = async () => {
+    try {
+      const values = await subCategoryForm.validateFields();
+      const { IDDanhMucCon, TenDanhMucCon, MieuTa } = values;
 
-    
-        await axios.put(
-          `/api/danhmuc/updateDanhMucCon/${currentCategoryId}/${currentSubCategoryId}`,
-          { IDDanhMucCon, TenDanhMucCon, MieuTa }
-        );
-    
-        message.success("Cập nhật danh mục con thành công");
-        setIsSubCategoryModalVisible(false);
-        subCategoryForm.resetFields();
-        fetchCategories();
-      } catch (error) {
-        message.error("Cập nhật danh mục con thất bại");
-        console.error("Error updating subcategory:", error);
-      }
-    };
-    
+      console.log("Editing subcategory with values:", values); // Log the values to check
+      console.log("Current Subcategory ID:", currentSubCategoryId); // Log the ID
+      console.log("Current category ID:", currentCategoryId); // Log the ID
 
-    // Handle subcategory creation
-    const handleCreateSubCategory = async () => {
-      try {
-        const values = await subCategoryForm.validateFields(); // Ensure using the correct form
-        const { IDDanhMucCon, TenDanhMucCon, MieuTa } = values;
-    
-        // Debugging log
-        console.log("Creating subcategory with values:", {
-          IDDanhMucCon,
-          TenDanhMucCon,
-          MieuTa,
-        });
-    
-        const response = await axios.post(
-          `/api/danhmuc/createDanhMucCon/${currentCategoryId}`,
-          { IDDanhMucCon, TenDanhMucCon, MieuTa }
-        );
-        
-        console.log("Subcategory response:", response);
-        message.success("Thêm danh mục con thành công");
-        setIsSubCategoryModalVisible(false);
-        subCategoryForm.resetFields();
-        fetchCategories(); // Refresh categories
-      } catch (error) {
-        message.error("Thêm danh mục con thất bại");
-        console.error("Error adding subcategory:", error);
-      }
-    };
-    
-    
+      // await axios.put(
+      //   `/api/danhmuc/updateDanhMucCon/${currentCategoryId}/${currentSubCategoryId}`,
+      //   { IDDanhMucCon, TenDanhMucCon, MieuTa }
+      // );
+
+      await updateDanhMucCon(currentCategoryId, currentSubCategoryId, {
+        IDDanhMucCon,
+        TenDanhMucCon,
+        MieuTa,
+      });
+      message.success("Cập nhật danh mục con thành công");
+      setIsSubCategoryModalVisible(false);
+      subCategoryForm.resetFields();
+      fetchCategories();
+    } catch (error) {
+      message.error("Cập nhật danh mục con thất bại");
+      console.error("Error updating subcategory:", error);
+    }
+  };
+
+  // Handle subcategory creation
+  const handleCreateSubCategory = async () => {
+    try {
+      const values = await subCategoryForm.validateFields(); // Ensure using the correct form
+      const { IDDanhMucCon, TenDanhMucCon, MieuTa } = values;
+
+      // Debugging log
+      console.log("Creating subcategory with values:", {
+        IDDanhMucCon,
+        TenDanhMucCon,
+        MieuTa,
+      });
+
+      // const response = await axios.post(
+      //   `/api/danhmuc/createDanhMucCon/${currentCategoryId}`,
+      //   { IDDanhMucCon, TenDanhMucCon, MieuTa }
+      // );
+      await createDanhMucCon(currentCategoryId, {
+        IDDanhMucCon,
+        TenDanhMucCon,
+        MieuTa,
+      });
+
+      // console.log("Subcategory response:", response);
+      message.success("Thêm danh mục con thành công");
+      setIsSubCategoryModalVisible(false);
+      subCategoryForm.resetFields();
+      fetchCategories(); // Refresh categories
+    } catch (error) {
+      message.error("Thêm danh mục con thất bại");
+      console.error("Error adding subcategory:", error);
+    }
+  };
 
   const columns = [
     {
@@ -271,7 +291,9 @@ const CategoriesPage = () => {
                   icon={<EditOutlined />}
                   size="small"
                   style={{ color: "#1890ff" }}
-                  onClick={() => showEditSubCategoryModal(parentRecord._id,subCategory)}
+                  onClick={() =>
+                    showEditSubCategoryModal(parentRecord._id, subCategory)
+                  }
                 />
                 <Popconfirm
                   title="Bạn có chắc chắn muốn xóa danh mục con này không?"
@@ -288,7 +310,12 @@ const CategoriesPage = () => {
               </div>
             </div>
           ))}
-           <Button type="link" onClick={() => showSubCategoryModal(parentRecord._id)}>+ Thêm danh mục con</Button>
+          <Button
+            type="link"
+            onClick={() => showSubCategoryModal(parentRecord._id)}
+          >
+            + Thêm danh mục con
+          </Button>
         </>
       ),
     },
@@ -384,23 +411,31 @@ const CategoriesPage = () => {
       </Modal>
 
       <Modal
-        title={isEditingSubCategory ? "Cập nhật danh mục con" : "Thêm danh mục con"}
+        title={
+          isEditingSubCategory ? "Cập nhật danh mục con" : "Thêm danh mục con"
+        }
         visible={isSubCategoryModalVisible}
-        onOk={isEditingSubCategory ? handleEditSubCategory : handleCreateSubCategory}
+        onOk={
+          isEditingSubCategory ? handleEditSubCategory : handleCreateSubCategory
+        }
         onCancel={() => setIsSubCategoryModalVisible(false)}
       >
         <Form form={subCategoryForm} layout="vertical" name="sub_category_form">
           <Form.Item
             name="IDDanhMucCon"
             label="ID Danh Mục Con"
-            rules={[{ required: true, message: "Vui lòng nhập ID danh mục con!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập ID danh mục con!" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="TenDanhMucCon"
             label="Tên danh mục con"
-            rules={[{ required: true, message: "Vui lòng nhập tên danh mục con!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tên danh mục con!" },
+            ]}
           >
             <Input />
           </Form.Item>

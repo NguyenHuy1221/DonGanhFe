@@ -1,0 +1,129 @@
+// .user-list {
+//   display: flex;
+//   flex-direction: column;
+//   // min-height: 100vh; /* Đảm bảo không gian cho toàn bộ nội dung */
+//   padding-bottom: 60px; /* Dành không gian cho phân trang */
+//   font-size: 16px; /* Giảm kích thước font chung cho toàn bộ bảng */
+//   position: relative;
+// }
+
+// .user-tr:hover {
+//   background-color: #f1f1f1;
+// }
+
+// .filter-container {
+//   display: flex;
+//   justify-content: flex-end;
+//   align-items: center;
+//   gap: 10px; // Khoảng cách giữa các phần tử
+//   margin-bottom: 15px;
+//   padding: 10px;
+// }
+
+// .search-bar {
+//   flex: 1;
+//   max-width: 30%; // Giới hạn độ rộng tối đa của thanh tìm kiếm ở 50%
+// }
+
+// .search-bar input {
+//   width: 100%;
+//   padding: 8px;
+//   font-size: 14px;
+//   border: 1px solid #ccc;
+//   border-radius: 4px;
+// }
+
+// .filter {
+//   display: flex;
+//   align-items: center;
+// }
+
+// .filter label {
+//   font-size: 14px;
+//   margin-right: 8px;
+// }
+
+// .filter select {
+//   padding: 8px;
+//   font-size: 14px;
+//   border: 1px solid #ccc;
+//   border-radius: 4px;
+// }
+
+// .role-select {
+//   padding: 8px;
+//   margin: 8px 0;
+//   border: 1px solid #ccc;
+//   border-radius: 4px;
+//   font-size: 14px;
+// }
+
+// table.user-table {
+//   flex-grow: 1;
+//   width: 100%;
+//   border-collapse: collapse;
+// }
+
+// .user-th, .user-td {
+//   padding: 6px 10px; /* Giảm padding cho các ô */
+//   text-align: left;
+//   border-bottom: 1px solid #ddd;
+// }
+
+// .user-td {
+//   font-size: 16px; /* Giảm kích thước font cho dữ liệu bên trong */
+// }
+
+// .user-td img {
+//   border-radius: 50%;
+//   width: 28px;  /* Giảm kích thước ảnh */
+//   height: 28px;
+// }
+
+// .pagination {
+//   position: absolute; /* Đặt phân trang ở vị trí cố định */
+//   bottom: 0; /* Đặt phân trang ở cuối trang */
+//   left: 0;
+//   width: 100%; /* Chiều rộng bằng 100% */
+//   display: flex;
+//   justify-content: center;
+//   padding: 8px 0;
+//   font-size: 12px; /* Giảm kích thước font cho phân trang */
+// }
+
+// .pagination-btn {
+//   padding: 4px 8px; /* Giảm kích thước nút phân trang */
+//   margin: 0 3px;
+//   border: 1px solid #ccc;
+//   background-color: #f3f3f3;
+//   cursor: pointer;
+//   font-size: 12px;
+// }
+
+// .pagination-btn.disabled {
+//   cursor: not-allowed;
+//   opacity: 0.5;
+// }
+
+// .pagination-btn.active {
+//   background-color: #007bff;
+//   color: white;
+// }
+
+.user-td {
+  text-align: center;
+  font-weight: bold;
+
+  &.business-yes {
+    color: #0eb366;  
+  }
+
+  &.business-no {
+    color: #b11421;  
+  }
+}
+
+
+.custom-width {
+  width: 100%; 
+}

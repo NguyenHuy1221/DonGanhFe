@@ -25,12 +25,29 @@ export const addToCart = async (userId, productDetails) => {
 
 export const updateCart = async (cartId, updatedCartItems) => {
   try {
+    // Đảm bảo đường dẫn API chính xác
     const response = await axios.put(`/api/cart/gioHang/${cartId}`, {
-      chiTietGioHang: updatedCartItems,
+      chiTietGioHang: updatedCartItems, // Gửi đúng dữ liệu cần thiết
     });
+
+    // Trả về dữ liệu từ API
     return response.data;
   } catch (error) {
     console.error("Error updating cart:", error);
+
+    // In chi tiết lỗi ra console để bạn có thể dễ dàng debug
+    if (error.response) {
+      // Nếu có lỗi từ server, in chi tiết lỗi
+      console.error("Server Error:", error.response.data);
+    } else if (error.request) {
+      // Nếu không có phản hồi từ server
+      console.error("No response from server:", error.request);
+    } else {
+      // Các lỗi khác
+      console.error("Error Message:", error.message);
+    }
+
+    // Ném lỗi ra ngoài để xử lý
     throw error;
   }
 };

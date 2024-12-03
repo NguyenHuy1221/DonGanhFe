@@ -1,0 +1,252 @@
+/* Cấu trúc chính */
+.flash_sale {
+    max-height: 800px;
+    overflow: hidden !important;
+  }
+  
+  .sec-box-white {
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+  
+  .sec-box-white .entry-head {
+    margin: -20px -20px 20px;
+    background-color: #fff;
+    z-index: 5;
+    position: relative;
+  }
+  
+  .entry-head .menuajax1 {
+    display: flex;
+    border-bottom: 1px solid #eee;
+  }
+  
+
+  .entry-head .menuajax1 a {
+    font-size: 16px;
+    padding: 14px 20px;
+    transition: 0.3s;
+    text-decoration: none;
+  }
+  
+  .entry-head .ht {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #373737;
+    font-weight: 700;
+    padding: 14px 20px;
+    text-transform: uppercase;
+    margin: 0;
+}
+  
+.ht {
+  font-family: 'Roboto', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.pdl {
+  padding-left: 50px;
+}
+.hot {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px !important;
+  font-weight: 500;
+  color: #555;
+  // margin-right: 20px;
+  padding: 10px 20px;
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover {
+    color: #2ecc71; // Màu nền khi hover
+    transform: translateY(-3px);  // Hiệu ứng nâng lên khi hover
+  }
+
+  &.active {
+    color: #2ecc71; // Màu nền khi hover
+
+  }
+}
+
+.xem-tat-ca {
+  margin-left: auto;  
+  font-size: 14px !important;
+  color: #555;
+
+  cursor: pointer;
+  padding: 10px;
+  text-decoration: none;
+  
+  &:hover {
+    color: #2980b9;
+  }
+}
+  
+  .owl-carousel .owl-item {
+    position: relative;
+    padding: 0 5px;
+    width: 230px;
+  }
+  
+  .owl-carousel .owl-stage {
+    margin-top: 20px;
+    display: flex;
+    width: fit-content;
+  }
+
+  .owl-stage1 {
+    padding-left: 10px;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 215px); /* Chiều rộng mỗi sản phẩm */
+    grid-template-rows: repeat(2, auto); /* Hiển thị 2 hàng */
+    gap: 7px; /* Khoảng cách giữa các sản phẩm */
+  
+  }
+
+  .owl-item1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+ 
+  .list-p-1 .item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    // padding: 10px;
+    border: 1px solid #E6E6E6;
+    border-radius: 5px;
+    background: #fff;
+    overflow: hidden;
+    min-height: 200px;
+  }
+  
+ 
+  
+  .list-p-1 .item h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #373737;
+    line-height: 1.7;
+    margin-bottom: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+
+  
+  .ratingresult,
+  .list-p-1 .item .ulmeta,
+  .list-p-1 .item .price {
+    margin-top: 5px;
+  }
+  
+  .ratingresult {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .ratingresult .total-reviews {
+    font-size: 13px;
+    color: #10723A;
+    list-style-type: none;
+    a {
+      text-decoration: none; 
+      margin-left: 5px;
+    }
+  }
+  
+  .list-p-1 .item .ulmeta {
+    font-size: 13px;
+    color: #A1A1A1;
+  }
+  
+  .list-p-1 .item .ulmeta span {
+    color: #10723A;
+  }
+  
+  .list-p-1 .item .price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .list-p-1 .item .price strong {
+    font-size: 18px;
+    color: #000;
+  }
+  
+  .list-p-1 .item .price span {
+    font-size: 12px;
+    text-decoration: line-through;
+    color: #9e9e9e;
+    margin-left: 5px;
+  }
+  
+  .line-2 {
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+  }
+  
+  .icon-star {
+    color: #ffc107;
+  }
+  
+  .detail_add_to_cart_3 {
+    width: 100%;
+    border-radius: 6px !important;
+    background-color: white !important;
+    color: #0A923C !important;
+    padding: 0 6px;
+  
+    span{
+      color: #10723A !important;
+      font-size: 24px;
+    }
+    
+  }
+  
+
+  
+  .owl-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+  }
+  
+  .owl-prev {
+    cursor: pointer;
+  }
+  
+  .owl-nav>.owl-prev {
+    left: 7px;
+  }
+  
+  .owl-nav>.owl-next {
+    right: 7px;
+  }
+  
+ 
+ 
+  .no-products {
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }

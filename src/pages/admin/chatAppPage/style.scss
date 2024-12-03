@@ -9,34 +9,56 @@
 
 /* Sidebar: danh sách bạn bè */
 .fb-user-list {
-  width: 25%;
-  background-color: white;
-  border-right: 1px solid #ddd;
-  padding: 20px;
-  overflow-y: auto;
+  width: 250px;
+  background-color: #fff; /* Nền trắng */
+  border-right: 1px solid #ddd; /* Đường viền bên phải */
+  overflow-y: auto; /* Cuộn nếu danh sách quá dài */
+  max-height: 100vh; /* Chiều cao tối đa */
 }
 
 .fb-user-list h3 {
-  margin-bottom: 10px;
+  padding: 15px;
+  background-color: #007bff; /* Màu nền của tiêu đề */
+  color: white; /* Màu chữ của tiêu đề */
+  text-align: center; /* Căn giữa tiêu đề */
+  margin: 0; /* Không có lề */
+  font-size: 1.25em; /* Kích thước chữ lớn hơn một chút */
 }
 
 .fb-user-list ul {
-  list-style: none;
-  padding: 0;
+  list-style: none; /* Xóa điểm đầu dòng */
+  padding: 0; /* Không có khoảng cách trong */
+  margin: 0; /* Không có khoảng cách ngoài */
 }
 
 .fb-user-list li {
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
+  display: flex; /* Dùng flex để căn chỉnh */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  padding: 10px 15px; /* Khoảng cách trong */
+  cursor: pointer; /* Hiển thị dấu chuột như con trỏ */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu nền */
 }
 
-.fb-user-list li img {
-  border-radius: 50%;
-  margin-right: 10px;
+.fb-user-list li:hover {
+  background-color: #f0f0f0; /* Màu nền khi hover */
 }
+
+.fb-user-list img {
+  border-radius: 50%; /* Hình ảnh tròn */
+  width: 40px; /* Kích thước cố định */
+  height: 40px; /* Kích thước cố định */
+  margin-right: 10px; /* Khoảng cách giữa ảnh và tên người dùng */
+}
+
+.fb-user-list span {
+  font-weight: bold; /* Chữ đậm cho tên người dùng */
+  color: #333; /* Màu chữ */
+  overflow: hidden; /* Ẩn phần chữ thừa */
+  white-space: nowrap; /* Không xuống dòng */
+  text-overflow: ellipsis; /* Hiệu ứng ba chấm nếu văn bản dài */
+}
+
+
 
 /* Cửa sổ chat chính */
 .fb-chat-box {
@@ -58,16 +80,45 @@
   margin-bottom: 10px;
 }
 
+
+.fb-chat-header {
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-weight: bold;
+}
+
+
 /* Tin nhắn của bạn (bên phải) */
 .fb-message.right {
-  background-color: #0084ff;
+  // background-color: #0084ff;
   color: white;
   align-self: flex-end;  /* Align message to the right */
-  padding: 10px;
+  // padding: 10px;
   border-radius: 15px 15px 0 15px;
   margin: 5px 0;
   max-width: 60%;
   word-wrap: break-word;
+
+  display: flex;
+  flex-direction: column;
+
+  video {
+    width: 300px;
+    height: auto;
+  }
+
+  img{
+    width: 300px;
+    height: auto;
+  }
+  span {
+    background-color: #0084ff;
+    padding: 10px;
+    border-radius: 15px 15px 0 15px;
+    margin-bottom: 5px;
+  }
 }
 
 /* Tin nhắn của người khác (bên trái) */
@@ -80,6 +131,21 @@
   margin: 5px 0;
   max-width: 60%;
   word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+
+  video {
+    width: 300px;
+    height: auto;
+  }
+  img {
+    width: 150px;
+    height: auto;
+    border: none; // Đảm bảo không có viền
+    border-radius: 0; // Loại bỏ bo góc nếu đã đặt trước đó
+  }
+
+  
 }
 
 /* Khung nhập tin nhắn */
@@ -121,3 +187,75 @@
 .fb-input-container .send-btn:hover {
   background-color: #006bbf;
 }
+
+
+.fb-input-container {
+  position: relative; // Đặt vị trí tương đối cho phần container
+
+  .input-area {
+    display: flex;
+    align-items: center;
+    width: 100%; // Chiều rộng đầy đủ cho input và preview
+  }
+
+  .file-preview {
+    display: flex;
+    align-items: center;
+    margin-left: 10px; // Thêm khoảng cách giữa input và preview
+
+    img, video {
+      max-width: 50px; // Kích thước của preview
+      max-height: 50px; // Chiều cao tối đa của preview
+      margin-right: 5px; // Khoảng cách giữa hình ảnh/video và nút xóa
+    }
+
+    button {
+      background-color: #ff4d4d; // Màu nền cho nút xóa
+      color: white; // Màu chữ cho nút xóa
+      border: none; // Bỏ viền cho nút xóa
+      border-radius: 4px; // Bo góc cho nút xóa
+      cursor: pointer; // Thay đổi con trỏ khi hover
+      padding: 2px 5px; // Padding cho nút xóa
+    }
+  }
+}
+
+.fb-user-info {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f3f3f3;
+  margin-bottom: 10px;
+}
+
+.fb-user-info img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.fb-user-info h4 {
+  font-size: 1.1em;
+  color: #333;
+  margin: 0;
+}
+
+.separator {
+  margin: 0 10px;  /* Thêm khoảng cách xung quanh dấu "|" */
+  font-size: 18px; /* Điều chỉnh kích thước dấu "|" */
+  color: #333; /* Màu sắc dấu "|" */
+}
+
+.user-phone {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+}
+
+.notification {
+  margin-top: 10px;
+}
+
+

@@ -2,9 +2,11 @@ import axios from "axios";
 
 const API_BASE_URL = "/api/thuoctinhgiatri";
 
-export const layDanhSachThuocTinhGiaTri = async () => {
+export const layDanhSachThuocTinhGiaTri = async (userId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getlistThuocTinhGiaTri`);
+    const response = await axios.get(
+      `${API_BASE_URL}/getlistThuocTinhGiaTri/${userId}`
+    );
     return response.data;
   } catch (error) {
     throw new Error("Lỗi khi lấy danh sách thuộc tính giá trị");
@@ -49,5 +51,17 @@ export const xoaThuocTinhGiaTri = async (id) => {
     throw new Error(
       error.response.data.message || "Lỗi khi xóa thuộc tính giá trị"
     );
+  }
+};
+
+export const getGiaTriThuocTinh = async (id) => {
+  try {
+    const response = await axios.get(
+      `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}`
+    );
+    return response.data; // Trả về dữ liệu nhận được từ API
+  } catch (error) {
+    console.error("Lỗi khi lấy giá trị thuộc tính:", error);
+    throw error; // Ném lỗi để component có thể xử lý
   }
 };

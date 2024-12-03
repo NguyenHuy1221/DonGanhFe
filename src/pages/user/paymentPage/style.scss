@@ -1,7 +1,7 @@
 .pd {
   width: 50%;
   // background-color: rebeccapurple;
-  margin: 20px;
+  margin: 20px 0 ;
   button {
     background-color: rebeccapurple;
   }
@@ -235,8 +235,26 @@ button:hover {
 
 /* Address display section */
 .displayed-address {
-  margin: 20px;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 5px;
+}
+
+
+.cart-summary img {
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+.store-section {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+
+
+
+.text-danger-custom {
+  color: #ff4d4d; /* Màu đỏ tùy chỉnh */
+  font-weight: bold; /* In đậm thêm nếu cần */
 }

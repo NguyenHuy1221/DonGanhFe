@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import "./style.scss";
+import { getHoaDonById } from "../../../api/hoaDonService";
 
-const ChiTietHoaDonPage = ({ quayLaiHoaDon }) => {
+const ChiTietHoaDonPage = ({ quayLaiHoaDon, onClickChat }) => {
   const { id } = useParams(); // Lấy ID hóa đơn từ URL
   const navigate = useNavigate(); // Điều hướng quay lại
   const [hoaDon, setHoaDon] = useState(null);
@@ -14,11 +15,17 @@ const ChiTietHoaDonPage = ({ quayLaiHoaDon }) => {
   const fetchHoaDon = async () => {
     try {
       const hoaDonId = localStorage.getItem("hoadonId");
-      const response = await axios.get(
-        `http://localhost:3000/api/hoadon/getHoaDonByHoaDonIdFullVersion/${hoaDonId}`
-      );
-      setHoaDon(response.data);
-      localStorage.removeItem("hoadonId");
+      // const response = await axios.get(
+      //   `/api/hoadon/getHoaDonByHoaDonIdFullVersion/${hoaDonId}`
+      // );
+      // setHoaDon(response.data);
+
+      // localStorage.removeItem("hoadonId");
+      const hoaDonData = await getHoaDonById(hoaDonId);
+
+      // Cập nhật dữ liệu hóa đơn vào state
+      setHoaDon(hoaDonData);
+      console.log("Dữ liệu hóa đơn:", hoaDonData);
     } catch (error) {
       console.error("Lỗi khi lấy thông tin hóa đơn:", error);
       setError("Không thể lấy thông tin hóa đơn");
@@ -36,7 +43,18 @@ const ChiTietHoaDonPage = ({ quayLaiHoaDon }) => {
 
   return (
     <div className="chi-tiet-hoa-don-container">
-      <h1>Chi Tiết Hóa Đơn</h1>
+      <div className="box_l_ct">
+        <button className="btn-back" onClick={quayLaiHoaDon}>
+          Quay Lại
+        </button>
+        <h1>Chi Tiết Hóa Đơn</h1>
+        <button
+          className="btn-message"
+          onClick={() => onClickChat(hoaDon.userId._id)}
+        >
+          Chát
+        </button>
+      </div>
 
       <div className="order-info">
         <p>
@@ -51,24 +69,24 @@ const ChiTietHoaDonPage = ({ quayLaiHoaDon }) => {
           <span
             className={`status ${
               hoaDon.TrangThai === 0
-                ? "pending-approval"
+                ? "ordered"
                 : hoaDon.TrangThai === 1
-                ? "paid"
+                ? "packaging"
                 : hoaDon.TrangThai === 2
-                ? "pending-payment"
+                ? "shipping"
                 : hoaDon.TrangThai === 3
-                ? "failed"
+                ? "completed"
                 : "canceled"
             }`}
           >
             {hoaDon.TrangThai === 0
-              ? "Đang chờ duyệt"
+              ? "Đặt hàng"
               : hoaDon.TrangThai === 1
-              ? "Đã thanh toán"
+              ? "Đóng gói"
               : hoaDon.TrangThai === 2
-              ? "Đang chờ thanh toán"
+              ? "Bắt đầu giao"
               : hoaDon.TrangThai === 3
-              ? "Thanh toán thất bại"
+              ? "Hoàn thành đơn hàng"
               : "Hủy"}
           </span>
         </p>
@@ -104,40 +122,35 @@ const ChiTietHoaDonPage = ({ quayLaiHoaDon }) => {
           </tr>
         </thead>
         <tbody>
-          {hoaDon.chiTietHoaDon.map((item) => (
-            <tr key={item._id}>
-              <td>{item.idBienThe.IDSanPham.TenSanPham}</td>
-              <td>{item.soLuong}</td>
-              <td>{item.donGia.toLocaleString()} VND</td>
-              <td>{(item.soLuong * item.donGia).toLocaleString()} VND</td>
-              <td>
-                <img
-                  src={item.idBienThe.IDSanPham.HinhSanPham}
-                  alt={item.idBienThe.IDSanPham.TenSanPham}
-                  style={{ width: "100px", height: "auto" }}
-                />
-              </td>
-            </tr>
-          ))}
+          {hoaDon.chiTietHoaDon.map((item) => {
+            // Kiểm tra nếu IDSanPham có tồn tại
+            const sanPham = item.idBienThe?.IDSanPham;
+            if (!sanPham) {
+              return null; // Nếu không có sản phẩm, bỏ qua mục này
+            }
+
+            return (
+              <tr key={item._id}>
+                <td>{sanPham.TenSanPham || "Không có tên sản phẩm"}</td>
+                <td>{item.soLuong}</td>
+                <td>{item.donGia.toLocaleString()} VND</td>
+                <td>{(item.soLuong * item.donGia).toLocaleString()} VND</td>
+                <td>
+                  <img
+                    src={sanPham.HinhSanPham || "/default-image.jpg"} // Hiển thị ảnh mặc định nếu không có ảnh
+                    alt={sanPham.TenSanPham}
+                    style={{ width: "100px", height: "auto" }}
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
       <div className="total-amount">
         <strong>Tổng Tiền:</strong> {hoaDon.TongTien.toLocaleString()} VND
       </div>
-
-      <a
-        className="payment-link"
-        href={hoaDon.payment_url}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Thanh Toán Ngay
-      </a>
-
-      <button className="btn-back" onClick={quayLaiHoaDon}>
-        Quay Lại
-      </button>
     </div>
   );
 };

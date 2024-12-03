@@ -1,0 +1,94 @@
+/* Title Styling */
+.km-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+/* Bold Text for Tên Khuyến Mãi Column */
+.km-table .km-ten-khuyen-mai {
+  font-weight: bold;
+  color: #333; /* Adjust color if needed */
+}
+
+
+/* Add Button Styling */
+.km-add-button {
+  background-color: #1890ff;
+  color: #fff;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.km-add-button:hover {
+  background-color: #40a9ff;
+  color: #fff;
+}
+
+/* Table Styling */
+.km-table {
+  width: 100%;
+}
+
+.km-table .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: bold;
+  color: #555;
+}
+
+.km-table .ant-table-tbody > tr > td {
+  padding: 12px;
+}
+
+.km-table .ant-table-row:hover {
+  background-color: #f1f1f1;
+}
+
+
+/* Modal Styling */
+.km-modal .ant-modal-header {
+  background-color: #fafafa;
+}
+
+.km-modal .ant-modal-title {
+  font-weight: bold;
+  color: #333;
+}
+
+.km-modal .ant-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Form Styling */
+.km-form {
+  padding: 16px;
+}
+
+.km-form-item {
+  margin-bottom: 16px;
+}
+
+.km-form-item label {
+  font-weight: 500;
+  color: #555;
+}
+
+.km-form-item .ant-input,
+.km-form-item .ant-input-number,
+.km-form-item .ant-picker {
+  width: 100%;
+  border-radius: 4px;
+}
+
+/* Success and Warning Message Styling */
+.ant-message-success .ant-message-notice-content {
+  background-color: #f6ffed;
+  color: #389e0d;
+}
+
+.ant-message-error .ant-message-notice-content {
+  background-color: #fff1f0;
+  color: #cf1322;
+}
