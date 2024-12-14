@@ -6,7 +6,16 @@ import {
   UserOutlined,
   DeploymentUnitOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Col, Layout, Menu, Row, Typography } from "antd";
+import {
+  Avatar,
+  Button,
+  Col,
+  Dropdown,
+  Layout,
+  Menu,
+  Row,
+  Typography,
+} from "antd";
 import { theme } from "antd";
 import "./style.scss";
 import TableList from "../TableList";
@@ -30,8 +39,9 @@ import XacNhanKinhDoanhPage from "../xacNhanKinhDoanhPage";
 import UserXacNhanPage from "../userXacNhanPage";
 import YeuCauRutTienPage from "../yeuCauRutTienPage";
 import ThongSoPage from "../thongSoPage";
+import ImportExcelPage from "../ImportExcelPage";
 import { fetchUserById } from "api/userService";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -41,6 +51,7 @@ const DashboardPage = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { token } = theme.useToken();
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   // Get the selectedNav state from local storage or default to "thuocTinh"
   const [selectedNav, setSelectedNav] = useState(
@@ -104,7 +115,7 @@ const DashboardPage = () => {
   const handlChat = (userId) => {
     console.log("User ID:", userId); // Kiểm tra giá trị userId
     setSelectedNav("chat");
-    localStorage.setItem("userId", userId);
+    localStorage.setItem("userIdChatAdmin", userId);
   };
 
   const handlXacNhanUser = (userId) => {
@@ -126,6 +137,24 @@ const DashboardPage = () => {
     localStorage.setItem("userIdDetail", userId);
     console.log("User ID:", userId);
   };
+
+  const handleLogout = () => {
+    // Xóa userId khỏi localStorage
+    localStorage.removeItem("userId");
+    // Chuyển hướng đến trang đăng xuất (hoặc trang đăng nhập)
+    navigate("/login");
+  };
+
+  const menuItems = (
+    <Menu>
+      <Menu.Item key="browse">
+        <Link to="/">Lướt web</Link>
+      </Menu.Item>
+      <Menu.Item key="login" onClick={handleLogout}>
+        Đăng xuất
+      </Menu.Item>
+    </Menu>
+  );
 
   const renderContent = () => {
     switch (selectedNav) {
@@ -202,6 +231,8 @@ const DashboardPage = () => {
         return <YeuCauRutTienPage key="ruttien" />;
       case "thongso":
         return <ThongSoPage key="thongso" />;
+      case "excel":
+        return <ImportExcelPage key="excel" />;
       default:
         return null;
     }
@@ -255,20 +286,25 @@ const DashboardPage = () => {
           <Menu.Item key="chat" icon={<UploadOutlined />}>
             Nhắn tin
           </Menu.Item>
-          {user && user.role !== "hokinhdoanh" && (
+          {/* {user && user.role !== "hokinhdoanh" && (
             <Menu.Item key="banner" icon={<UploadOutlined />}>
               Banner
             </Menu.Item>
-          )}
+          )} */}
           {/* <Menu.Item key="banner" icon={<UploadOutlined />}>
             Banner
           </Menu.Item> */}
           <Menu.Item key="doanhthu" icon={<UploadOutlined />}>
             Doanh thu
           </Menu.Item>
-          <Menu.Item key="khuyenmai" icon={<UploadOutlined />}>
+          {user && user.role !== "hokinhdoanh" && (
+            <Menu.Item key="khuyenmai" icon={<UploadOutlined />}>
+              Khuyến mãi
+            </Menu.Item>
+          )}
+          {/* <Menu.Item key="khuyenmai" icon={<UploadOutlined />}>
             Khuyến mãi
-          </Menu.Item>
+          </Menu.Item> */}
           <Menu.Item key="danhgia" icon={<UploadOutlined />}>
             Đánh giá
           </Menu.Item>
@@ -277,6 +313,9 @@ const DashboardPage = () => {
           </Menu.Item>
           <Menu.Item key="thongso" icon={<UploadOutlined />}>
             Thông số
+          </Menu.Item>
+          <Menu.Item key="excel" icon={<UploadOutlined />}>
+            Excel
           </Menu.Item>
           {user && user.role !== "hokinhdoanh" && (
             <Menu.Item key="userxnkinhdoanh" icon={<UploadOutlined />}>
@@ -304,7 +343,7 @@ const DashboardPage = () => {
             background: token.colorBgContainer,
           }}
         >
-          <Row align="middle" style={{ height: "100%" }}>
+          {/* <Row align="middle" style={{ height: "100%" }}>
             <Col flex={1}>
               <Button
                 type="text"
@@ -330,6 +369,38 @@ const DashboardPage = () => {
                 <Col>
                   <Text style={{ marginLeft: 8, marginRight: 20 }}>
                     <Link to="/">Lướt web</Link>
+                  </Text>
+                </Col>
+              </Row>
+            </Col>
+          </Row> */}
+          <Row align="middle" style={{ height: "100%" }}>
+            <Col flex={1}>
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: "16px",
+                  width: 64,
+                  height: 64,
+                }}
+              />
+            </Col>
+            <Col>
+              <Row align="middle">
+                <Col>
+                  <Dropdown overlay={menuItems} trigger={["click"]}>
+                    <Avatar
+                      size="default"
+                      icon={<UserOutlined />}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </Dropdown>
+                </Col>
+                <Col>
+                  <Text style={{ marginLeft: 8, marginRight: 20 }}>
+                    {user ? user.tenNguoiDung : "Loading..."}
                   </Text>
                 </Col>
               </Row>

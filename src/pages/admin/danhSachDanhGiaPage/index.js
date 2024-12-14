@@ -25,19 +25,36 @@ const DanhSachDanhGiaPage = () => {
   const [currentPage, setCurrentPage] = useState(1); // Current page state
   const [pageSize, setPageSize] = useState(5);
 
+  // const fetchDanhGia = async () => {
+  //   try {
+  //     const userId = localStorage.getItem("userId");
+  //     // const response = await axios.get(`/api/danhgia/getListDanhGiaAdmin/${userId}`);
+  //     // setDanhGia(response.data);
+  //     const danhGiaData = await getDanhGiaForAdmin(userId);
+
+  //     // Lưu danh sách đánh giá vào state
+  //     setDanhGia(danhGiaData);
+  //   } catch (error) {
+  //     console.error("Lỗi khi lấy dữ liệu đánh giá:", error);
+  //   }
+  // };
+
   const fetchDanhGia = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      // const response = await axios.get(`/api/danhgia/getListDanhGiaAdmin/${userId}`);
-      // setDanhGia(response.data);
       const danhGiaData = await getDanhGiaForAdmin(userId);
-
-      // Lưu danh sách đánh giá vào state
-      setDanhGia(danhGiaData);
+  
+      // Lọc ra những đánh giá có `sanphamId` đầy đủ
+      const filteredDanhGia = danhGiaData.filter(
+        (item) => item.sanphamId && item.sanphamId.HinhSanPham
+      );
+  
+      setDanhGia(filteredDanhGia);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu đánh giá:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchDanhGia();
@@ -237,14 +254,20 @@ const DanhSachDanhGiaPage = () => {
           {paginatedDanhGia.map((danhGia, index) => (
             <tr key={index}>
               <td>
-                <img
-                  src={danhGia.sanphamId.HinhSanPham}
-                  alt={danhGia.sanphamId.TenSanPham}
-                  className="product-image"
-                />
+                {danhGia.sanphamId?.HinhSanPham ? (
+                  <img
+                    src={danhGia.sanphamId.HinhSanPham}
+                    alt={danhGia.sanphamId.TenSanPham || "Sản phẩm"}
+                    className="product-image"
+                  />
+                ) : (
+                  "Không có ảnh"
+                )}
               </td>
-              <td>{danhGia.sanphamId.TenSanPham}</td>
-              <td>{danhGia.sanphamId.IDSanPham}</td>
+              <td>
+                {danhGia.sanphamId?.TenSanPham || "Không có tên sản phẩm"}
+              </td>
+              <td>{danhGia.sanphamId?.IDSanPham || "Không có mã đơn hàng"}</td>
               <td>{"⭐".repeat(danhGia.XepHang)}</td>
               <td>
                 <span

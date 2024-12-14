@@ -10,6 +10,7 @@ import {
   Button,
   Pagination,
   Popconfirm,
+  Switch,
 } from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -34,6 +35,9 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
   const [hoveredRow, setHoveredRow] = useState(null);
   const [categories, setCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchName, setSearchName] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(null); // Lưu lựa chọn danh mục
+  const [stockStatus, setStockStatus] = useState(null);
   const pageSize = 10;
 
   const handleEdit = (productId) => {
@@ -44,10 +48,11 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     onClickBT(productId);
   };
 
+
   useEffect(() => {
     fetchProducts();
     fetchCategoriesData();
-  }, [currentPage]);
+  },  [currentPage, selectedCategory, stockStatus]);
 
   const fetchProducts = async () => {
     try {
@@ -68,6 +73,9 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
       console.error("Error during data fetch:", error);
     }
   };
+
+
+
 
   const fetchCategoriesData = async () => {
     try {
@@ -115,6 +123,26 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     setIsModalVisible(false);
   };
 
+   // Lọc sản phẩm theo tên
+   const filteredProducts = products.filter((product) =>
+    product.TenSanPham.toLowerCase().includes(searchName.toLowerCase())
+  );
+
+  const handleToggleChange = async (id, isActive) => {
+    console.log(`Product ID: ${id}, Active: ${isActive}`);
+    try {
+      // Sử dụng POST thay vì PUT cho API toggleSanPhamMoi
+      await axios.post(`/api/sanpham/toggleSanPhamMoi/${id}`);
+      message.success("Cập nhật trạng thái thành công!");
+      fetchProducts(); // Làm mới danh sách sản phẩm
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái:", error);
+      message.error("Không thể cập nhật trạng thái.");
+    }
+  };
+  
+  
+
   const expandedRowRender = (record) => {
     return (
       <div className="expanded-row-actions">
@@ -125,6 +153,7 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
         </a>
         |<a onClick={() => message.info("Sao chép ID")}>Sao chép</a> |
         <a onClick={() => handleClickBienThe(record)}>Xem biến thể</a> |
+        
         <Popconfirm
           title="Bạn có chắc chắn muốn xóa sản phẩm này không?"
           onConfirm={() => deleteProductHandler(record._id)}
@@ -196,21 +225,26 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
       ),
     },
     {
-      title: "Lần sửa gần nhất",
-      dataIndex: "NgayTao",
-      key: "NgayTao",
-      render: (date) =>
-        moment(date)
-          .format("DD/MM/YYYY [lúc] hh:mm A")
-          .replace("AM", "sáng")
-          .replace("PM", "chiều"),
+      title: "Đăng bán",
+      dataIndex: "SanPhamMoi", // Sử dụng đúng tên của field
+      key: "SanPhamMoi",
+      render: (isNew, record) => (
+        <span style={{ marginLeft: "8px" }}>
+          <Switch
+            checked={isNew} // Dựa vào giá trị `SanPhamMoi`
+            onChange={(checked) => handleToggleChange(record._id, checked)}
+            checkedChildren="Bán"
+            unCheckedChildren="Tắt"
+          />
+        </span>
+      ),
     },
   ];
 
-  const displayedProducts = products
-    .filter((product) => product.TinhTrang !== "Đã xóa")
-    .slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
+  const displayedProducts = filteredProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
   return (
     <>
       <h1>Sản phẩm</h1>
@@ -224,7 +258,7 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
       </Button>
 
       <div className="filter-section">
-        <Select
+        {/* <Select
           placeholder="Chọn danh mục"
           style={{ width: 200, marginLeft: "16px" }}
           onChange={handleCategoryChange}
@@ -234,15 +268,6 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
               {category.TenDanhMuc}
             </Option>
           ))}
-        </Select>
-
-        <Select
-          placeholder="Lọc theo loại sản phẩm"
-          style={{ width: 200, marginLeft: "16px" }}
-          // onChange={(value) => handleFilterChange(value, "productType")}
-        >
-          <Option value="type1">Sản phẩm đơn giản</Option>
-          <Option value="type2">Sản phẩm có biến thể</Option>
         </Select>
 
         <Select
@@ -256,10 +281,10 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
 
         <Button type="primary" style={{ marginLeft: "8px" }}>
           Lọc
-        </Button>
+        </Button> */}
 
         <div className="custom-search">
-          <Input.Search placeholder="Tìm sản phẩm" style={{ width: 250 }} />
+          <Input.Search value={searchName} placeholder="Tìm sản phẩm" style={{ width: 250 }} onChange={(e) => setSearchName(e.target.value)} />
         </div>
       </div>
 
@@ -291,45 +316,7 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
         onChange={(page) => setCurrentPage(page)}
         style={{ marginTop: "16px" }}
       />
-      <Modal
-        title={isEditing ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm"}
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="cancel" onClick={handleCancel}>
-            Hủy
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
-            {isEditing ? "Cập nhật" : "Thêm"}
-          </Button>,
-        ]}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            label="Tên sản phẩm"
-            name="TenSanPham"
-            rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item label="Giá bán" name="DonGiaBan">
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item label="Số lượng hiện tại" name="SoLuongHienTai">
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item label="Tình trạng" name="TinhTrang">
-            <Select>
-              <Option value="Còn hàng">Còn hàng</Option>
-              <Option value="Hết hàng">Hết hàng</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="Hình ảnh" name="HinhSanPham">
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
+    
     </>
   );
 };

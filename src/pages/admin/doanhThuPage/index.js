@@ -22,7 +22,7 @@ const DoanhThuPage = () => {
   const [filter, setFilter] = useState({
     startDate: null,
     endDate: null,
-    transactionType: "",
+    transactionType: "tatca",
   });
 
   const [form] = Form.useForm();
@@ -36,32 +36,18 @@ const DoanhThuPage = () => {
     setLoading(true);
     try {
       const userId = localStorage.getItem("userId");
-      // const response = await axios.get(
-      //   `http://localhost:3000/api/doanhthu/GetDoanhThu12/${userId}`,
-      //   {
-      //     params: {
-      //       fromDate: filter.startDate,
-      //       toDate: filter.endDate,
-      //       filter: filter.transactionType,
-      //     },
-      //   }
-      // );
-
-      // // Dữ liệu trả về từ API là một đối tượng
-      // const data = response.data;
-      // console.log("Dữ liệu trả về từ API: ", data);
-
-      // // Chuyển đối tượng thành mảng và đổi tên các trường để hiển thị phù hợp
-      // const revenueData = Object.entries(data).map(([date, values]) => ({
-      //   ngay: date,
-      //   doanhThu: values.totalRevenue,
-      //   soLuongChuaThanhToan: values.totalPending, // Đổi tên trường ở đây
-      //   soLuongDaHuy: values.totalCanceled, // Đổi tên trường ở đây
-      // }));
-
-      const revenueData = await getDoanhThu(userId, filter);
-
-      // Kiểm tra nếu revenueData là mảng
+      
+      // Tạo payload bộ lọc
+      const filterPayload = { ...filter };
+      if (filter.transactionType === "tatca") {
+        // Bỏ qua ngày nếu chọn "Hiển thị tất cả"
+        delete filterPayload.startDate;
+        delete filterPayload.endDate;
+      }
+  
+      const revenueData = await getDoanhThu(userId, filterPayload);
+  
+      // Kiểm tra nếu dữ liệu hợp lệ
       if (Array.isArray(revenueData) && revenueData.length > 0) {
         setRevenueData(revenueData);
       } else {
@@ -74,7 +60,7 @@ const DoanhThuPage = () => {
       setLoading(false);
     }
   };
-
+  
   // Cập nhật bộ lọc khi người dùng thay đổi một trường
   const handleFilterChange = (value, type) => {
     setFilter((prevFilter) => {
@@ -96,14 +82,44 @@ const DoanhThuPage = () => {
   };
 
   // Biểu đồ doanh thu với màu sắc tùy chỉnh
-  const chartData = revenueData.map((item) => ({
-    name: moment(item.ngay).format("DD-MM-YYYY"),
-    doanhThu: item.doanhThu,
-    chuaThanhToan: item.soLuongChuaThanhToan,
-  }));
+  // Sắp xếp dữ liệu theo ngày
+  const chartData = revenueData
+    .sort((a, b) => new Date(a.ngay) - new Date(b.ngay)) // Sắp xếp theo ngày tăng dần
+    .map((item) => {
+      let label;
+      if (filter.transactionType === "ngay") {
+        label = moment(item.ngay).format("DD-MM-YYYY");
+      } else if (filter.transactionType === "tuan") {
+        const startOfWeek = moment(item.ngay).startOf("isoWeek");
+        label = `Tuần ${startOfWeek.format("DD-MM-YYYY")}`;
+      } else if (filter.transactionType === "thang") {
+        label = moment(item.ngay).format("MM-YYYY");
+      }
+
+      return {
+        name: label,
+        doanhThu: item.doanhThu,
+        chuaThanhToan: item.soLuongChuaThanhToan,
+      };
+    });
 
   // Cột bảng doanh thu với màu sắc tùy chỉnh
   const columns = [
+    // {
+    //   title: "Thời Gian",
+    //   dataIndex: "ngay",
+    //   render: (text) => {
+    //     if (filter.transactionType === "ngay") {
+    //       return moment(text).format("DD-MM-YYYY");
+    //     } else if (filter.transactionType === "tuan") {
+    //       const startOfWeek = moment(text).startOf("isoWeek");
+    //       return `Tuần ${startOfWeek.format("DD-MM-YYYY")}`;
+    //     } else if (filter.transactionType === "thang") {
+    //       return moment(text).format("MM-YYYY");
+    //     }
+    //     return text;
+    //   },
+    // },
     {
       title: "Ngày",
       dataIndex: "ngay",
@@ -195,6 +211,20 @@ const DoanhThuPage = () => {
             ]}
           >
             <RangePicker format="DD-MM-YYYY" onChange={handleDateRangeChange} />
+          </Form.Item>
+          <Form.Item label="Bộ lọc">
+            <Select
+              placeholder="Chọn bộ lọc"
+              style={{ width: 200 }}
+              value={filter.transactionType} // Gắn giá trị mặc định
+              onChange={(value) => handleFilterChange(value, "transactionType")}
+              allowClear
+            >
+              <Select.Option value="tatca">Hiển thị tất cả</Select.Option>
+              <Select.Option value="ngay">Theo Ngày</Select.Option>
+              <Select.Option value="tuan">Theo Tuần</Select.Option>
+              <Select.Option value="thang">Theo Tháng</Select.Option>
+            </Select>
           </Form.Item>
         </Form>
       </div>

@@ -30,6 +30,8 @@ const XacNhanKinhDoanhPage = ({ quayLaiUserXacNhan }) => {
             ghiChu: data[0].ghiChu,
             diaChi: `${data[0].diaChi.duongThon}, ${data[0].diaChi.phuongXa}, ${data[0].diaChi.quanHuyen}, ${data[0].diaChi.tinhThanhPho}`,
             ngayDangKy: new Date(data[0].createdAt).toLocaleDateString("vi-VN"),
+            maSoThue: data[0].maSoThue || "Chưa cập nhật",
+            anhGiayPhepHoKinhDoanh: data[0].anhGiayPhepHoKinhDoanh || null,
           };
 
           setBusinessData(mappedData);
@@ -98,6 +100,9 @@ const XacNhanKinhDoanhPage = ({ quayLaiUserXacNhan }) => {
       <div className="business-info">
         <h2>Thông tin chi tiết</h2>
         <p>
+          <strong>Mã số thuế:</strong> {businessData.maSoThue}
+        </p>
+        <p>
           <strong>Tên người đăng ký:</strong> {businessData.tenNguoiDangKy}
         </p>
         <p>
@@ -115,6 +120,16 @@ const XacNhanKinhDoanhPage = ({ quayLaiUserXacNhan }) => {
         <p>
           <strong>Ngày đăng ký:</strong> {businessData.ngayDangKy}
         </p>
+        {businessData.anhGiayPhepHoKinhDoanh && (
+        <div className="business-image">
+          <h2>Ảnh giấy phép hộ kinh doanh</h2>
+          <img
+            src={businessData.anhGiayPhepHoKinhDoanh}
+            alt="Giấy phép hộ kinh doanh"
+            className="license-image"
+          />
+        </div>
+      )}
       </div>
 
       <div className="action-section">

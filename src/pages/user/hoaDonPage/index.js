@@ -80,7 +80,7 @@ const HoaDonUserPage = ({ onShowChiTietHoaDon  }) => {
               
               <td className="actions-cell">
                
-              <button onClick={() => handleViewDetails(hoaDon._id)}>
+              <button className="btn detail" onClick={() => handleViewDetails(hoaDon._id)}>
               Xem chi tiết
             </button>
               </td>

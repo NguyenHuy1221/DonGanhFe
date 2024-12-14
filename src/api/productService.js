@@ -32,12 +32,30 @@ export const fetchProducts = async () => {
   }
 };
 
+// export const fetchProductsByDanhMuc = async (IDDanhMuc) => {
+//   try {
+//     const response = await axios.get(`/api/sanpham/findSanPham/${IDDanhMuc}`);
+//     const products = response.data;
+
+//     return products;
+//   } catch (error) {
+//     if (error.response && error.response.status === 404) {
+//       console.warn(`Không tìm thấy sản phẩm cho ID danh mục: ${IDDanhMuc}`);
+//       return [];
+//     } else {
+//       console.error("Lỗi khi lấy sản phẩm theo danh mục:", error);
+//       throw error;
+//     }
+//   }
+// };
+
 export const fetchProductsByDanhMuc = async (IDDanhMuc) => {
   try {
     const response = await axios.get(`/api/sanpham/findSanPham/${IDDanhMuc}`);
     const products = response.data;
 
-    return products;
+    // Lọc sản phẩm không có TinhTrang là "Đã xóa"
+    return products.filter((product) => product.TinhTrang !== "Đã xóa");
   } catch (error) {
     if (error.response && error.response.status === 404) {
       console.warn(`Không tìm thấy sản phẩm cho ID danh mục: ${IDDanhMuc}`);

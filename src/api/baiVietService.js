@@ -4,7 +4,7 @@ const API_URL = "/api/baiviet";
 
 export const getListBaiViet = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/getListBaiViet/${userId}`);
+    const response = await axios.get(`${API_URL}/getListBaiVietAdmin/${userId}`);
 
     return response.data;
   } catch (error) {

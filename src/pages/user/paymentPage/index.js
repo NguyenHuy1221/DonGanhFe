@@ -12,17 +12,27 @@ import {
   FormControl,
   FormLabel,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./style.scss";
 import { fetchUserById, showDiaChiByIdUser } from "api/userService";
 import { navigate } from "react-router-dom";
 import { createDiaChi } from "api/diaChiService";
-import { createInvoiceAPI,updateTransactionAPI } from 'api/hoaDonService';
+import {
+  createInvoiceAPI,
+  updateTransactionAPI,
+  updateTransactionAPICOD,
+} from "api/hoaDonService";
+import icon1_1 from "../../../image/icon_1.png";
+import icon1_2 from "../../../image/icon_2.png";
+import baokim from "../../../image/baokim.jpg";
 
 const PaymentPage = () => {
   const [open, setOpen] = useState(false);
+  const [openMGG, setOpenMGG] = useState(false);
+
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [user, setUser] = useState(null);
@@ -30,11 +40,15 @@ const PaymentPage = () => {
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const navigate = useNavigate();
 
   // CART-ITEM
   const location = useLocation();
   const cartItems = location.state?.cartItems || [];
-  const totalAmount = location.state?.totalAmount || 0;
+  // const totalAmount = location.state?.totalAmount || 0;
+  const [totalAmount, setTotalAmount] = useState(
+    location.state?.totalAmount || 0
+  );
   const { selectedStores } = location.state;
 
   console.log("Danh sách cửa hàng:", selectedStores);
@@ -42,18 +56,109 @@ const PaymentPage = () => {
   const [addresses, setAddresses] = useState([]);
   const [displayedAddress, setDisplayedAddress] = useState(null);
 
-  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
-
-  const [discountCodes, setDiscountCodes] = useState({});
   const [messages, setMessages] = useState({});
-  const [selectedVouchers, setSelectedVouchers] = useState({});
 
-  const handleDiscountChange = (storeName, discountCode) => {
-    // Lưu trữ mã giảm giá của cửa hàng
-    setDiscountCodes({
-      ...discountCodes,
-      [storeName]: discountCode,
+  const [discounts, setDiscounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [opeenMGG, setOpeenMGG] = useState(false);
+  const [appliedDiscountNames, setAppliedDiscountNames] = useState({});
+  const [appliedDiscounts, setAppliedDiscounts] = useState({});
+  const [selectedStore, setSelectedStore] = useState(null);
+
+  const handleApplyDiscount = (discount, storeName) => {
+    console.log("Áp dụng mã giảm giá:", discount);
+    console.log("Cửa hàng áp dụng:", storeName);
+
+    // Lưu tên mã giảm giá vào state cho cửa hàng cụ thể
+    setAppliedDiscounts((prevDiscounts) => ({
+      ...prevDiscounts,
+      [storeName]: discount, // Lưu thông tin giảm giá cho cửa hàng
+    }));
+
+    setAppliedDiscountNames((prevNames) => ({
+      ...prevNames,
+      [storeName]: discount.TenKhuyenMai, // Lưu tên mã giảm giá vào appliedDiscountNames
+    }));
+
+    handleCloseMGG(); // Đóng modal sau khi áp dụng
+  };
+
+  const calculateTotalAmountForAllStores = (stores) => {
+    let totalAllStores = 0;
+
+    stores.forEach((store) => {
+      const { finalAmount } = calculateTotalAmount(store); // Tính tổng tiền cho từng shop
+      totalAllStores += finalAmount; // Cộng dồn tổng tiền
     });
+
+    console.log("Tổng tiền của tất cả các cửa hàng:", totalAllStores);
+    setTotalAmount(totalAllStores); // Cập nhật state
+    return totalAllStores;
+  };
+
+  useEffect(() => {
+    if (selectedStores && selectedStores.length > 0) {
+      calculateTotalAmountForAllStores(selectedStores);
+    }
+  }, [selectedStores, appliedDiscounts]);
+
+  const calculateTotalAmount = (store) => {
+    let total = store.storeProducts.reduce(
+      (total, product) => total + product.price * product.quantity,
+      0
+    );
+
+    console.log("Tổng tiền trước khi giảm giá:", total);
+
+    const discount = appliedDiscounts[store.storeName]; // Lấy mã giảm giá của cửa hàng hiện tại
+    let discountAmount = 0;
+
+    if (discount) {
+      // Kiểm tra nếu mã giảm giá đủ điều kiện áp dụng
+      if (total >= discount.GioiHanGiaTriDuocApDung) {
+        discountAmount = discount.giaTriGiam; // Số tiền giảm
+
+        // Kiểm tra giới hạn giảm tối đa
+        if (discount.GioiHanGiaTriGiamToiDa) {
+          discountAmount = Math.min(
+            discountAmount,
+            discount.GioiHanGiaTriGiamToiDa
+          );
+          console.log(
+            "Giảm giá sau khi áp dụng giới hạn tối đa:",
+            discountAmount
+          );
+        }
+
+        total -= discountAmount; // Trừ số tiền giảm vào tổng
+        console.log("Tổng tiền sau khi áp dụng giảm giá:", total);
+      } else {
+        console.log("Tổng tiền không đủ điều kiện áp dụng mã giảm giá.");
+      }
+    }
+
+    const finalAmount = total < 0 ? 0 : total; // Đảm bảo tổng tiền không âm
+    console.log("Tổng tiền sau khi áp dụng mã giảm giá:", finalAmount);
+    // calculateTotalAmountForAllStores();
+    return { finalAmount, discountAmount }; // Trả về cả tổng tiền và số tiền giảm
+  };
+
+  const calculateTotalDiscount = (stores) => {
+    return stores.reduce((totalDiscount, store) => {
+      const { discountAmount } = calculateTotalAmount(store); // Tính số tiền giảm của từng cửa hàng
+      return totalDiscount + discountAmount;
+    }, 0);
+  };
+
+  // Hàm để mở modal
+  const handleOpenMGG = () => {
+    setOpeenMGG(true);
+    fetchDiscounts(); // Tải mã giảm giá khi mở modal
+  };
+
+  // Hàm để đóng modal
+  const handleCloseMGG = () => {
+    setOpeenMGG(false);
   };
 
   const handleMessageChange = (storeName, message) => {
@@ -61,13 +166,6 @@ const PaymentPage = () => {
     setMessages({
       ...messages,
       [storeName]: message,
-    });
-  };
-
-  const handleVoucherChange = (storeName, voucherCode) => {
-    setSelectedVouchers({
-      ...selectedVouchers,
-      [storeName]: voucherCode,
     });
   };
 
@@ -83,6 +181,29 @@ const PaymentPage = () => {
       fetchUserData(userId);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (open) {
+      fetchDiscounts();
+    }
+  }, [open]);
+
+  const fetchDiscounts = async () => {
+    try {
+      setLoading(true);
+      // const totalAmount = store.storeProducts
+      // .reduce((total, product) => total + product.price * product.quantity, 0);
+
+      const response = await axios.get(
+        `/api/khuyenmai/getlistKhuyenMai/${totalAmount}`
+      );
+      setDiscounts(response.data);
+    } catch (error) {
+      console.error("Error fetching discounts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchUserData = async (userId) => {
     try {
@@ -104,6 +225,7 @@ const PaymentPage = () => {
 
       setAddresses(formattedAddresses);
       setUser(userData);
+      console.log("tổng tiền ", totalAmount);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu người dùng:", error);
     }
@@ -280,11 +402,29 @@ const PaymentPage = () => {
 
   const createInvoice = async () => {
     const userId = localStorage.getItem("userId");
-
     // Kiểm tra giỏ hàng
     if (!selectedStores || selectedStores.length === 0) {
       alert("Giỏ hàng trống hoặc dữ liệu không hợp lệ.");
       return;
+    }
+
+    let transactionId;
+    switch (paymentMethod) {
+      case "cash":
+        transactionId = "111"; // Thanh toán khi nhận hàng
+        break;
+      case "vietqr":
+        transactionId = "295"; // VietQR
+        break;
+      case "vnpay":
+        transactionId = "297"; // VNPay QR
+        break;
+      case "atm":
+        transactionId = "151"; // ATM Card
+        break;
+      default:
+        alert("Vui lòng chọn phương thức thanh toán.");
+        return;
     }
 
     // Gộp tất cả sản phẩm của các cửa hàng vào một mảng chung
@@ -292,15 +432,19 @@ const PaymentPage = () => {
       user: {
         _id: store.storeOwnerId, // ID chủ cửa hàng
       },
-      transactionId: "111", // Bạn có thể thay bằng một ID giao dịch thực tế nếu có
+      transactionId, // Bạn có thể thay bằng một ID giao dịch thực tế nếu có
       sanPhamList: store.storeProducts.map((product) => ({
         chiTietGioHangs: [
           {
+            _id: product.id,
+
             idBienThe: {
-              _id: product.idBt, // ID biến thể
+              _id: product.idBt,
             },
-            soLuong: product.quantity, // Số lượng sản phẩm
-            donGia: product.price, // Đơn giá
+            soLuong: product.quantity,
+            donGia: product.price,
+            // TongTien: totalAmount, 
+            // SoTienKhuyenMai: calculateTotalDiscount(selectedStores),
           },
         ],
       })),
@@ -318,7 +462,7 @@ const PaymentPage = () => {
         SoDienThoai: displayedAddress.phone || "",
       },
       ghiChu: "Giao hàng vào sáng mai",
-      TongTien: totalAmount, // Tổng tiền hóa đơn
+
       mergedCart: {
         mergedCart: mergedCart, // Chứa danh sách tất cả cửa hàng và sản phẩm
       },
@@ -330,13 +474,8 @@ const PaymentPage = () => {
     );
 
     // Gửi dữ liệu đến API tạo hóa đơn
-    try {
-      // const response = await axios.post(
-      //   "/api/hoadon/createUserDiaChivaThongTinGiaoHang",
-      //   invoiceData
-      // );
 
-      // console.log("Phản hồi từ API tạo hóa đơn:", response.data);
+    try {
       const createInvoiceResponse = await createInvoiceAPI(invoiceData);
 
       console.log("Phản hồi từ API tạo hóa đơn:", createInvoiceResponse);
@@ -346,42 +485,31 @@ const PaymentPage = () => {
         createInvoiceResponse.hoadon &&
         createInvoiceResponse.hoadon.length > 0
       ) {
-        alert("Hóa đơn đã được tạo thành công!");
+        // alert("Hóa đơn đã được tạo thành công!");
 
-        // Gọi API updateTransactionListHoaDonCOD sau khi tạo hóa đơn thành công
-        const hoadonIds = createInvoiceResponse.hoadon.map((hd) => hd._id); // Lấy tất cả các _id của hóa đơn
-        const transactionId = "111"; // ID giao dịch, thay bằng ID thực tế nếu có 
+        const hoadonIds = createInvoiceResponse.hoadon.map((hd) => hd._id);
 
-        // const updateResponse = await axios.post(
-        //   "/api/hoadon/updateTransactionListHoaDonCOD",
-        //   {
-        //     transactionId,
-        //     hoadon: hoadonIds,
-        //   }
-        // );
-        const updateResponse = await updateTransactionAPI(transactionId, hoadonIds);
+        let updateResponse;
 
-        console.log("Phản hồi từ API cập nhật giao dịch:", updateResponse.data);
-
-        // Hiển thị hộp thoại để người dùng chọn hành động tiếp theo
-        const nextAction = window.confirm(
-          "Đơn hàng đã được tạo thành công! Bạn muốn quay lại trang chủ hay đi đến trang hồ sơ?"
-        );
-  
-        // Sử dụng các tên khác cho nút "OK" và "Cancel"
-        if (nextAction) {
-          // Người dùng chọn "Quay lại trang chủ"
-          window.location.href = "/"; // Chuyển hướng về trang chủ
+        if (transactionId === "111") {
+          // Gọi API updateTransactionAPICOD nếu thanh toán bằng tiền mặt
+          updateResponse = await updateTransactionAPICOD(
+            transactionId,
+            hoadonIds
+          );
         } else {
-          // Người dùng chọn "Đi đến hồ sơ"
-          window.location.href = "/profile"; // Chuyển hướng về trang hồ sơ
+          // Gọi API updateTransactionAPI cho các phương thức khác
+          updateResponse = await updateTransactionAPI(transactionId, hoadonIds);
         }
-
-        // if (updateResponse.data && updateResponse.data.message === "Cập nhật thành công") {
-        //   alert("Cập nhật giao dịch thành công!");
-        // } else {
-        //   alert("Không thể cập nhật giao dịch. Phản hồi không hợp lệ.");
-        // }
+        console.log("Phản hồi từ API cập nhật giao dịch:", updateResponse);
+        const userChoice = window.confirm(
+          "Hóa đơn đã được tạo thành công! Bạn có muốn xem đơn hàng của mình không?"
+        );
+        if (userChoice) {
+          navigate("/profile"); // Điều hướng đến trang hồ sơ
+        } else {
+          navigate("/"); // Điều hướng đến trang chính
+        }
       } else {
         alert("Không thể tạo hóa đơn. Phản hồi không hợp lệ.");
       }
@@ -391,11 +519,10 @@ const PaymentPage = () => {
     }
   };
 
- 
   const handleConfirmPayment = () => {
     if (displayedAddress) {
       createInvoice();
-      handleClose(); // Đóng dialog sau khi tạo hóa đơn
+      handleClose();
     } else {
       alert("Vui lòng chọn địa chỉ trước khi thanh toán.");
     }
@@ -616,7 +743,7 @@ const PaymentPage = () => {
       <div className="container my-4 cart-summary">
         <div className="row">
           <div className="col-lg-8">
-            {selectedStores.map((store) => (
+            {/* {selectedStores.map((store) => (
               <div key={store.storeName} className="store-section mb-4">
                 <h4 className="mb-3">{store.storeName}</h4>
                 <table className="table table-bordered table-hover">
@@ -663,7 +790,8 @@ const PaymentPage = () => {
                   </tbody>
                 </table>
 
-                {/* Thêm mã giảm giá cho cửa hàng */}
+                
+
                 <div className="mb-3">
                   <label
                     htmlFor={`discount-code-${store.storeName}`}
@@ -676,41 +804,19 @@ const PaymentPage = () => {
                     className="form-control"
                     id={`discount-code-${store.storeName}`}
                     placeholder="Nhập mã giảm giá"
-                    onChange={(e) =>
-                      handleDiscountChange(store.storeName, e.target.value)
-                    }
+                    value={appliedDiscountNames[store.storeName] || ""} // Hiển thị tên mã giảm giá
+                    // onClick={handleOpenMGG}
+                    onClick={() => {
+                      setSelectedStore(store); // Lưu cửa hàng khi người dùng chọn
+                      console.log("Cửa hàng đã chọn:", store.storeName);
+
+                      handleOpenMGG(); // Mở modal
+                    }}
+                    // Mở modal để chọn mã giảm giá
+                    readOnly
                   />
                 </div>
 
-                {/* Chọn voucher cho cửa hàng */}
-                <div className="mb-3">
-                  <label
-                    htmlFor={`voucher-${store.storeName}`}
-                    className="form-label"
-                  >
-                    Chọn voucher
-                  </label>
-                  <select
-                    className="form-select"
-                    id={`voucher-${store.storeName}`}
-                    onChange={(e) =>
-                      handleVoucherChange(store.storeName, e.target.value)
-                    }
-                  >
-                    <option value="">Chọn voucher</option>
-                    <option value="voucher-10-off">
-                      Giảm 10% cho đơn hàng
-                    </option>
-                    <option value="voucher-20-off">
-                      Giảm 20% cho đơn hàng
-                    </option>
-                    <option value="voucher-50-off">
-                      Giảm 50% cho đơn hàng
-                    </option>
-                  </select>
-                </div>
-
-                {/* Thêm lời nhắn cho cửa hàng */}
                 <div className="mb-3">
                   <label
                     htmlFor={`message-${store.storeName}`}
@@ -729,24 +835,145 @@ const PaymentPage = () => {
                   ></textarea>
                 </div>
 
-                {/* Tổng số tiền cửa hàng */}
                 <tr className="table-light">
                   <td colSpan="4" className="text-end align-middle fw-bold">
                     Tổng số tiền:{" "}
                     <span className="text-danger">
-                      {store.storeProducts
-                        .reduce(
-                          (total, product) =>
-                            total + product.price * product.quantity,
-                          0
-                        )
-                        .toLocaleString()}{" "}
-                      VND
+                      {calculateTotalAmount(store).toLocaleString()} VND
                     </span>
                   </td>
                 </tr>
               </div>
-            ))}
+            ))} */}
+            {selectedStores.map((store) => {
+              const { finalAmount, discountAmount } =
+                calculateTotalAmount(store); // Lấy thông tin tổng tiền và số tiền giảm
+
+              return (
+                <div key={store.storeName} className="store-section mb-4">
+                  <h4 className="mb-3">{store.storeName}</h4>
+                  <table className="table table-bordered table-hover">
+                    <thead className="table-light">
+                      <tr>
+                        <th className="text-center align-middle">Sản phẩm</th>
+                        <th className="text-center align-middle">Đơn giá</th>
+                        <th className="text-center align-middle">Số lượng</th>
+                        <th className="text-center align-middle">Tổng tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {store.storeProducts.map((product) => (
+                        <tr key={product.id}>
+                          <td className="text-center align-middle">
+                            <div className="d-flex align-items-center">
+                              <img
+                                src={product.image || "placeholder.png"}
+                                alt={product.name}
+                                className="img-thumbnail me-3"
+                                style={{
+                                  width: "80px",
+                                  height: "80px",
+                                  objectFit: "cover",
+                                }}
+                              />
+                              <div>
+                                <p className="mb-0">{product.name}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="text-center align-middle">
+                            {product.price.toLocaleString()} VND
+                          </td>
+                          <td className="text-center align-middle">
+                            {product.quantity}
+                          </td>
+                          <td className="text-center align-middle">
+                            {(
+                              product.price * product.quantity
+                            ).toLocaleString()}{" "}
+                            VND
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* Mã giảm giá */}
+                  <div className="mb-3">
+                    <label
+                      htmlFor={`discount-code-${store.storeName}`}
+                      className="form-label"
+                    >
+                      Mã giảm giá
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id={`discount-code-${store.storeName}`}
+                      placeholder="Nhập mã giảm giá"
+                      value={appliedDiscountNames[store.storeName] || ""} // Hiển thị tên mã giảm giá
+                      onClick={() => {
+                        setSelectedStore(store); // Lưu cửa hàng khi người dùng chọn
+                        console.log("Cửa hàng đã chọn:", store.storeName);
+                        handleOpenMGG(); // Mở modal
+                      }}
+                      readOnly
+                    />
+                  </div>
+
+                  {/* Lời nhắn cho cửa hàng */}
+                  <div className="mb-3">
+                    <label
+                      htmlFor={`message-${store.storeName}`}
+                      className="form-label"
+                    >
+                      Lời nhắn cho cửa hàng
+                    </label>
+                    <textarea
+                      className="form-control"
+                      id={`message-${store.storeName}`}
+                      rows="3"
+                      placeholder="Nhập lời nhắn"
+                      onChange={(e) =>
+                        handleMessageChange(store.storeName, e.target.value)
+                      }
+                    ></textarea>
+                  </div>
+
+                  <table className="table table-light">
+                    <tbody>
+                      <tr>
+                        <td colSpan="4" className="fw-bold">
+                          Tổng số tiền:
+                          {discountAmount > 0 && (
+                            <>
+                              <span
+                                style={{
+                                  textDecoration: "line-through",
+                                  color: "#6f4f28", // Màu nâu
+                                  marginRight: 5,
+                                }}
+                              >
+                                - {discountAmount.toLocaleString()}
+                              </span>
+                            </>
+                          )}
+                          <span
+                            className={
+                              discountAmount > 0
+                                ? "text-danger line-through mglhd"
+                                : "text-danger mglhd"
+                            }
+                          >
+                            {finalAmount.toLocaleString()} VND
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
           </div>
 
           <div className="col-lg-4">
@@ -757,6 +984,8 @@ const PaymentPage = () => {
                 </h3>
                 <hr />
                 <h5>Chọn phương thức thanh toán:</h5>
+
+                {/* Thanh toán khi nhận hàng */}
                 <div className="form-check">
                   <input
                     type="radio"
@@ -771,20 +1000,63 @@ const PaymentPage = () => {
                     Thanh toán khi nhận hàng
                   </label>
                 </div>
+
+                {/* VietQR */}
                 <div className="form-check mt-2">
                   <input
                     type="radio"
                     className="form-check-input"
-                    id="payment-bank"
-                    value="bank"
+                    id="payment-vietqr"
+                    value="vietqr"
                     name="payment-method"
-                    checked={paymentMethod === "bank"}
+                    checked={paymentMethod === "vietqr"}
                     onChange={handlePaymentMethodChange}
                   />
-                  <label className="form-check-label" htmlFor="payment-bank">
-                    Chuyển khoản
+                  <label className="form-check-label" htmlFor="payment-vietqr">
+                    <img src={icon1_2} alt="VietQR" className="me-2" />
+                    VietQR
                   </label>
                 </div>
+
+                {/* ATM Card */}
+                <div className="form-check mt-2">
+                  <input
+                    type="radio"
+                    className="form-check-input"
+                    id="payment-atm"
+                    value="atm"
+                    name="payment-method"
+                    checked={paymentMethod === "atm"}
+                    onChange={handlePaymentMethodChange}
+                  />
+                  <label className="form-check-label" htmlFor="payment-atm">
+                    <img
+                      style={{ height: 40 }}
+                      src={baokim}
+                      alt="ATM Card"
+                      className="me-2"
+                    />
+                    ATM Card
+                  </label>
+                </div>
+
+                {/* VNPay QR */}
+                <div className="form-check mt-2">
+                  <input
+                    type="radio"
+                    className="form-check-input"
+                    id="payment-vnpay"
+                    value="vnpay"
+                    name="payment-method"
+                    checked={paymentMethod === "vnpay"}
+                    onChange={handlePaymentMethodChange}
+                  />
+                  <label className="form-check-label" htmlFor="payment-vnpay">
+                    <img src={icon1_1} alt="VNPay QR" className="me-2" />
+                    VNPay QR
+                  </label>
+                </div>
+
                 <button
                   className="btn btn-primary w-100 mt-3"
                   onClick={handleConfirmPayment}
@@ -796,6 +1068,78 @@ const PaymentPage = () => {
           </div>
         </div>
       </div>
+      <Dialog open={opeenMGG} onClose={handleCloseMGG} maxWidth="sm" fullWidth>
+        <DialogTitle>Áp dụng mã giảm giá</DialogTitle>
+        <div className="discount-list">
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              <CircularProgress />
+            </div>
+          ) : discounts.length > 0 ? (
+            discounts.map((discount) => (
+              <div key={discount._id} className="discount-card">
+                <div className="discount-left">
+                  <span className="discount-percent">
+                    {discount.giaTriGiam / 1000}k
+                  </span>
+                  <span className="discount-off">OFF</span>
+                  <span className="discount-usage">
+                    {discount.TongSoLuongDuocTao} LƯỢT
+                  </span>
+                </div>
+                <div className="discount-right">
+                  <div className="discount-code">{discount.TenKhuyenMai}</div>
+                  <div className="discount-dates">
+                    Áp dụng từ{" "}
+                    {new Date(discount.NgayBatDau).toLocaleDateString()} -{" "}
+                    {new Date(discount.NgayKetThuc).toLocaleDateString()}
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      className="copy-button"
+                      onClick={() =>
+                        navigator.clipboard.writeText(discount.TenKhuyenMai)
+                      }
+                    >
+                      <i className="fa fa-clone"></i>
+                    </button>
+                    <button
+                      className="apply-button"
+                      onClick={() => {
+                        if (selectedStore) {
+                          console.log(
+                            "Áp dụng mã giảm giá cho cửa hàng:",
+                            selectedStore.storeName
+                          );
+                          handleApplyDiscount(
+                            discount,
+                            selectedStore.storeName
+                          ); // Áp dụng mã giảm giá cho cửa hàng đã chọn
+                        } else {
+                          console.log("Chưa chọn cửa hàng.");
+                        }
+                      }}
+                      // onClick={() => {
+                      //   // Log cửa hàng đang áp dụng mã giảm giá
+                      //   const storeName = selectedStores[0].storeName; // Lấy tên cửa hàng đầu tiên, bạn có thể thay đổi logic này để chọn đúng cửa hàng
+                      //   console.log("Store name đang chọn:", storeName);
+                      //   handleApplyDiscount(discount, storeName); // Áp dụng mã giảm giá cho cửa hàng tương ứng
+                      // }}
+                      // onClick={() => handleApplyDiscount(discount)} // Áp dụng mã giảm giá
+                    >
+                      Áp dụng
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              Không có mã giảm giá nào.
+            </div>
+          )}
+        </div>
+      </Dialog>
     </div>
   );
 };

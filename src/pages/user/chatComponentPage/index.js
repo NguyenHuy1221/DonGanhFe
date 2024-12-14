@@ -10,7 +10,6 @@ import {
   uploadFile,
 } from "../../../api/chatSocket";
 
-
 function ChatComponent({ isChatMo, toggleChatMo }) {
   const [isChatOpen, setIsChatOpen] = useState(false); // Quản lý trạng thái mở chat
   const [newMessage, setNewMessage] = useState("");
@@ -97,13 +96,14 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
 
   const createConversation = async (senderId, receiverId) => {
     try {
-      // const response = await axios.post("/api/chatsocket/Createconversation", {
-      //   sender_id: senderId,
-      //   receiver_id: receiverId,
-      // });
-      // return response.data;
-      const conversation = await createConversation(senderId, receiverId);
-      console.log("Cuộc trò chuyện mới:", conversation);
+      const response = await axios.post("/api/chatsocket/Createconversation", {
+        sender_id: senderId,
+        receiver_id: receiverId,
+      });
+      console.log("Cuộc trò chuyện mới:", response.data);
+
+      return response.data;
+      // const conversation = await createConversation(senderId, receiverId);
     } catch (error) {
       console.error("Lỗi khi tạo hội thoại:", error);
     }
@@ -141,7 +141,7 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
           (conv.receiver_id._id === currentUserId &&
             conv.sender_id._id === user._id)
       );
-      
+
       if (conversation) {
         console.log("Hội thoại tìm thấy:", conversation);
         setSelectedConversationId(conversation._id);
@@ -170,7 +170,8 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
     console.log("Trạng thái chat mới:", !isChatOpen);
 
     const currentUserId = getUserIdFromToken(); // Lấy currentUserId từ token
-    const chatUserId = localStorage.getItem("userId"); // Lấy chatUserId từ localStorage
+    const chatUserId = localStorage.getItem("userIdChat"); // Lấy chatUserId từ localStorage
+    // const chatUserId = localStorage.getItem("userId"); // Lấy chatUserId từ localStorage
 
     console.log("currentUserId:", currentUserId);
     console.log("chatUserId:", chatUserId);
@@ -227,43 +228,6 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
     }
   };
 
-  // const toggleChat = async () => {
-  //   console.log("Toggling chat...");
-  //   setIsChatOpen(!isChatOpen);
-  //   toggleChatMo && toggleChatMo(!isChatMo); // Đồng bộ với trạng thái từ props
-  //   console.log("Trạng thái chat mới:", !isChatOpen);
-  //   if (!isChatOpen) {
-  //     // Chỉ tải dữ liệu khi mở chat
-  //     const chatUserId = localStorage.getItem("userId");
-  //     const currentUserId = getUserIdFromToken();
-
-  //     if (chatUserId) {
-  //       fetchConversations(currentUserId).then((conversations = []) => {
-  //         const existingConversation = conversations.find(
-  //           (conv) =>
-  //             (conv.sender_id._id === currentUserId &&
-  //               conv.receiver_id._id === chatUserId) ||
-  //             (conv.receiver_id._id === currentUserId &&
-  //               conv.sender_id._id === chatUserId)
-  //         );
-
-  //         if (!existingConversation) {
-  //           // Tạo cuộc trò chuyện nếu chưa có
-  //           createConversation(currentUserId, chatUserId).then(() => {
-  //             fetchConversations(currentUserId); // Cập nhật lại danh sách người dùng sau khi tạo
-  //           });
-  //         } else {
-  //           // Đã tồn tại cuộc trò chuyện, chỉ cần cập nhật danh sách người dùng
-  //           fetchConversations(currentUserId);
-  //         }
-  //       });
-  //     } else {
-  //       // Lấy danh sách cuộc trò chuyện nếu không có userId
-  //       fetchConversations(currentUserId);
-  //     }
-  //   }
-  // };
-
   const closeChat = () => {
     setIsChatOpen(false);
     toggleChatMo && toggleChatMo(false); // Đảm bảo trạng thái bên ngoài cũng được tắt
@@ -302,7 +266,7 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
 
         const uploadResponse = await uploadFile(selectedFile);
         const { imageUrl, videoUrl } = uploadResponse;
-        
+
         if (imageUrl) {
           message.imageUrl = imageUrl;
         }
@@ -393,6 +357,21 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
               ))}
             </div>
             <div className="col-8 content-user">
+              {selectedUser && (
+                <div className="chat-header-info">
+                  <img
+                    src={
+                      selectedUser.anhDaiDien ||
+                      "https://via.placeholder.com/150"
+                    }
+                    alt={selectedUser.tenNguoiDung}
+                    className="chat-header-avatar"
+                  />
+                  <span className="chat-header-name">
+                    {selectedUser.tenNguoiDung}
+                  </span>
+                </div>
+              )}
               <div className="messages">
                 {messages.map((msg, index) => (
                   <div

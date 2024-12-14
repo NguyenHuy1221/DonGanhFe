@@ -12,6 +12,8 @@ import {
   Row,
   Col,
   InputNumber,
+  Checkbox,
+  Card,
 } from "antd";
 
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -26,6 +28,7 @@ import axios from "axios";
 import { layDanhSachThuocTinh } from "../../../api/thuocTinhService";
 import { formatter, numberFormatter } from "../../../utils/fomater";
 import { updateThuocTinh, addThuocTinh } from "../../../api/productService";
+import { Text } from "recharts";
 const BienThePage = () => {
   const { Option } = Select;
   const [duLieu, setDuLieu] = useState([]);
@@ -41,14 +44,24 @@ const BienThePage = () => {
   ]);
   const [thuocTinhGiaTri, setThuocTinhGiaTri] = useState([]);
   const [isAttributeModalVisible, setIsAttributeModalVisible] = useState(false);
-  const [attributeForm] = Form.useForm();
+  const [isToHopBienThe, setToHopBienThe] = useState(false);
 
+  const [attributeForm] = Form.useForm();
+  const [toHopBienTheForm] = Form.useForm();
+
+  const [recordIdEditing, setRecordIdEditing] = useState(null);
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(price);
   };
+
+  useEffect(() => {
+    if (!isModalVisible) {
+      fetchThuocTinh(); // Làm mới danh sách thuộc tính khi đóng modal biến thể
+    }
+  }, [isModalVisible]);
 
   useEffect(() => {
     fetchData();
@@ -79,7 +92,10 @@ const BienThePage = () => {
       const productId = localStorage.getItem("productId");
       const data = await layDanhSachBienThe(productId);
       const sanPham = await layDanhSachSanPham(productId);
-      setDuLieu(data);
+      const filteredData = data.filter((item) => !item.isDeleted);
+
+      setDuLieu(filteredData);  // Sử dụng filteredData để set dữ liệu đã lọc
+      // setDuLieu(data);
       setDuLieuSanPham(sanPham);
 
       console.log("dâtt", data);
@@ -100,75 +116,6 @@ const BienThePage = () => {
     await fetchGiaTriThuocTinh(value);
   };
 
-  const handleAddAttribute = async () => {
-    try {
-      const values = await attributeForm.validateFields();
-
-      // Format dữ liệu thành object đúng định dạng
-      const formattedAttributes = {
-        thuocTinhId: values[`thuocTinhSKU_0`], // Lấy ID thuộc tính đầu tiên
-        giaTriThuocTinhIds: values[`giaTri_0`], // Lấy giá trị thuộc tính
-      };
-
-      console.log("Dữ liệu gửi đi:", formattedAttributes);
-
-      // Gửi API để cập nhật hoặc thêm thuộc tính
-      const response = isEditing
-        ? await updateThuocTinh(duLieuSanPham._id, formattedAttributes) // Gọi API cập nhật
-        : await addThuocTinh(duLieuSanPham._id, formattedAttributes); // Gọi API thêm mới
-
-      // Kiểm tra phản hồi từ API
-      if (response) {
-        message.success("Thêm thuộc tính thành công");
-        setIsAttributeModalVisible(false);
-        fetchData();
-        attributeForm.resetFields();
-      } else {
-        message.error("Thêm thuộc tính thất bại.");
-      }
-    } catch (error) {
-      console.error("Lỗi khi thêm thuộc tính:", error);
-      message.error("Có lỗi xảy ra, vui lòng thử lại!");
-    }
-  };
-
-  // const handleAddAttribute = async () => {
-  //   try {
-  //     const values = await attributeForm.validateFields();
-
-  //     // Format dữ liệu thành object đúng định dạng
-  //     const formattedAttributes = {
-  //       thuocTinhId: values[`thuocTinhSKU_0`], // Lấy ID thuộc tính đầu tiên
-  //       giaTriThuocTinhIds: values[`giaTri_0`], // Lấy giá trị thuộc tính
-  //     };
-
-  //     console.log("Dữ liệu gửi đi:", formattedAttributes);
-
-  //     // Gửi API để cập nhật hoặc thêm thuộc tính
-  //     const response = isEditing
-  //       ? await axios.put(
-  //           `/api/sanpham/updateThuocTinhForSanPham/${duLieuSanPham._id}`,
-  //           formattedAttributes
-  //         )
-  //       : await axios.post(
-  //           `/api/sanpham/addThuocTinhForSanPham/${duLieuSanPham._id}`,
-  //           formattedAttributes
-  //         );
-
-  //     if (response.status === 200) {
-  //       message.success("Cập nhật thuộc tính thành công");
-  //       setIsAttributeModalVisible(false);
-  //       fetchData();
-  //       attributeForm.resetFields();
-  //     } else {
-  //       message.error("Thêm thuộc tính thất bại.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Lỗi khi thêm thuộc tính:", error);
-  //     message.error("Có lỗi xảy ra, vui lòng thử lại!");
-  //   }
-  // };
-
   const fetchThuocTinh = async () => {
     try {
       const userId = localStorage.getItem("userId");
@@ -186,9 +133,7 @@ const BienThePage = () => {
       const response = await axios.get(
         `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}`
       );
-      // Lọc bỏ các giá trị thuộc tính bị xóa (isDeleted === true)
-      // const filteredData = response.data.filter((item) => !item.isDeleted);
-      setThuocTinhGiaTri(response.data);
+      setThuocTinhGiaTri(response.data); // Không lọc, lấy tất cả giá trị
       return response.data;
     } catch (error) {
       message.error("Lỗi khi tải giá trị thuộc tính!");
@@ -249,65 +194,103 @@ const BienThePage = () => {
       message.error("Xóa biến thể thất bại");
     }
   };
-
   const xacNhanHandler = async () => {
     try {
-      // Xác thực và lấy giá trị từ form
       const values = await form.validateFields();
-      console.log("Giá trị từ form:", values); // Ghi lại giá trị từ form
 
-      // Tạo mảng KetHopThuocTinh từ các giá trị thuộc tính
-      const ketHopThuocTinh = [];
-      duLieuSanPham.DanhSachThuocTinh.forEach((thuocTinh, index) => {
-        const giaTri = values[`giaTriThuocTinh${index}`]; // Lấy giá trị từ form
-        console.log(`Giá trị thuộc tính ${index}:`, giaTri); // Log giá trị thuộc tính
+      console.log("Giá trị form trước khi xử lý:", values);
 
-        // Kiểm tra xem giaTri có phải là một mảng không
-        if (Array.isArray(giaTri)) {
-          giaTri.forEach((idGiaTri) => {
-            ketHopThuocTinh.push({ IDGiaTriThuocTinh: idGiaTri }); // Thêm vào mảng
-          });
-        } else if (giaTri) {
-          // Nếu giaTri không phải là mảng nhưng vẫn có giá trị
-          ketHopThuocTinh.push({ IDGiaTriThuocTinh: giaTri }); // Thêm vào mảng
+      const ketHopThuocTinh = duLieuSanPham.DanhSachThuocTinh.map(
+        (thuocTinh, index) => {
+          const giaTri = values[`giaTriThuocTinh${index}`];
+          return {
+            IDGiaTriThuocTinh: Array.isArray(giaTri)
+              ? giaTri.filter((id) =>
+                  thuocTinh.giaTriThuocTinh.some((gt) => gt._id === id)
+                )
+              : thuocTinh.giaTriThuocTinh.some((gt) => gt._id === giaTri)
+              ? giaTri
+              : null,
+          };
         }
-      });
+      ).filter((item) => item.IDGiaTriThuocTinh);
+
+      if (!ketHopThuocTinh.length) {
+        message.error("Vui lòng chọn giá trị hợp lệ!");
+        return;
+      }
 
       const dataToSend = {
         sku: values.sku,
         gia: values.gia,
         soLuong: values.soLuong,
-        KetHopThuocTinh: ketHopThuocTinh, // Đưa mảng vào đối tượng cuối cùng
+        KetHopThuocTinh: ketHopThuocTinh,
       };
 
-      console.log("Dữ liệu gửi đi:", dataToSend); // Log dữ liệu sẽ được gửi đi
+      console.log("Dữ liệu gửi lên server:", dataToSend);
 
       if (isEditing) {
-        console.log("Cập nhật biến thể với ID:", editRecord._id); // Ghi lại ID biến thể đang sửa
-        await suaBienThe({ ...dataToSend, id: editRecord._id }); // Gọi hàm cập nhật với ID biến thể
+        // Gọi API sửa biến thể
+        const response = await suaBienThe({
+          ...dataToSend,
+          id: editRecord._id,
+        });
+        console.log("Phản hồi từ API khi sửa:", response);
         message.success("Cập nhật biến thể thành công");
       } else {
-        const IDSanPham = localStorage.getItem("productId");
-        if (!IDSanPham) {
-          message.error("Không tìm thấy ID sản phẩm.");
-          return;
-        }
-        console.log("Thêm biến thể với dữ liệu:", dataToSend); // Ghi lại dữ liệu thêm
-        await themBienThe(IDSanPham, dataToSend); // Gọi hàm thêm với ID sản phẩm
+        // Gọi API thêm biến thể
+        const response = await themBienThe(
+          localStorage.getItem("productId"),
+          dataToSend
+        );
+        console.log("Phản hồi từ API khi thêm:", response);
         message.success("Thêm biến thể thành công");
       }
 
       setIsModalVisible(false);
-      fetchData(); // Lấy lại dữ liệu sau khi thêm
+      fetchData();
     } catch (error) {
-      console.error("Lỗi khi thêm/cập nhật biến thể:", error); // Log lỗi nếu có
-      message.error("Biến thể đã tồn tại!");
+      console.error("Lỗi khi thêm/cập nhật biến thể:", error);
+      message.error("Lỗi khi thêm/cập nhật biến thể!");
+    }
+  };
+
+  const handleAddAttribute = async () => {
+    try {
+      const values = await attributeForm.validateFields();
+
+      // Format dữ liệu thành object đúng định dạng
+      const formattedAttributes = {
+        thuocTinhId: values[`thuocTinhSKU_0`], // Lấy ID thuộc tính đầu tiên
+        giaTriThuocTinhIds: values[`giaTri_0`], // Lấy giá trị thuộc tính
+      };
+
+      console.log("Dữ liệu gửi đi:", formattedAttributes);
+
+      // Gửi API để cập nhật hoặc thêm thuộc tính
+      const response = isEditing
+        ? await updateThuocTinh(duLieuSanPham._id, formattedAttributes) // Gọi API cập nhật
+        : await addThuocTinh(duLieuSanPham._id, formattedAttributes); // Gọi API thêm mới
+
+      // Kiểm tra phản hồi từ API
+      if (response) {
+        message.success("Thêm thuộc tính thành công");
+        setIsAttributeModalVisible(false);
+        fetchData();
+        attributeForm.resetFields();
+      } else {
+        message.error("Thêm thuộc tính thất bại.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi thêm thuộc tính:", error);
+      message.error("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
 
   const huyHandler = () => {
     setIsModalVisible(false);
-    attributeForm.resetFields();
+    setIsEditing(false);
+    form.resetFields();
   };
 
   const xoaThuocTinhHandler = async (record) => {
@@ -323,6 +306,42 @@ const BienThePage = () => {
     } catch (error) {
       message.error("Xóa thuộc tính thất bại");
       console.log("xóa này ", record);
+    }
+  };
+
+  const handleToHopBienThe = async () => {
+    try {
+      // Lấy dữ liệu từ form
+      const values = await toHopBienTheForm.validateFields();
+  
+      // Thêm ID sản phẩm vào dữ liệu gửi
+      const idsp = duLieuSanPham._id;
+      console.log("id sản phẩm " , idsp);
+      const payload = {
+        IDSanPham: idsp, 
+        sku: values.sku,
+        gia: values.gia,
+        soLuong: values.soLuong,
+      };
+  
+      // Gửi dữ liệu qua API
+      const response = await axios.post(
+        "/api/sanpham/ToHopBienThePhienBanBangTay",
+        payload
+      );
+  
+      // Xử lý khi gọi API thành công
+      if (response.status === 200) {
+        setToHopBienThe(false); // Đóng modal
+        toHopBienTheForm.resetFields(); // Reset form
+        fetchData();
+        message.success("Tổ hợp biến thể thành công");
+
+      } else {
+        message.error("Tổ hợp biến thể thất bại.");
+      }
+    } catch (error) {
+      message.error("Tổ hợp biến thể thất bại.");
     }
   };
 
@@ -388,9 +407,18 @@ const BienThePage = () => {
         type="dashed"
         icon={<PlusOutlined />}
         onClick={() => setIsAttributeModalVisible(true)}
+        style={{margin : 10}}
       >
         Thêm thuộc tính
       </Button>
+      <Button
+        icon={<PlusOutlined />}
+        onClick={() => setToHopBienThe(true)}
+        style={{ backgroundColor: "#4CAF50", color: "white" ,margin : 5}}
+      >
+        Tổ hợp biến thể
+      </Button>
+
       {duLieuSanPham && (
         <div style={{ marginBottom: "16px" }}>
           {/* Hiển thị danh sách thuộc tính */}
@@ -444,11 +472,15 @@ const BienThePage = () => {
       )}
 
       <Table columns={cotDuLieu} dataSource={duLieu} pagination={false} />
+
       <Modal
         title={isEditing ? "Sửa biến thể" : "Thêm biến thể"}
         visible={isModalVisible}
         onOk={xacNhanHandler}
-        onCancel={huyHandler}
+        onCancel={() => {
+          huyHandler(); // Xử lý đóng modal
+          form.resetFields(); // Reset dữ liệu form khi tắt modal
+        }}
         okText={isEditing ? "Cập nhật" : "Thêm"}
       >
         <Form form={form} layout="vertical" name="bien_the_form">
@@ -483,48 +515,105 @@ const BienThePage = () => {
               parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
             />
           </Form.Item>
+          {isEditing ? (
+            // Trường hợp sửa
+            editRecord &&
+            editRecord.KetHopThuocTinh &&
+            editRecord.KetHopThuocTinh.length > 0 ? (
+              editRecord.KetHopThuocTinh.map((thuocTinh, index) => {
+                const thuocTinhID =
+                  thuocTinh?.IDGiaTriThuocTinh?.ThuocTinhID?._id;
 
-          {duLieuSanPham?.DanhSachThuocTinh?.map((thuocTinh, index) => (
-            <Form.Item key={thuocTinh.thuocTinh._id}>
-              <Row gutter={16} justify="center" align="middle">
-                <Col span={12}>
-                  <Form.Item label="Thuộc tính">
-                    <Input value={thuocTinh.thuocTinh.TenThuocTinh} readOnly />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name={`giaTriThuocTinh${index}`}
-                    label={`Giá trị của ${thuocTinh.thuocTinh.TenThuocTinh}`}
-                    rules={[
-                      { required: true, message: "Vui lòng chọn giá trị!" },
-                    ]}
-                  >
-                    <Select
-                      placeholder="Chọn giá trị"
-                      onFocus={async () => {
-                        const giaTri = await fetchGiaTriThuocTinh(
-                          thuocTinh.thuocTinh._id
-                        );
-                        setGiaTriThuocTinh((prev) => ({
-                          ...prev,
-                          [thuocTinh.thuocTinh._id]: giaTri,
-                        }));
-                      }}
+                // Lấy danh sách giá trị có trong thuộc tính từ `duLieuSanPham`
+                const giaTriThuocTinhSanPham =
+                  duLieuSanPham?.DanhSachThuocTinh?.find(
+                    (item) => item.thuocTinh._id === thuocTinhID
+                  )?.giaTriThuocTinh || [];
+
+                return (
+                  <Row key={thuocTinhID} gutter={16}>
+                    <Col span={12}>
+                      <Form.Item label="Thuộc tính">
+                        <Input
+                          value={
+                            thuocTinh?.IDGiaTriThuocTinh?.ThuocTinhID
+                              ?.TenThuocTinh
+                          }
+                          readOnly
+                        />
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={12}>
+                      <Form.Item
+                        label="Giá trị"
+                        name={`giaTriThuocTinh${index}`}
+                        initialValue={thuocTinh?.IDGiaTriThuocTinh?._id}
+                      >
+                        <Select>
+                          {giaTriThuocTinhSanPham.map((giaTri) => (
+                            <Select.Option key={giaTri._id} value={giaTri._id}>
+                              {giaTri.GiaTri}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                );
+              })
+            ) : (
+              <span>Không có thuộc tính</span>
+            )
+          ) : (
+            // Trường hợp thêm
+            duLieuSanPham?.DanhSachThuocTinh?.map((thuocTinh, index) => (
+              <Form.Item key={thuocTinh.thuocTinh._id}>
+                <Row gutter={16} justify="center" align="middle">
+                  <Col span={12}>
+                    <Form.Item label="Thuộc tính">
+                      <Input
+                        value={thuocTinh.thuocTinh.TenThuocTinh}
+                        readOnly
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name={`giaTriThuocTinh${index}`}
+                      label={`Giá trị của ${thuocTinh.thuocTinh.TenThuocTinh}`}
                     >
-                      {(giaTriThuocTinh[thuocTinh.thuocTinh._id] || []).map(
-                        (giaTri) => (
-                          <Select.Option key={giaTri._id} value={giaTri._id}>
-                            {giaTri.GiaTri}
-                          </Select.Option>
-                        )
-                      )}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form.Item>
-          ))}
+                      <Select
+                        placeholder="Chọn giá trị"
+                        onFocus={async () => {
+                          // Lấy danh sách giá trị thuộc tính trong sản phẩm
+                          const thuocTinhTrongSanPham =
+                            duLieuSanPham.DanhSachThuocTinh.find(
+                              (item) =>
+                                item.thuocTinh._id === thuocTinh.thuocTinh._id
+                            );
+                          const giaTri =
+                            thuocTinhTrongSanPham?.giaTriThuocTinh || [];
+                          setGiaTriThuocTinh((prev) => ({
+                            ...prev,
+                            [thuocTinh.thuocTinh._id]: giaTri,
+                          }));
+                        }}
+                      >
+                        {(giaTriThuocTinh[thuocTinh.thuocTinh._id] || []).map(
+                          (giaTri) => (
+                            <Select.Option key={giaTri._id} value={giaTri._id}>
+                              {giaTri.GiaTri}
+                            </Select.Option>
+                          )
+                        )}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form.Item>
+            ))
+          )}
         </Form>
       </Modal>
 
@@ -589,6 +678,61 @@ const BienThePage = () => {
           ))}
         </Form>
       </Modal>
+
+      <Modal
+        title="Tổ hợp biến thể"
+        visible={isToHopBienThe}
+        onCancel={() => {
+          setToHopBienThe(false); 
+          toHopBienTheForm.resetFields(); 
+        }}
+        onOk={handleToHopBienThe}
+        width={800}
+      >
+        <Form form={toHopBienTheForm}>
+          <h1>Tổ hợp biến thể</h1>
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item
+                name="sku"
+                label="SKU"
+                rules={[{ required: true, message: "Vui lòng nhập SKU!" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="gia"
+                label="Giá"
+                rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
+              >
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  formatter={numberFormatter}
+                  parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="soLuong"
+                label="Số Lượng"
+                rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
+              >
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  formatter={numberFormatter}
+                  parser={(value) => value.replace(/\$\s?|(\.*)/g, "")}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
     </>
   );
 };

@@ -341,7 +341,7 @@ const HomePage = () => {
         <div class="info-grid">
           {/* <!-- Card 1 --> */}
           <div class="info-card">
-            <img src={gg} alt="google" />
+            <img src="https://shop.donganh.vn/wp-content/uploads/2024/07/cai-don-ganh.jpg" alt="google" />
 
             <h3>Câu chuyện Đòn Gánh</h3>
             <p>
@@ -353,7 +353,7 @@ const HomePage = () => {
 
           {/* <!-- Card 2 --> */}
           <div class="info-card">
-            <img src={gg} alt="google" />
+            <img src="https://shop.donganh.vn/wp-content/uploads/2024/07/chinh-sach-thanh-toan-the-gioi-thep-group.jpg" alt="google" />
 
             <h3>Chính sách thanh toán</h3>
             <p>
@@ -364,7 +364,7 @@ const HomePage = () => {
 
           {/* <!-- Card 3 --> */}
           <div class="info-card">
-            <img src={gg} alt="google" />
+            <img src="https://shop.donganh.vn/wp-content/uploads/2024/07/chinh-sach-doi-tra-thumbnail.png" alt="google" />
 
             <h3>Chính sách đổi trả</h3>
             <p>
@@ -375,7 +375,7 @@ const HomePage = () => {
 
           {/* <!-- Card 4 --> */}
           <div class="info-card">
-            <img src={gg} alt="google" />
+            <img src="https://shop.donganh.vn/wp-content/uploads/2024/07/Chinh-sach-van-chuyen-giao-nhan-hang-hoa.jpg" alt="google" />
             <h3>Chính sách vận chuyển & giao nhận hàng hóa</h3>
             <p>
               Thời gian giao – nhận hàng sau khi được tiếp nhận xử lý xong sẽ
@@ -385,7 +385,7 @@ const HomePage = () => {
 
           {/* Card 5  */}
           <div class="info-card">
-            <img src={gg} alt="google" />
+            <img src="https://shop.donganh.vn/wp-content/uploads/2024/07/news_1645000389.jpg" alt="google" />
 
             <h3>Chính sách bảo mật</h3>
             <p>

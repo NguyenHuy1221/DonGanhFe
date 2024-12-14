@@ -30,7 +30,11 @@ const BaiVietManager = () => {
   const [baiVietList, setBaiVietList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisibleConTents, setIsModalVisibleConTents] = useState(false);
+
   const [editingId, setEditingId] = useState(null); // ID của bài viết đang chỉnh sửa
+  const [modalContent, setModalContent] = useState({ type: "", data: null });
+
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
@@ -162,6 +166,16 @@ const BaiVietManager = () => {
     console.log("Thích bài viết: ", id);
   };
 
+  const handleViewMore = (type, data) => {
+    setModalContent({ type, data });
+    setIsModalVisibleConTents(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisibleConTents(false);
+    setModalContent({ type: "", data: null });
+  };
+
   const columns = [
     {
       title: "Tiêu đề",
@@ -172,6 +186,27 @@ const BaiVietManager = () => {
       title: "Nội dung",
       dataIndex: "noidung",
       key: "noidung",
+      render: (text) => {
+        const MAX_LENGTH = 20; // Độ dài nội dung tối đa trước khi ẩn bớt
+        return (
+          <div>
+            {text.length > MAX_LENGTH ? (
+              <>
+                {`${text.slice(0, MAX_LENGTH)}... `}
+                <Button
+                  type="link"
+                  onClick={() => handleViewMore("content", text)}
+                  style={{ padding: 0 }}
+                >
+                  Xem thêm
+                </Button>
+              </>
+            ) : (
+              text
+            )}
+          </div>
+        );
+      },
     },
     {
       title: "Tác giả",
@@ -200,26 +235,36 @@ const BaiVietManager = () => {
       title: "Hình ảnh",
       dataIndex: "image",
       key: "image",
-      render: (images) => (
-        <Space className="image-container" size="middle">
-          {Array.isArray(images) && images.length > 0 ? (
-            images.map((imgUrl, index) => (
-              <Image
-                key={index}
-                width={50}
-                height={50}
-                src={imgUrl}
-                style={{
-                  objectFit: "cover",
-                  borderRadius: "5px",
-                }}
-              />
-            ))
-          ) : (
-            <span>Không có hình ảnh</span>
-          )}
-        </Space>
-      ),
+      render: (images) => {
+        const MAX_IMAGES = 3; // Số lượng ảnh tối đa trước khi ẩn bớt
+        return (
+          <div>
+            <Space size="middle">
+              {images.slice(0, MAX_IMAGES).map((imgUrl, index) => (
+                <Image
+                  key={index}
+                  width={50}
+                  height={50}
+                  src={imgUrl}
+                  style={{
+                    objectFit: "cover",
+                    borderRadius: "5px",
+                  }}
+                />
+              ))}
+            </Space>
+            {images.length > MAX_IMAGES && (
+              <Button
+                type="link"
+                onClick={() => handleViewMore("images", images)}
+                style={{ padding: 0 }}
+              >
+                Xem thêm
+              </Button>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: "Hành động",
@@ -353,6 +398,41 @@ const BaiVietManager = () => {
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title={
+          modalContent.type === "content"
+            ? "Chi tiết Nội dung"
+            : modalContent.type === "images"
+            ? "Danh sách Hình ảnh"
+            : ""
+        }
+        visible={isModalVisibleConTents}
+        onCancel={handleCloseModal}
+        footer={null}
+      >
+        {modalContent.type === "content" && (
+          <div>
+            <p>{modalContent.data}</p>
+          </div>
+        )}
+
+        {modalContent.type === "images" && (
+          <div>
+            <Space wrap>
+              {modalContent.data.map((imgUrl, index) => (
+                <Image
+                  key={index}
+                  width={100}
+                  height={100}
+                  src={imgUrl}
+                  style={{ objectFit: "cover", borderRadius: "5px" }}
+                />
+              ))}
+            </Space>
+          </div>
+        )}
       </Modal>
     </div>
   );

@@ -21,22 +21,51 @@ const ItemSanPham = () => {
     getProducts();
   }, []);
 
+  // const getProducts = async () => {
+  //   try {
+  //     const productsData = await fetchProducts(); // Gọi API để lấy dữ liệu
+
+  //     // Lọc sản phẩm mới
+  //     const sortedNewProducts = [...productsData]
+  //       .sort((a, b) => new Date(b.NgayTao) - new Date(a.NgayTao))
+  //       .slice(0, 10);
+  //     setNewProducts(sortedNewProducts);
+
+  //     // Lọc sản phẩm bán chạy
+  //     const sortedBestSellingProducts = [...productsData]
+  //       .sort(
+  //         (a, b) =>
+  //           a.SoLuongNhap -
+  //           a.SoLuongHienTai -
+  //           (b.SoLuongNhap - b.SoLuongHienTai)
+  //       )
+  //       .slice(0, 10);
+  //     setBestSellingProducts(sortedBestSellingProducts);
+  //   } catch (error) {
+  //     console.error("Error fetching products:", error);
+  //   }
+  // };
+
   const getProducts = async () => {
     try {
       const productsData = await fetchProducts(); // Gọi API để lấy dữ liệu
-
+  
+      // Lọc sản phẩm không có TinhTrang là "Đã xóa"
+      const filteredProducts = productsData.filter(
+        (product) => product.TinhTrang !== "Đã xóa"
+      );
+  
       // Lọc sản phẩm mới
-      const sortedNewProducts = [...productsData]
+      const sortedNewProducts = [...filteredProducts]
         .sort((a, b) => new Date(b.NgayTao) - new Date(a.NgayTao))
         .slice(0, 10);
       setNewProducts(sortedNewProducts);
-
+  
       // Lọc sản phẩm bán chạy
-      const sortedBestSellingProducts = [...productsData]
+      const sortedBestSellingProducts = [...filteredProducts]
         .sort(
           (a, b) =>
-            a.SoLuongNhap -
-            a.SoLuongHienTai -
+            a.SoLuongNhap - a.SoLuongHienTai -
             (b.SoLuongNhap - b.SoLuongHienTai)
         )
         .slice(0, 10);
@@ -46,6 +75,7 @@ const ItemSanPham = () => {
     }
   };
 
+  
   const moveLeft = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? prevIndex : prevIndex - 1

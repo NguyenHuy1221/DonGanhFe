@@ -108,39 +108,61 @@ const UserListPage = ({ onClickXacNhan }) => {
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((user, index) => (
-              <tr key={user._id} style={{ cursor: "pointer" }}>
-                <td>{firstIndex + index + 1}</td>
-                <td>{user.diaChi?.Name || "N/A"}</td>
-                <td>{user.diaChi?.Email || "Không có email"}</td>
-                <td>{user.diaChi?.SoDienThoai || "Không có số"}</td>
-                <td>
-                  <span className="badge bg-warning text-dark">
-                    {user.trangThai === "cho"
-                      ? "Đang chờ xác nhận"
-                      : user.trangThai === "huy"
-                      ? "Đã hủy" // Hiển thị "Đã hủy" khi trạng thái là "huy"
-                      : user.trangThai}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className="approve-btn btn btn-success"
-                    onClick={() => {
-                      // Lấy _id đầu tiên hoặc tất cả _id từ mảng userId
-                      const extractedId =
-                        Array.isArray(user.userId) && user.userId.length > 0
-                          ? user.userId[0]._id // Hoặc sử dụng `.map` để lấy toàn bộ _id
-                          : user.userId?._id || "Không có ID";
-
-                      onClickXacNhan(extractedId); // Gửi _id tới hàm xử lý
-                    }}
-                  >
-                    Xác nhận
-                  </button>
+            {currentItems.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  Chưa có dữ liệu
                 </td>
               </tr>
-            ))}
+            ) : (
+              currentItems.map((user, index) => (
+                <tr key={user._id} style={{ cursor: "pointer" }}>
+                  <td>{firstIndex + index + 1}</td>
+                  <td>{user.diaChi?.Name || "N/A"}</td>
+                  <td>{user?.gmail || "Không có email"}</td>
+                  <td>{user.diaChi?.SoDienThoai || "Không có số"}</td>
+                  <td>
+                    <span className="badge bg-warning text-dark">
+                      {user.trangThai === "cho"
+                        ? "Đang chờ xác nhận"
+                        : user.trangThai === "huy"
+                        ? "Đã hủy"
+                        : user.trangThai}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      className="approve-btn btn btn-success"
+                      onClick={() => {
+                        const extractedId =
+                          Array.isArray(user.userId) && user.userId.length > 0
+                            ? user.userId[0]._id
+                            : user.userId?._id || "Không có ID";
+
+                        onClickXacNhan(extractedId);
+                      }}
+                    >
+                      Xác nhận
+                    </button>
+                    {/* {user.trangThai !== "xacnhan" && (
+                      <button
+                        className="approve-btn btn btn-success"
+                        onClick={() => {
+                          const extractedId =
+                            Array.isArray(user.userId) && user.userId.length > 0
+                              ? user.userId[0]._id
+                              : user.userId?._id || "Không có ID";
+
+                          onClickXacNhan(extractedId);
+                        }}
+                      >
+                        Xác nhận
+                      </button>
+                    )} */}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

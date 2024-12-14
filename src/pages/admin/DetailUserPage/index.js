@@ -97,7 +97,9 @@ const DetailUserPage = ({ quayLaiListUser }) => {
       alert("Cập nhật thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);
-      alert("Đã xảy ra lỗi khi cập nhật quyền hạn.");
+      alert(
+        "User này chưa tạo yêu cầu đăng ký làm hộ kinh doanh phải đăng ký và admin xác nhận thì mới được phân quyền."
+      );
     }
   };
 
@@ -115,6 +117,21 @@ const DetailUserPage = ({ quayLaiListUser }) => {
 
       {user && (
         <div className="user-detail-info">
+          {user.anhDaiDien && (
+            <div className="user-avatar">
+              <img
+                src={user.anhDaiDien}
+                alt="Ảnh đại diện"
+                style={{
+                  width: "150px",
+                  height: "150px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  marginBottom: "16px",
+                }}
+              />
+            </div>
+          )}
           <p>
             <strong>Tên người dùng:</strong> {user.tenNguoiDung}
           </p>
@@ -141,7 +158,9 @@ const DetailUserPage = ({ quayLaiListUser }) => {
             <>
               {defaultPermissions.map((perm) => (
                 <div key={perm.entity} className="permission-group">
-                  <h3>{`Quản lý ${translationMap[perm.entity] || perm.entity}`}</h3>
+                  <h3>{`Quản lý ${
+                    translationMap[perm.entity] || perm.entity
+                  }`}</h3>
                   {perm.actions.map((action) => (
                     <label key={action}>
                       <input

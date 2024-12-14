@@ -43,9 +43,9 @@ const GiaTriThuocTinhPage = () => {
       setThuocTinhList(filteredThuocTinh);
     } catch (error) {
       console.error(error.message);
-      message.error(
-        "Lấy danh sách thuộc tính giá trị và thuộc tính thất bại"
-      );
+      // message.error(
+      //   "Lấy danh sách thuộc tính giá trị và thuộc tính thất bại"
+      // );
     }
   };
   

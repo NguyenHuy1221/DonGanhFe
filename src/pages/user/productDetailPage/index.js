@@ -43,7 +43,9 @@ const ProductDetailPage = () => {
 
   const toggleChat = (newState) => {
     if (product.userId && product.userId._id) {
-      localStorage.setItem("userId", product.userId._id); // Lưu userId vào localStorage
+      localStorage.setItem("userIdChat", product.userId._id); // Lưu userId vào localStorage
+      // localStorage.setItem("userId", product.userId._id); // Lưu userId vào localStorage
+
       console.log("User ID đã lưu vào localStorage:", product.userId._id);
     }
 

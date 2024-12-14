@@ -15,13 +15,13 @@ const HoSoPage = () => {
   const [birthMonth, setBirthMonth] = useState("11");
   const [birthYear, setBirthYear] = useState("2024");
   const [profileImage, setProfileImage] = useState(null);
+  const queryParams = new URLSearchParams(location.search);
+  const userIdFromUrl = queryParams.get("user");
+  const storedUserId = localStorage.getItem("userId");
 
+  const userId = userIdFromUrl || storedUserId;
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const userIdFromUrl = queryParams.get("user");
-    const storedUserId = localStorage.getItem("userId");
-
-    const userId = userIdFromUrl || storedUserId;
+    
 
     if (userId) {
       localStorage.setItem("userId", userId);
@@ -81,7 +81,8 @@ const HoSoPage = () => {
         
         if (response) {
           alert("Đổi ảnh đại diện thành công");
-          setProfileImage(response.newProfileImageUrl); // Cập nhật ảnh từ API
+          // setProfileImage(response.newProfileImageUrl); // Cập nhật ảnh từ API
+          fetchUserData(userId);
         }
       } catch (error) {
         console.error("Lỗi khi tải lên ảnh:", error);
@@ -143,7 +144,7 @@ const HoSoPage = () => {
             />
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>Giới tính</label>
             <div className="radio-group">
               <label>
@@ -174,7 +175,7 @@ const HoSoPage = () => {
                 Khác
               </label>
             </div>
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label>Ngày sinh</label>

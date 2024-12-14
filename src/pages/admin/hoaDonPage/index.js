@@ -21,11 +21,11 @@ const HoaDonPage = ({ onClickHoaDon }) => {
       const hoaDons = await getHoaDons(userId);
 
       // Sắp xếp danh sách hóa đơn theo ngày tạo
-      const sortedHoaDons = hoaDons.sort(
-        (a, b) => new Date(b.NgayTao) - new Date(a.NgayTao)
-      );
+      // const sortedHoaDons = hoaDons.sort(
+      //   (a, b) => new Date(b.NgayTao) - new Date(a.NgayTao)
+      // );
 
-      setHoaDons(sortedHoaDons);
+      setHoaDons(hoaDons);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách hóa đơn:", error);
       setError("Không thể lấy danh sách hóa đơn");
@@ -36,15 +36,15 @@ const HoaDonPage = ({ onClickHoaDon }) => {
 
   const updateStatus = async (id, status) => {
     try {
-      // await axios.post(`/api/hoadon/updatetrangthaiHoaDOn/${id}`, {
-      //   TrangThai: status,
-      // });
-      // setHoaDons((prevHoaDons) =>
-      //   prevHoaDons.map((hoaDon) =>
-      //     hoaDon._id === id ? { ...hoaDon, TrangThai: status } : hoaDon
-      //   )
-      // );
-      await updateHoaDonStatus(id, status);
+      await axios.post(`/api/hoadon/updatetrangthaiHoaDOn/${id}`, {
+        TrangThai: status,
+      });
+      setHoaDons((prevHoaDons) =>
+        prevHoaDons.map((hoaDon) =>
+          hoaDon._id === id ? { ...hoaDon, TrangThai: status } : hoaDon
+        )
+      );
+      // await updateHoaDonStatus(id, status);
 
       // Cập nhật trạng thái trong state
       setHoaDons((prevHoaDons) =>
@@ -116,6 +116,7 @@ const HoaDonPage = ({ onClickHoaDon }) => {
             <th>Tổng Tiền</th>
             <th>Trạng Thái</th>
             <th>Hình Thức Thanh Toán</th>
+            <th>Thanh toán</th>
             <th className="actions-column">Hành Động</th>
           </tr>
         </thead>
@@ -168,13 +169,16 @@ const HoaDonPage = ({ onClickHoaDon }) => {
                     : "Thanh toán qua thẻ ngân hàng"}
                 </span>
               </td>
-              <td className="actions-cell">
-                {/* <button
-                  className="btn delete"
-                  onClick={() => deleteHoaDon(hoaDon._id)}
+              <td>
+                <span
+                  className={`transfer-status ${
+                    hoaDon.tienDaCong ? "transfer-true" : "transfer-false"
+                  }`}
                 >
-                  Xóa
-                </button> */}
+                  {hoaDon.tienDaCong ? "Đã thanh toán" : "Chưa thanh toán"}
+                </span>
+              </td>
+              <td className="actions-cell">
                 <button
                   className="btn detail"
                   onClick={() => onClickHoaDon(hoaDon._id)}

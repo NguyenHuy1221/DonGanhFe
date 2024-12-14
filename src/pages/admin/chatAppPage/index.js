@@ -39,7 +39,7 @@ const ChatApp = () => {
   const currentUserId = getUserIdFromToken();
 
   useEffect(() => {
-    const chatUserId = localStorage.getItem("userId");
+    const chatUserId = localStorage.getItem("userIdChatAdmin");
     const newSocket = io("http://localhost:5000", {
       transports: ["websocket"],
       auth: { token: localStorage.getItem("token") },
@@ -131,13 +131,13 @@ const ChatApp = () => {
 
   const createConversation = async (senderId, receiverId) => {
     try {
-      // const response = await axios.post("/api/chatsocket/Createconversation", {
-      //   sender_id: senderId,
-      //   receiver_id: receiverId,
-      // });
-      // return response.data;
-      const conversation = await createConversation(senderId, receiverId);
-      console.log("Cuộc trò chuyện mới:", conversation);
+      const response = await axios.post("/api/chatsocket/Createconversation", {
+        sender_id: senderId,
+        receiver_id: receiverId,
+      });
+      return response.data;
+      // const conversation = await createConversation(senderId, receiverId);
+      // console.log("Cuộc trò chuyện mới:", conversation);
     } catch (error) {
       console.error("Lỗi khi tạo hội thoại:", error);
     }

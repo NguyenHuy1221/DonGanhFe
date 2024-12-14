@@ -4,7 +4,7 @@ import "./style.scss";
 import {
   fetchAdminYeuCauRutTien,
   updateYeuCauRutTienAdmin,
-  rejectRequestApi
+  rejectRequestApi,
 } from "../../../api/yeuCauRutTienService";
 const YeuCauRutTienPage = () => {
   const [requests, setRequests] = useState([]);
@@ -16,7 +16,6 @@ const YeuCauRutTienPage = () => {
 
   const fetchRequests = async () => {
     try {
-      
       const requests = await fetchAdminYeuCauRutTien();
       setRequests(requests);
       setFilteredRequests(requests.filter((req) => req.XacThuc === true));
@@ -28,8 +27,6 @@ const YeuCauRutTienPage = () => {
   };
 
   useEffect(() => {
-   
-
     fetchRequests();
   }, []);
 
@@ -62,14 +59,14 @@ const YeuCauRutTienPage = () => {
   const handleFilterChange = (e) => {
     const value = e.target.value;
     setFilter(value);
-    filterRequests(value, xacThucFilter); 
+    filterRequests(value, xacThucFilter);
   };
 
   // Hàm thay đổi trạng thái bộ lọc XacThuc
   const handleXacThucFilterChange = (e) => {
     const value = e.target.value;
     setXacThucFilter(value);
-    filterRequests(filter, value); 
+    filterRequests(filter, value);
   };
 
   // Hàm phê duyệt yêu cầu
@@ -99,7 +96,6 @@ const YeuCauRutTienPage = () => {
         // Lọc lại dữ liệu hiển thị
         filterRequests(filter, xacThucFilter);
         fetchRequests();
-
       } else {
         alert("Không thể phê duyệt yêu cầu. Đã xảy ra lỗi.");
       }
@@ -115,21 +111,21 @@ const YeuCauRutTienPage = () => {
       alert("ID yêu cầu không hợp lệ.");
       return;
     }
-  
+
     try {
       // Gửi yêu cầu từ chối thông qua hàm API
       const response = await rejectRequestApi(id);
-  
+
       // Kiểm tra nếu phản hồi thành công
       if (response.status === 200) {
         alert("Yêu cầu rút tiền đã được cập nhật.");
-  
+
         // Cập nhật state requests
         const updatedRequests = requests.map((req) =>
           req._id === id ? { ...req, daXuLy: true, thatBai: true } : req
         );
         setRequests(updatedRequests);
-  
+
         // Lọc lại dữ liệu hiển thị
         filterRequests(filter, xacThucFilter, updatedRequests);
       } else {
@@ -192,6 +188,55 @@ const YeuCauRutTienPage = () => {
             </tr>
           </thead>
           <tbody>
+            {filteredRequests.length === 0 ? (
+              <tr>
+                <td colSpan="9" className="text-center">
+                  Chưa có dữ liệu
+                </td>
+              </tr>
+            ) : (
+              filteredRequests.map((request, index) => (
+                <tr key={request._id}>
+                  <td>{index + 1}</td>
+                  <td>{request.userId.tenNguoiDung}</td>
+                  <td>{request.userId.gmail}</td>
+                  <td>{request.tenNganHang}</td>
+                  <td>{request.soTaiKhoan}</td>
+                  <td>{request.soTien.toLocaleString()} VNĐ</td>
+                  <td>{request.ghiChu}</td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        request.daXuLy ? "bg-success" : "bg-warning"
+                      } text-dark`}
+                    >
+                      {request.daXuLy ? "Đã xử lý" : "Chờ xử lý"}
+                    </span>
+                  </td>
+                  <td>
+                    {!request.daXuLy && (
+                      <div className="action-buttons-nng">
+                        <button
+                          className="btn btn-success"
+                          onClick={() => handleApprove(request._id)}
+                        >
+                          Phê duyệt
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => handleReject(request._id)}
+                        >
+                          Từ chối
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+
+          {/* <tbody>
             {filteredRequests.map((request, index) => (
               <tr key={request._id}>
                 <td>{index + 1}</td>
@@ -230,7 +275,7 @@ const YeuCauRutTienPage = () => {
                 </td>
               </tr>
             ))}
-          </tbody>
+          </tbody> */}
         </table>
       </div>
     </div>

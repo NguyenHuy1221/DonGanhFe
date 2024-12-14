@@ -11,8 +11,16 @@ import {
   Space,
   Popconfirm,
   message,
+  Card,
+  Col,
+  Row,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import "./style.scss";
 import {
@@ -23,6 +31,7 @@ import {
   deleteKhuyenMai,
 } from "../../../api/khuyenMaiService";
 import { formatter, numberFormatter } from "../../../utils/fomater";
+import Meta from "antd/es/card/Meta";
 
 const KhuyenMaiPage = () => {
   const [duLieu, setDuLieu] = useState([]);
@@ -41,6 +50,7 @@ const KhuyenMaiPage = () => {
     try {
       const data = await layDanhSachKhuyenMai();
       setDuLieu(data);
+      console.log("km" , data);
     } catch (error) {
       console.error(error.message);
       message.error("Lấy danh sách khuyến mãi thất bại");
@@ -164,6 +174,21 @@ const KhuyenMaiPage = () => {
       key: "GiaTriKhuyenMai",
       render: (value) => formatter(value),
     },
+    // {
+    //   title: "Giá trị khuyến mãi",
+    //   dataIndex: "GiaTriKhuyenMai",
+    //   key: "GiaTriKhuyenMai",
+    //   render: (value, record) => {
+    //     // Kiểm tra loại khuyến mãi
+    //     const loaiKhuyenMai = loaiKhuyenMaiList.find(
+    //       (item) => item._id === record.IDLoaiKhuyenMai
+    //     );
+    //     if (loaiKhuyenMai && loaiKhuyenMai.TenLoaiKhuyenMai === "Khuyến mãi theo Phần trăm giỏ hàng") {
+    //       return `${value}%`; // Hiển thị phần trăm nếu là loại giảm giá phần trăm
+    //     }
+    //     return formatter(value); // Hiển thị giá trị tiền nếu không phải phần trăm
+    //   },
+    // },
     {
       title: "Tổng số lượng",
       dataIndex: "TongSoLuongDuocTao",
@@ -216,6 +241,7 @@ const KhuyenMaiPage = () => {
   return (
     <>
       <h1 className="km-title">Quản lý khuyến mãi</h1>
+
       <Button
         type="primary"
         icon={<PlusOutlined />}
@@ -225,12 +251,46 @@ const KhuyenMaiPage = () => {
       >
         Thêm khuyến mãi
       </Button>
-      <Table
+
+      <div className="km-card-container">
+        {duLieu.map((item) => (
+          <Card
+            key={item._id}
+            className="km-card"
+            title={`${item.GiaTriKhuyenMai}đ`}
+           
+            extra={
+              <Space>
+                <Button
+                  icon={<EditOutlined />}
+                  onClick={() => suaKhuyenMaiHandler(item)}
+                />
+                <Popconfirm
+                  title="Bạn có chắc chắn muốn xóa?"
+                  onConfirm={() => xoaKhuyenMaiHandler(item._id)}
+                >
+                  <Button icon={<DeleteOutlined />} danger />
+                </Popconfirm>
+              </Space>
+            }
+          >
+            <Meta
+              title={item.TenKhuyenMai}
+              description={`Hiệu lực: ${moment(item.NgayBatDau).format(
+                "DD/MM/YYYY"
+              )} - ${moment(item.NgayKetThuc).format("DD/MM/YYYY")}`}
+            />
+            <p>Số lượng: {item.TongSoLuongDuocTao}</p>
+          </Card>
+        ))}
+      </div>
+
+      {/* <Table
         className="km-table"
         columns={columns}
         dataSource={duLieu}
         pagination={true}
-      />
+      /> */}
 
       <Modal
         title={isEditing ? "Sửa khuyến mãi" : "Thêm khuyến mãi"}
@@ -276,12 +336,17 @@ const KhuyenMaiPage = () => {
             name="GioiHanGiaTriDuocApDung"
             label="Giới hạn giá trị được áp dụng"
             className="km-form-item"
-            rules={[{ required: true, message: "Vui lòng nhập giới hạn giá trị!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập giới hạn giá trị!" },
+            ]}
           >
             <InputNumber
               min={0}
               style={{ width: "100%" }}
               placeholder="Giới hạn giá trị"
+              formatter={
+                (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") // Thêm dấu phẩy mà không làm thay đổi giá trị gốc
+              }
             />
           </Form.Item>
 
@@ -289,12 +354,20 @@ const KhuyenMaiPage = () => {
             name="GioiHanGiaTriGiamToiDa"
             label="Giới hạn giá trị giảm tối đa (chỉ áp dụng cho loại giảm giá theo %)"
             className="km-form-item"
-            rules={[{ required: true, message: "Vui lòng nhập giới hạn giá trị giảm!" }]}
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập giới hạn giá trị giảm!",
+              },
+            ]}
           >
             <InputNumber
               min={0}
               style={{ width: "100%" }}
               placeholder="Giới hạn giá trị giảm"
+              formatter={
+                (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") // Thêm dấu phẩy mà không làm thay đổi giá trị gốc
+              }
             />
           </Form.Item>
           <Form.Item
@@ -316,6 +389,15 @@ const KhuyenMaiPage = () => {
                 min: 0,
                 message: "Giá trị khuyến mãi phải là số và không âm!",
               },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const gioiHanGiaTri = getFieldValue("GioiHanGiaTriDuocApDung");
+                  if (value && gioiHanGiaTri && value > gioiHanGiaTri) {
+                    return Promise.reject(new Error("Giá trị khuyến mãi phải nhỏ hơn giới hạn giá trị được áp dụng"));
+                  }
+                  return Promise.resolve();
+                },
+              }),
             ]}
           >
             <InputNumber
@@ -409,8 +491,8 @@ const KhuyenMaiPage = () => {
             rules={[{ required: true, message: "Vui lòng chọn trạng thái!" }]}
           >
             <Select>
-              <Select.Option value={0}>Không hoạt động</Select.Option>
-              <Select.Option value={1}>Hoạt động</Select.Option>
+              <Select.Option value={0}>Hoạt động</Select.Option>
+              <Select.Option value={1}>Không hoạt động</Select.Option>
             </Select>
           </Form.Item>
         </Form>

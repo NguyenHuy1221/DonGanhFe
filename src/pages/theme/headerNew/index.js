@@ -18,19 +18,22 @@ import { getBanners } from '../../../api/bannerService';
 import { IoCartOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { fetchCartById } from "api/cartService";
+
 
 const HeaderNew = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [totalItemCount, setTotalItemCount] = useState(0);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const userIdFromUrl = queryParams.get("user");
     const storedUserId = localStorage.getItem("userId");
-
     const userId = userIdFromUrl || storedUserId;
 
     if (userId) {
@@ -51,6 +54,53 @@ const HeaderNew = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+
+  const fetchCartData = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        console.log("User chưa đăng nhập.");
+        setTotalItemCount(0);
+        return;
+      }
+
+      const cartData = await fetchCartById(userId);
+
+      if (
+        !cartData.mergedCart ||
+        !Array.isArray(cartData.mergedCart) ||
+        cartData.mergedCart.length === 0
+      ) {
+        console.log("Giỏ hàng rỗng hoặc không hợp lệ.");
+        setTotalItemCount(0);
+        return;
+      }
+
+      // Tính tổng số lượng sản phẩm
+      const totalCount = cartData.mergedCart.reduce(
+        (total, store) =>
+          total +
+          store.sanPhamList.reduce(
+            (subTotal, product) =>
+              subTotal +
+              product.chiTietGioHang.reduce((sum, item) => sum + item.soLuong, 0),
+            0
+          ),
+        0
+      );
+
+      setTotalItemCount(totalCount);
+    } catch (error) {
+      console.error("Lỗi khi lấy giỏ hàng:", error);
+      setTotalItemCount(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchCartData();
+  }, []); // Chỉ chạy một lần khi header được render
+
 
   // const fetchCategories = () => {
   //   axios
@@ -189,7 +239,7 @@ const HeaderNew = () => {
                     className="count"
                     style={{ top: 0, position: "absolute", right: 0 }}
                   >
-                    0
+                     {totalItemCount}
                   </span>
                 </span>
               </Link>
@@ -292,52 +342,6 @@ const HeaderNew = () => {
             </li>
           </ul>
 
-          {/* <ul class="menu-top-header">
-            <li class="children  di-cho-online" id="li-134" data-categoryid="">
-              <a>
-                <img style={{ width: 28, marginRight: 6 }} src={nha} alt="" />
-                <span>ĐI CHỢ ONLINE</span>
-              </a>
-            </li>
-            <li class="children  trai-cay" id="li-131" data-categoryid="">
-              <a>
-                <img style={{ width: 28, marginRight: 6 }} src={nha} alt="" />
-                <span>TRÁI CÂY</span>
-              </a>
-            </li>
-            <li class="children  " id="li-132" data-categoryid="">
-              <a>
-                <img style={{ width: 28, marginRight: 6 }} src={nha} alt="" />
-                <span>RAU CỦ</span>
-              </a>
-            </li>
-            <li
-              class="children  tra---ca-phe---socola"
-              id="li-133"
-              data-categoryid=""
-            >
-              <a>
-                <img style={{ width: 28, marginRight: 6 }} src={nha} alt="" />
-                <span>TRÀ - CÀ PHÊ</span>
-              </a>
-            </li>
-            <li
-              class="children  dac-san-vung-mien"
-              id="li-135"
-              data-categoryid=""
-            >
-              <a>
-                <img style={{ width: 28, marginRight: 6 }} src={nha} alt="" />
-                <span>ĐẶC SẢN</span>
-              </a>
-            </li>
-            <li class="children  " id="li-136" data-categoryid="">
-              <a>
-                <img style={{ width: 28, marginRight: 6 }} src={nha} alt="" />
-                <span>THÔNG TIN</span>
-              </a>
-            </li>
-          </ul> */}
         </div>
       </div>
 
@@ -410,17 +414,17 @@ const HeaderNew = () => {
               <div className="col-3 bn2">
                 <div className="row">
                   <div className="col-12 ctbn1">
-                    <img src={girl1} alt="Image 1" className="img-fluid" />
+                    <img src="https://shop.donganh.vn/wp-content/uploads/2024/07/cai-don-ganh.jpg" alt="Image 1" className="img-fluid" />
                   </div>
                 </div>
                 <div className="row">
                   <div className="col-12 ctbn2">
-                    <img src={girl2} className="img-fluid" />
+                    <img src= "https://shop.donganh.vn/wp-content/uploads/2024/07/chinh-sach-thanh-toan-the-gioi-thep-group.jpg" className="img-fluid" />
                   </div>
                 </div>
                 <div className="row">
                   <div className="col-12 ctbn3">
-                    <img src={girl1} className="img-fluid" />
+                    <img src= "https://shop.donganh.vn/wp-content/uploads/2024/07/Chinh-sach-van-chuyen-giao-nhan-hang-hoa.jpg" className="img-fluid" />
                   </div>
                 </div>
               </div>

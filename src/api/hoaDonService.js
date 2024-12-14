@@ -70,7 +70,25 @@ export const createInvoiceAPI = async (invoiceData) => {
 export const updateTransactionAPI = async (transactionId, hoadonIds) => {
   try {
     const response = await axios.post(
+      "/api/hoadon/updateTransactionListHoaDon",
+      // updateTransactionListHoaDonCOD
+      {
+        transactionId,
+        hoadon: hoadonIds,
+      }
+    );
+    return response.data; // Trả về dữ liệu từ API
+  } catch (error) {
+    console.error("Lỗi khi cập nhật giao dịch:", error);
+    throw new Error("Không thể cập nhật giao dịch");
+  }
+};
+
+export const updateTransactionAPICOD = async (transactionId, hoadonIds) => {
+  try {
+    const response = await axios.post(
       "/api/hoadon/updateTransactionListHoaDonCOD",
+      // updateTransactionListHoaDonCOD
       {
         transactionId,
         hoadon: hoadonIds,

@@ -16,27 +16,56 @@ const ItemSanPhamByCategoriPage = () => {
   const [products, setProducts] = useState([]); // Sản phẩm theo danh mục
   const [currentIndex, setCurrentIndex] = useState(0); // Quản lý vị trí hiển thị
 
+  // useEffect(() => {
+  //   const getCategories = async () => {
+  //     try {
+  //       const categoriesData = await fetchCategories();
+  //       setCategories(categoriesData);
+
+  //       // Chọn danh mục đầu tiên nếu có danh mục
+  //       if (categoriesData.length > 0) {
+  //         setCurrentCategory(categoriesData[0]._id);
+  //         fetchProductsByDanhMuc(categoriesData[0]._id).then((productsData) => {
+  //           setProducts(productsData);
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching categories:", error);
+  //     }
+  //   };
+
+  //   getCategories();
+  // }, []);
+
   useEffect(() => {
     const getCategories = async () => {
       try {
         const categoriesData = await fetchCategories();
-        setCategories(categoriesData);
-
+  
+        // Lọc danh mục không có TinhTrang là "Đã xóa"
+        const filteredCategories = categoriesData.filter(
+          (category) => category.TinhTrang !== "Đã xóa"
+        );
+  
+        setCategories(filteredCategories);
+  
         // Chọn danh mục đầu tiên nếu có danh mục
-        if (categoriesData.length > 0) {
-          setCurrentCategory(categoriesData[0]._id);
-          fetchProductsByDanhMuc(categoriesData[0]._id).then((productsData) => {
-            setProducts(productsData);
-          });
+        if (filteredCategories.length > 0) {
+          setCurrentCategory(filteredCategories[0]._id);
+          fetchProductsByDanhMuc(filteredCategories[0]._id).then(
+            (productsData) => {
+              setProducts(productsData);
+            }
+          );
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-
+  
     getCategories();
   }, []);
-
+  
   // Hàm chuyển đổi danh mục
   const handleCategoryChange = (categoryId) => {
     setCurrentCategory(categoryId);

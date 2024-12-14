@@ -11,7 +11,7 @@ export const layDanhSachSanPham = async (sanPhamId) => {
 
 // Lấy danh sách biến thể theo sản phẩm
 export const layDanhSachBienThe = async (sanPhamId) => {
-  const response = await axios.get(`${API_URL}/getlistBienThe/${sanPhamId}`);
+  const response = await axios.get(`${API_URL}/getlistBienTheAdmin/${sanPhamId}`);
   return response.data; // Giả sử dữ liệu trả về là một mảng
 };
 // Thêm biến thể

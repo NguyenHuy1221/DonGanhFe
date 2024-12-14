@@ -39,7 +39,7 @@ export const suaThuocTinh = async (data,userId) => {
 // Xóa thuộc tính
 export const xoaThuocTinh = async (id) => {
   try {
-    const response = await axios.delete(
+    const response = await axios.put(
       `${API_BASE_URL}/deleteThuocTinh/${id}`
     );
     return response.data;

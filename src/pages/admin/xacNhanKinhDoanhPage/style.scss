@@ -81,3 +81,38 @@
     }
   }
 }
+
+
+.business-image {
+  margin-top: 20px;
+
+  .license-image {
+    width: 100%;
+    max-width: 750px;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.btn-back {
+  background-color: #f0f0f0; /* Màu nền sáng */
+  border: 1px solid #ccc; /* Viền nhẹ */
+  color: #333; /* Màu chữ */
+  padding: 8px 16px; /* Khoảng cách bên trong */
+  font-size: 16px; /* Kích thước chữ */
+  border-radius: 5px; /* Bo tròn góc */
+  transition: background-color 0.3s, transform 0.2s; /* Hiệu ứng khi hover */
+  cursor: pointer; /* Con trỏ thay đổi khi di chuột vào */
+}
+
+.btn-back:hover {
+  background-color: #e0e0e0; /* Màu nền khi hover */
+  transform: translateY(-2px); /* Hiệu ứng đẩy nút lên khi hover */
+}
+
+.btn-back:focus {
+  outline: none; /* Xóa viền focus */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Tạo bóng khi focus */
+}

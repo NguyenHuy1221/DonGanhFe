@@ -104,57 +104,128 @@ const CategoriesPage = () => {
   };
 
   // Handle submit form
+  // const handleOk = async () => {
+  //   let isDuplicateId = false;
+  //   try {
+  //     const values = await form.validateFields();
+  //     console.log("Giá trị form:", values);
+  //     isDuplicateId = categories.some(
+  //       (category) =>
+  //         category.IDDanhMuc === values.IDDanhMuc &&
+  //         (!isEditing || category._id !== editRecord._id)
+  //     );
+
+  //     if (!isEditing && isDuplicateId) {
+  //       message.error("ID danh mục đã tồn tại. Vui lòng nhập ID khác!");
+  //       return;
+  //     }
+
+  //     const formData = new FormData();
+  //     formData.append("IDDanhMuc", values.IDDanhMuc);
+  //     formData.append("TenDanhMuc", values.TenDanhMuc);
+  //     console.log("Form data sau khi thêm giá trị:", formData); // Log form data
+
+  //     // formData.append("IDDanhMuc", values.IDDanhMuc);
+  //     // formData.append("TenDanhMuc", values.TenDanhMuc);
+
+  //     // Include file if exists
+  //     if (
+  //       values.file &&
+  //       values.file.fileList &&
+  //       values.file.fileList.length > 0
+  //     ) {
+  //       formData.append("file", values.file.fileList[0].originFileObj);
+  //       console.log("File đính kèm:", values.file.fileList[0].originFileObj);
+  //     }
+
+  //     if (isEditing) {
+  //       console.log("Cập nhật danh mục với ID:", currentCategoryId);
+  //       // await axios.put(
+  //       //   `/api/danhmuc/updateDanhMucCha/${currentCategoryId}`,
+  //       //   formData,
+  //       //   {
+  //       //     headers: {
+  //       //       "Content-Type": "multipart/form-data",
+  //       //     },
+  //       //   }
+  //       // );
+  //       const headers = {
+  //         "Content-Type": "multipart/form-data",
+  //       };
+        
+  //       console.log("Dữ liệu gửi đi:", formData); // Log trước khi gửi request
+        
+  //       await axios.put(`/api/danhmuc/updateDanhMucCha/${currentCategoryId}`, formData, { headers });
+        
+  //       // await updateDanhMucCha(currentCategoryId, formData);
+  //       message.success("Cập nhật danh mục thành công");
+  //     } else {
+  //       // await axios.post("/api/danhmuc/createDanhMucCha", formData, {
+  //       //   headers: {
+  //       //     "Content-Type": "multipart/form-data",
+  //       //   },
+  //       // });
+  //       await createDanhMucCha(formData);
+  //       message.success("Thêm danh mục thành công");
+  //     }
+
+  //     fetchCategories(); // Refresh the list of categories
+  //     form.resetFields(); // Clear form fields after successful submission
+  //     setImagePreview(null); // Clear image preview after form submission
+  //     setIsModalVisible(false);
+  //   } catch (error) {
+  //     console.error("Lỗi khi lưu danh mục:", error);
+  //     message.error("Lưu danh mục thất bại");
+  //   }
+  // };
+
   const handleOk = async () => {
     let isDuplicateId = false;
     try {
       const values = await form.validateFields();
-
+      console.log("Giá trị form:", values);
+  
+      // Kiểm tra trùng lặp ID
       isDuplicateId = categories.some(
         (category) =>
           category.IDDanhMuc === values.IDDanhMuc &&
           (!isEditing || category._id !== editRecord._id)
       );
-
+  
       if (!isEditing && isDuplicateId) {
         message.error("ID danh mục đã tồn tại. Vui lòng nhập ID khác!");
         return;
       }
-
+  
       const formData = new FormData();
+  
+      // Append dữ liệu vào formData
       formData.append("IDDanhMuc", values.IDDanhMuc);
       formData.append("TenDanhMuc", values.TenDanhMuc);
-
+  
       // Include file if exists
-      if (
-        values.file &&
-        values.file.fileList &&
-        values.file.fileList.length > 0
-      ) {
+      if (values.file && values.file.fileList && values.file.fileList.length > 0) {
         formData.append("file", values.file.fileList[0].originFileObj);
+        console.log("File đính kèm:", values.file.fileList[0].originFileObj);
       }
-
+  
+      // Log dữ liệu trong formData
+      formData.forEach((value, key) => {
+        console.log("CÁI LONE " , key, value);
+      });
+  
       if (isEditing) {
-        // await axios.put(
-        //   `/api/danhmuc/updateDanhMucCha/${currentCategoryId}`,
-        //   formData,
-        //   {
-        //     headers: {
-        //       "Content-Type": "multipart/form-data",
-        //     },
-        //   }
-        // );
-        await updateDanhMucCha(currentCategoryId, formData);
+        console.log("Cập nhật danh mục với ID:", currentCategoryId);
+        const headers = {
+          "Content-Type": "multipart/form-data",
+        };
+        await axios.put(`/api/danhmuc/updateDanhMucCha/${currentCategoryId}`, formData, { headers });
         message.success("Cập nhật danh mục thành công");
       } else {
-        // await axios.post("/api/danhmuc/createDanhMucCha", formData, {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // });
         await createDanhMucCha(formData);
         message.success("Thêm danh mục thành công");
       }
-
+  
       fetchCategories(); // Refresh the list of categories
       form.resetFields(); // Clear form fields after successful submission
       setImagePreview(null); // Clear image preview after form submission
@@ -164,7 +235,9 @@ const CategoriesPage = () => {
       message.error("Lưu danh mục thất bại");
     }
   };
+  
 
+  
   const showSubCategoryModal = (categoryId) => {
     setCurrentCategoryId(categoryId);
     setIsEditingSubCategory(false); // Đảm bảo modal ở trạng thái thêm mới

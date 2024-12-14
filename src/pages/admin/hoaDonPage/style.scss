@@ -187,3 +187,21 @@ select {
   background-color: red; // Màu đỏ cho "Hủy đơn hàng"
   color: white;
 }
+
+.transfer-status {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+}
+
+.transfer-true {
+  color: #ffffff;
+  background-color: #28a745; /* Màu xanh cho trạng thái Đã chuyển khoản */
+}
+
+.transfer-false {
+  color: #ffffff;
+  background-color: #dc3545; /* Màu đỏ cho trạng thái Chưa chuyển khoản */
+}

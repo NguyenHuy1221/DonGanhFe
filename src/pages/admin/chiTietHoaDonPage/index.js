@@ -52,7 +52,7 @@ const ChiTietHoaDonPage = ({ quayLaiHoaDon, onClickChat }) => {
           className="btn-message"
           onClick={() => onClickChat(hoaDon.userId._id)}
         >
-          Chát
+          Chat
         </button>
       </div>
 
