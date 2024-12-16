@@ -16,7 +16,9 @@ const YeuCauRutTienPage = () => {
 
   const fetchRequests = async () => {
     try {
-      const requests = await fetchAdminYeuCauRutTien();
+      const token = localStorage.getItem("token");
+
+      const requests = await fetchAdminYeuCauRutTien(token);
       setRequests(requests);
       setFilteredRequests(requests.filter((req) => req.XacThuc === true));
       setLoading(false);
@@ -77,8 +79,9 @@ const YeuCauRutTienPage = () => {
     }
 
     try {
+      const token = localStorage.getItem("token");
       // Gửi API và lấy phản hồi
-      const responseData = await updateYeuCauRutTienAdmin(id, "xacnhan");
+      const responseData = await updateYeuCauRutTienAdmin(id, "xacnhan",token);
 
       // Kiểm tra phản hồi và xử lý thành công
       if (responseData) {
@@ -114,7 +117,8 @@ const YeuCauRutTienPage = () => {
 
     try {
       // Gửi yêu cầu từ chối thông qua hàm API
-      const response = await rejectRequestApi(id);
+      const token = localStorage.getItem("token");
+      const response = await rejectRequestApi(id,token);
 
       // Kiểm tra nếu phản hồi thành công
       if (response.status === 200) {
@@ -198,8 +202,8 @@ const YeuCauRutTienPage = () => {
               filteredRequests.map((request, index) => (
                 <tr key={request._id}>
                   <td>{index + 1}</td>
-                  <td>{request.userId.tenNguoiDung}</td>
-                  <td>{request.userId.gmail}</td>
+                  <td>{request.userId?.tenNguoiDung || "Tên không xác định"}</td>
+                  <td>{request.userId?.gmail || "Email không xác định"}</td>
                   <td>{request.tenNganHang}</td>
                   <td>{request.soTaiKhoan}</td>
                   <td>{request.soTien.toLocaleString()} VNĐ</td>

@@ -95,7 +95,8 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     console.log("ID sản phẩm để xóa:", id);
     try {
       // await axios.put(`/api/sanpham/deleteSanPham/${id}`);
-      await deleteProduct(id);
+      const token = localStorage.getItem("token");
+      await deleteProduct(id,token);
       fetchProducts();
       message.success("Xóa sản phẩm thành công");
     } catch (error) {
@@ -132,7 +133,18 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     console.log(`Product ID: ${id}, Active: ${isActive}`);
     try {
       // Sử dụng POST thay vì PUT cho API toggleSanPhamMoi
-      await axios.post(`/api/sanpham/toggleSanPhamMoi/${id}`);
+      const token = localStorage.getItem("token");
+
+      // await axios.post(`/api/sanpham/toggleSanPhamMoi/${id}`);
+      await axios.post(
+        `/api/sanpham/toggleSanPhamMoi/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       message.success("Cập nhật trạng thái thành công!");
       fetchProducts(); // Làm mới danh sách sản phẩm
     } catch (error) {

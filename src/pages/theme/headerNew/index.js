@@ -201,7 +201,10 @@ const HeaderNew = () => {
                 </Link>
               ) : (
                 <>
+                  {/* <AiOutlineUser /> Đăng nhập */}
+                  <Link to="/login">
                   <AiOutlineUser /> Đăng nhập
+                </Link>
                 </>
               )}
             </a>

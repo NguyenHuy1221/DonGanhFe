@@ -21,7 +21,8 @@ const ChiTietHoaDonPage = ({ quayLaiHoaDon, onClickChat }) => {
       // setHoaDon(response.data);
 
       // localStorage.removeItem("hoadonId");
-      const hoaDonData = await getHoaDonById(hoaDonId);
+      const token = localStorage.getItem("token");
+      const hoaDonData = await getHoaDonById(hoaDonId,token);
 
       // Cập nhật dữ liệu hóa đơn vào state
       setHoaDon(hoaDonData);

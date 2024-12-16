@@ -22,6 +22,7 @@ const ThuocTinhPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
+  const token = localStorage.getItem("token");
   const [form] = Form.useForm();
 
   // Lấy dữ liệu từ API khi component được mount
@@ -57,7 +58,7 @@ const ThuocTinhPage = () => {
 
   const xoaThuocTinhHandler = async (id) => {
     try {
-      await xoaThuocTinh(id);
+      await xoaThuocTinh(id,token);
       fetchData();
       message.success("Xóa thuộc tính thành công");
     } catch (error) {
@@ -87,10 +88,10 @@ const ThuocTinhPage = () => {
           _id: editRecord._id, // Truyền _id
           ThuocTinhID: values.ThuocTinhID, // Truyền cả ThuocTinhID
           TenThuocTinh: values.TenThuocTinh,
-        },userId);
+        },userId,token);
         message.success("Cập nhật thuộc tính thành công");
       } else {
-        await themThuocTinh(values,userId);
+        await themThuocTinh(values,userId,token);
         message.success("Thêm thuộc tính thành công");
       }
       setIsModalVisible(false);

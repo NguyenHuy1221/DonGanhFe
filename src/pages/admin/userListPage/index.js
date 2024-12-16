@@ -20,7 +20,9 @@ const UserListPage = ({ onClickUser }) => {
     const fetchUsers = async () => {
       try {
         const userId = localStorage.getItem("userId");
-        const response = await getAllUser(userId);
+        const token = localStorage.getItem("token");
+
+        const response = await getAllUser(userId,token);
         setUsers(response.users);
         setFilteredUsers(response.users);
         setLoading(false);

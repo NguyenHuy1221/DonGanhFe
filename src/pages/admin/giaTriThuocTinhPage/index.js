@@ -25,7 +25,7 @@ const GiaTriThuocTinhPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
   const [form] = Form.useForm();
-
+  const token = localStorage.getItem("token");
 
   const fetchData = async () => {
     try {
@@ -76,7 +76,7 @@ const GiaTriThuocTinhPage = () => {
 
   const xoaGiaTriHandler = async (id) => {
     try {
-      await xoaThuocTinhGiaTri(id);
+      await xoaThuocTinhGiaTri(id,token);
       message.success("Xóa thuộc tính giá trị thành công");
       fetchData(); // Gọi lại fetchData sau khi xóa
     } catch (error) {
@@ -105,11 +105,11 @@ const GiaTriThuocTinhPage = () => {
       if (isEditing) {
         await suaThuocTinhGiaTri({
           ...values,
-          IDGiaTriThuocTinh: editRecord.IDGiaTriThuocTinh,
-        });
+          IDGiaTriThuocTinh: editRecord.IDGiaTriThuocTinh
+        },token);
         message.success("Cập nhật thuộc tính giá trị thành công");
       } else {
-        await themThuocTinhGiaTri(values);
+        await themThuocTinhGiaTri(values,token);
         message.success("Thêm thuộc tính giá trị thành công");
       }
   

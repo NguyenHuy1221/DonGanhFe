@@ -13,43 +13,99 @@ export const layDanhSachThuocTinhGiaTri = async (userId) => {
   }
 };
 
-export const themThuocTinhGiaTri = async (data) => {
+// export const themThuocTinhGiaTri = async (data) => {
+//   try {
+//     const response = await axios.post(
+//       `${API_BASE_URL}/createThuocTinhGiaTri`,
+//       data
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(
+//       error.response.data.message || "Lỗi khi thêm thuộc tính giá trị"
+//     );
+//   }
+// };
+
+export const themThuocTinhGiaTri = async (data, token) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/createThuocTinhGiaTri`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
     );
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Lỗi khi thêm thuộc tính giá trị"
+      error.response?.data?.message || "Lỗi khi thêm thuộc tính giá trị"
     );
   }
 };
 
-export const suaThuocTinhGiaTri = async (data) => {
+// export const suaThuocTinhGiaTri = async (data) => {
+//   try {
+//     const response = await axios.put(
+//       `${API_BASE_URL}/updateThuocTinhGiaTri`,
+//       data
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(
+//       error.response.data.message || "Lỗi khi cập nhật thuộc tính giá trị"
+//     );
+//   }
+// };
+
+export const suaThuocTinhGiaTri = async (data, token) => {
   try {
     const response = await axios.put(
       `${API_BASE_URL}/updateThuocTinhGiaTri`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
     );
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Lỗi khi cập nhật thuộc tính giá trị"
+      error.response?.data?.message || "Lỗi khi cập nhật thuộc tính giá trị"
     );
   }
 };
 
-export const xoaThuocTinhGiaTri = async (id) => {
+// export const xoaThuocTinhGiaTri = async (id) => {
+//   try {
+//     const response = await axios.delete(
+//       `${API_BASE_URL}/deleteThuocTinhGiaTri/${id}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(
+//       error.response.data.message || "Lỗi khi xóa thuộc tính giá trị"
+//     );
+//   }
+// };
+
+export const xoaThuocTinhGiaTri = async (id, token) => {
   try {
     const response = await axios.delete(
-      `${API_BASE_URL}/deleteThuocTinhGiaTri/${id}`
+      `${API_BASE_URL}/deleteThuocTinhGiaTri/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
     );
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response.data.message || "Lỗi khi xóa thuộc tính giá trị"
+      error.response?.data?.message || "Lỗi khi xóa thuộc tính giá trị"
     );
   }
 };

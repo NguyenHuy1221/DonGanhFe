@@ -39,6 +39,7 @@ const KhuyenMaiPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
   const [loaiKhuyenMaiList, setLoaiKhuyenMaiList] = useState([]);
+  const token = localStorage.getItem("token");
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -48,7 +49,7 @@ const KhuyenMaiPage = () => {
 
   const fetchKhuyenMaiList = async () => {
     try {
-      const data = await layDanhSachKhuyenMai();
+      const data = await layDanhSachKhuyenMai(token);
       setDuLieu(data);
       console.log("km" , data);
     } catch (error) {
@@ -94,7 +95,7 @@ const KhuyenMaiPage = () => {
 
   const xoaKhuyenMaiHandler = async (id) => {
     try {
-      await deleteKhuyenMai(id);
+      await deleteKhuyenMai(id,token);
       await fetchKhuyenMaiList();
       message.success("Xóa khuyến mãi thành công");
     } catch (error) {
@@ -123,7 +124,7 @@ const KhuyenMaiPage = () => {
 
       let response;
       if (isEditing) {
-        response = await updateKhuyenMai({ ...values, _id: editRecord._id });
+        response = await updateKhuyenMai({ ...values, _id: editRecord._id },token);
         if (response) {
           message.success("Cập nhật khuyến mãi thành công");
           setIsModalVisible(false);
@@ -132,7 +133,7 @@ const KhuyenMaiPage = () => {
           message.error("Cập nhật khuyến mãi thất bại");
         }
       } else {
-        response = await addKhuyenMai(values);
+        response = await addKhuyenMai(values,token);
         if (response) {
           message.success("Thêm khuyến mãi thành công");
           setIsModalVisible(false);

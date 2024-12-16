@@ -36,15 +36,16 @@ const HoaDonPage = ({ onClickHoaDon }) => {
 
   const updateStatus = async (id, status) => {
     try {
-      await axios.post(`/api/hoadon/updatetrangthaiHoaDOn/${id}`, {
-        TrangThai: status,
-      });
+      const token = localStorage.getItem("token");
+      // await axios.post(`/api/hoadon/updatetrangthaiHoaDOn/${id}`, {
+      //   TrangThai: status,
+      // });
       setHoaDons((prevHoaDons) =>
         prevHoaDons.map((hoaDon) =>
           hoaDon._id === id ? { ...hoaDon, TrangThai: status } : hoaDon
         )
       );
-      // await updateHoaDonStatus(id, status);
+      await updateHoaDonStatus(id, status,token);
 
       // Cập nhật trạng thái trong state
       setHoaDons((prevHoaDons) =>

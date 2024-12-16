@@ -65,7 +65,7 @@ const HoaDonUserPage = ({ onShowChiTietHoaDon  }) => {
               <td>{new Date(hoaDon.NgayTao).toLocaleDateString()}</td>
               <td>{hoaDon.TongTien.toLocaleString()} VND</td>
               <td>
-                <span className={`status-${hoaDon.TrangThai}`}>
+                <span className={`status_new-${hoaDon.TrangThai}`}>
                   {hoaDon.TrangThai === 0
                     ? "Đặt hàng"
                     : hoaDon.TrangThai === 1

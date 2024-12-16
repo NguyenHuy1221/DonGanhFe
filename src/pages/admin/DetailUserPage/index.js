@@ -88,12 +88,13 @@ const DetailUserPage = ({ quayLaiListUser }) => {
       role: selectedRole,
       permissions: updatedPermissions,
     });
+    const token = localStorage.getItem("token");
 
     try {
       await updateUserRoleAndPermissions(user._id, {
         role: selectedRole,
         permissions: updatedPermissions,
-      });
+      },token);
       alert("Cập nhật thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);

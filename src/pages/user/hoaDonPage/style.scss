@@ -157,33 +157,33 @@ select {
 
 
 // Màu nền cho các trạng thái đã chọn
-.status-0 {
-  background-color: white; // Màu xanh dương cho "Đặt hàng"
+.status_new-0 {
   color: black;
-
+  font-weight: bold;
 }
 
-.status-1 {
-  background-color: yellow; // Màu vàng cho "Đóng gói"
-  color: black;
-
-
-}
-
-.status-2 {
-  background-color: #c0fff7; // Màu cyan cho "Bắt đầu giao"
-  color: black;
+.status_new-1 {
+  color: rgb(245, 133, 59);
+  font-weight: bold;
 
 
 }
 
-.status-3 {
-  background-color: #28a745; // Màu xanh lá cho "Hoàn thành đơn hàng"
-  color: white;
+.status_new-2 {
+  color: #c0fff7;
+  font-weight: bold;
+
 
 }
 
-.status-4 {
-  background-color: red; // Màu đỏ cho "Hủy đơn hàng"
-  color: white;
+.status_new-3 {
+  color: #28a745;
+  font-weight: bold;
+
+}
+
+.status_new-4 {
+  color: red;
+  font-weight: bold;
+
 }

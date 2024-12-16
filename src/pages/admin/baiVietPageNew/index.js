@@ -31,7 +31,8 @@ const BaiVietPage = () => {
   const fetchData = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      const response = await getListBaiViet(userId);
+      const token = localStorage.getItem("token");
+      const response = await getListBaiViet(userId,token);
       setData(response);
     } catch (error) {
       message.error("Lấy danh sách bài viết thất bại");
@@ -53,7 +54,8 @@ const BaiVietPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteBaiViet(id);
+      const token = localStorage.getItem("token");
+      await deleteBaiViet(id,token);
       fetchData();
       message.success("Xóa bài viết thành công");
     } catch (error) {

@@ -12,9 +12,23 @@ export const loginGoogle = async () => {
   }
 };
 
-export const getAllUser = async (userId) => {
+// export const getAllUser = async (userId) => {
+//   try {
+//     const response = await axios.get(`/api/user/showAllUser/${userId}`);
+//     return response.data;
+//   } catch (error) {
+//     console.error("không có người dùng :", error);
+//     throw error;
+//   }
+// };
+
+export const getAllUser = async (userId, token) => {
   try {
-    const response = await axios.get(`/api/user/showAllUser/${userId}`);
+    const response = await axios.get(`/api/user/showAllUser/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("không có người dùng :", error);
@@ -111,11 +125,24 @@ export const updateUserProfile = async (userId, profileData) => {
   }
 };
 
-export const updateUserRoleAndPermissions = async (userId, data) => {
+// export const updateUserRoleAndPermissions = async (userId, data) => {
+//   return axios
+//     .post(`/api/admin/updateUserRoleAndPermissions/${userId}`, data)
+//     .then((response) => response.data)
+//     .catch((error) => {
+//       throw error.response.data;
+//     });
+// };
+
+export const updateUserRoleAndPermissions = async (userId, data, token) => {
   return axios
-    .post(`/api/admin/updateUserRoleAndPermissions/${userId}`, data)
+    .post(`/api/admin/updateUserRoleAndPermissions/${userId}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     .then((response) => response.data)
     .catch((error) => {
-      throw error.response.data;
+      throw error.response?.data || "Có lỗi xảy ra";
     });
 };

@@ -79,7 +79,7 @@ const PaymentPage = () => {
       ...prevNames,
       [storeName]: discount.TenKhuyenMai, // Lưu tên mã giảm giá vào appliedDiscountNames
     }));
-
+    console.log("Discount khi áp dụng:", discount);
     handleCloseMGG(); // Đóng modal sau khi áp dụng
   };
 
@@ -433,6 +433,7 @@ const PaymentPage = () => {
         _id: store.storeOwnerId, // ID chủ cửa hàng
       },
       transactionId, // Bạn có thể thay bằng một ID giao dịch thực tế nếu có
+    
       sanPhamList: store.storeProducts.map((product) => ({
         chiTietGioHangs: [
           {
@@ -444,9 +445,11 @@ const PaymentPage = () => {
             soLuong: product.quantity,
             donGia: product.price,
             // TongTien: totalAmount, 
-            // SoTienKhuyenMai: calculateTotalDiscount(selectedStores),
           },
         ],
+        khuyenMaiId: appliedDiscounts[store.storeName]?._id || null,
+        giaTriKhuyenMai: calculateTotalDiscount(selectedStores),
+  
       })),
     }));
 
@@ -502,14 +505,14 @@ const PaymentPage = () => {
           updateResponse = await updateTransactionAPI(transactionId, hoadonIds);
         }
         console.log("Phản hồi từ API cập nhật giao dịch:", updateResponse);
-        const userChoice = window.confirm(
-          "Hóa đơn đã được tạo thành công! Bạn có muốn xem đơn hàng của mình không?"
-        );
-        if (userChoice) {
-          navigate("/profile"); // Điều hướng đến trang hồ sơ
-        } else {
-          navigate("/"); // Điều hướng đến trang chính
-        }
+        // const userChoice = window.confirm(
+        //   "Hóa đơn đã được tạo thành công! Bạn có muốn xem đơn hàng của mình không?"
+        // );
+        // if (userChoice) {
+        //   navigate("/profile"); // Điều hướng đến trang hồ sơ
+        // } else {
+        //   navigate("/"); // Điều hướng đến trang chính
+        // }
       } else {
         alert("Không thể tạo hóa đơn. Phản hồi không hợp lệ.");
       }
@@ -1076,63 +1079,125 @@ const PaymentPage = () => {
               <CircularProgress />
             </div>
           ) : discounts.length > 0 ? (
-            discounts.map((discount) => (
-              <div key={discount._id} className="discount-card">
-                <div className="discount-left">
-                  <span className="discount-percent">
-                    {discount.giaTriGiam / 1000}k
-                  </span>
-                  <span className="discount-off">OFF</span>
-                  <span className="discount-usage">
-                    {discount.TongSoLuongDuocTao} LƯỢT
-                  </span>
-                </div>
-                <div className="discount-right">
-                  <div className="discount-code">{discount.TenKhuyenMai}</div>
-                  <div className="discount-dates">
-                    Áp dụng từ{" "}
-                    {new Date(discount.NgayBatDau).toLocaleDateString()} -{" "}
-                    {new Date(discount.NgayKetThuc).toLocaleDateString()}
+            // discounts.map((discount) => (
+            //   <div key={discount._id} className="discount-card">
+            //     <div className="discount-left">
+            //       <span className="discount-percent">
+            //         {discount.giaTriGiam / 1000}k
+            //       </span>
+            //       <span className="discount-off">OFF</span>
+            //       <span className="discount-usage">
+            //         {discount.TongSoLuongDuocTao} LƯỢT
+            //       </span>
+            //     </div>
+            //     <div className="discount-right">
+            //       <div className="discount-code">{discount.TenKhuyenMai}</div>
+            //       <div className="discount-dates">
+            //         Áp dụng từ{" "}
+            //         {new Date(discount.NgayBatDau).toLocaleDateString()} -{" "}
+            //         {new Date(discount.NgayKetThuc).toLocaleDateString()}
+            //       </div>
+            //       <div style={{ display: "flex", gap: "10px" }}>
+            //         <button
+            //           className="copy-button"
+            //           onClick={() =>
+            //             navigator.clipboard.writeText(discount.TenKhuyenMai)
+            //           }
+            //         >
+            //           <i className="fa fa-clone"></i>
+            //         </button>
+            //         <button
+            //           className="apply-button"
+            //           onClick={() => {
+            //             if (selectedStore) {
+            //               console.log(
+            //                 "Áp dụng mã giảm giá cho cửa hàng:",
+            //                 selectedStore.storeName
+            //               );
+            //               handleApplyDiscount(
+            //                 discount,
+            //                 selectedStore.storeName
+            //               ); // Áp dụng mã giảm giá cho cửa hàng đã chọn
+            //             } else {
+            //               console.log("Chưa chọn cửa hàng.");
+            //             }
+            //           }}
+            //           // onClick={() => {
+            //           //   // Log cửa hàng đang áp dụng mã giảm giá
+            //           //   const storeName = selectedStores[0].storeName; // Lấy tên cửa hàng đầu tiên, bạn có thể thay đổi logic này để chọn đúng cửa hàng
+            //           //   console.log("Store name đang chọn:", storeName);
+            //           //   handleApplyDiscount(discount, storeName); // Áp dụng mã giảm giá cho cửa hàng tương ứng
+            //           // }}
+            //           // onClick={() => handleApplyDiscount(discount)} // Áp dụng mã giảm giá
+            //         >
+            //           Áp dụng
+            //         </button>
+            //       </div>
+            //     </div>
+            //   </div>
+            // ))
+            discounts.map((discount) => {
+              const now = new Date(); // Ngày hiện tại
+              const startDate = new Date(discount.NgayBatDau);
+              const endDate = new Date(discount.NgayKetThuc);
+            
+              const isExpired = now > endDate; // Đã hết hạn
+              const isNotStarted = now < startDate; // Chưa bắt đầu
+            
+              return (
+                <div key={discount._id} className="discount-card">
+                  <div className="discount-left">
+                    <span className="discount-percent">{discount.giaTriGiam / 1000}k</span>
+                    <span className="discount-off">OFF</span>
+                    <span className="discount-usage">
+                      {discount.TongSoLuongDuocTao} LƯỢT
+                    </span>
                   </div>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <button
-                      className="copy-button"
-                      onClick={() =>
-                        navigator.clipboard.writeText(discount.TenKhuyenMai)
-                      }
-                    >
-                      <i className="fa fa-clone"></i>
-                    </button>
-                    <button
-                      className="apply-button"
-                      onClick={() => {
-                        if (selectedStore) {
-                          console.log(
-                            "Áp dụng mã giảm giá cho cửa hàng:",
-                            selectedStore.storeName
-                          );
-                          handleApplyDiscount(
-                            discount,
-                            selectedStore.storeName
-                          ); // Áp dụng mã giảm giá cho cửa hàng đã chọn
-                        } else {
-                          console.log("Chưa chọn cửa hàng.");
+                  <div className="discount-right">
+                    <div className="discount-code">{discount.TenKhuyenMai}</div>
+                    <div className="discount-dates">
+                      Áp dụng từ{" "}
+                      {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
+                    </div>
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <button
+                        className="copy-button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(discount.TenKhuyenMai)
                         }
-                      }}
-                      // onClick={() => {
-                      //   // Log cửa hàng đang áp dụng mã giảm giá
-                      //   const storeName = selectedStores[0].storeName; // Lấy tên cửa hàng đầu tiên, bạn có thể thay đổi logic này để chọn đúng cửa hàng
-                      //   console.log("Store name đang chọn:", storeName);
-                      //   handleApplyDiscount(discount, storeName); // Áp dụng mã giảm giá cho cửa hàng tương ứng
-                      // }}
-                      // onClick={() => handleApplyDiscount(discount)} // Áp dụng mã giảm giá
-                    >
-                      Áp dụng
-                    </button>
+                      >
+                        <i className="fa fa-clone"></i>
+                      </button>
+                      <button
+                        className="apply-button"
+                        onClick={() => {
+                          if (selectedStore) {
+                            console.log(
+                              "Áp dụng mã giảm giá cho cửa hàng:",
+                              selectedStore.storeName
+                            );
+                            handleApplyDiscount(discount, selectedStore.storeName);
+                          } else {
+                            console.log("Chưa chọn cửa hàng.");
+                          }
+                        }}
+                        disabled={isExpired || isNotStarted} // Vô hiệu hóa nếu hết hạn hoặc chưa bắt đầu
+                        style={{
+                          backgroundColor: isExpired || isNotStarted ? "#ccc" : "#007bff",
+                          cursor: isExpired || isNotStarted ? "not-allowed" : "pointer",
+                        }}
+                      >
+                        {isExpired
+                          ? "Hết hạn"
+                          : isNotStarted
+                          ? "Chưa bắt đầu"
+                          : "Áp dụng"}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div style={{ textAlign: "center", padding: "20px" }}>
               Không có mã giảm giá nào.

@@ -2,6 +2,7 @@ export const ROUTER = {
   USER: {
     LOGIN: "/login",
     REGISTER: "register",
+    OTP: "/verify-otp",
     HOME: "/",
     PROFILE: "profile",
     PRODUCTS: "/sanpham",

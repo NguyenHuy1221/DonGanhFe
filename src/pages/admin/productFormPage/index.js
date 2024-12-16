@@ -51,6 +51,7 @@ const ProductFormPage = ({ onQuayLaiProduct }) => {
   const [selectedAttributes, setSelectedAttributes] = useState([
     { thuocTinhSKU: null, giaTri: null },
   ]); // Khởi tạo với 2 thuộc tính
+  const token = localStorage.getItem("token");
 
   const [luachon, setLuachon] = useState(0);
   const [variants, setVariants] = useState([]);
@@ -357,11 +358,12 @@ const ProductFormPage = ({ onQuayLaiProduct }) => {
 
       if (productId) {
         // Nếu có productId, gọi API cập nhật sản phẩm
-        response = await updateProduct(productId, formData);
+        const token = localStorage.getItem("token");
+        response = await updateProduct(productId, formData,token);
         message.success("Cập nhật sản phẩm thành công");
       } else {
         // Nếu không có productId, gọi API thêm mới sản phẩm
-        response = await createProduct(formData);
+        response = await createProduct(formData,token);
         message.success("Thêm sản phẩm mới thành công");
       }
 

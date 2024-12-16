@@ -2,13 +2,28 @@ import axios from "axios";
 
 const API_URL = "/api/baiviet";
 
-export const getListBaiViet = async (userId) => {
+// export const getListBaiViet = async (userId) => {
+//   try {
+//     const response = await axios.get(`${API_URL}/getListBaiVietAdmin/${userId}`);
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("Lỗi khi gọi API: ", error);
+//     throw error;
+//   }
+// };
+
+export const getListBaiViet = async (userId, token) => {
   try {
-    const response = await axios.get(`${API_URL}/getListBaiVietAdmin/${userId}`);
+    const response = await axios.get(`${API_URL}/getListBaiVietAdmin/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
 
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi gọi API: ", error);
+    console.error("Lỗi khi gọi API: ", error.message);
     throw error;
   }
 };
@@ -22,12 +37,16 @@ export const createBaiViet = async (formData) => {
   }
 };
 
-export const deleteBaiViet = async (id) => {
+export const deleteBaiViet = async (id, token) => {
   try {
-    const response = await axios.delete(`${API_URL}/deleteBaiViet/${id}`);
+    const response = await axios.delete(`${API_URL}/deleteBaiViet/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Thêm token vào header
+      },
+    });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi xóa bài viết: ", error);
+    console.error("Lỗi khi xóa bài viết: ", error.message);
     throw error;
   }
 };

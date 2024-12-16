@@ -13,37 +13,91 @@ export const layDanhSachThuocTinh = async (userId) => {
 };
 
 // Thêm thuộc tính
-export const themThuocTinh = async (data,userId) => {
+// export const themThuocTinh = async (data,userId) => {
+//   try {
+//     const response = await axios.post(`${API_BASE_URL}/createThuocTinh/${userId}`, data);
+//     return response.data;
+//   } catch (error) {
+//     throw new Error("Lỗi khi thêm thuộc tính");
+//   }
+// };
+
+export const themThuocTinh = async (data, userId, token) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createThuocTinh/${userId}`, data);
-    return response.data;
+    const response = await axios.post(
+      `${API_BASE_URL}/createThuocTinh/${userId}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
+    );
+    return response.data; // Trả về dữ liệu đã thêm
   } catch (error) {
+    console.error("Lỗi khi thêm thuộc tính:", error.message);
     throw new Error("Lỗi khi thêm thuộc tính");
   }
 };
 
 // Cập nhật thuộc tính
-export const suaThuocTinh = async (data,userId) => {
+// export const suaThuocTinh = async (data,userId) => {
+//   try {
+//     const response = await axios.put(
+//       `${API_BASE_URL}/updateThuocTinh/${data._id}/${userId}`, // Truyền _id
+//       { ThuocTinhID: data.ThuocTinhID, TenThuocTinh: data.TenThuocTinh } // Truyền cả hai trường
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw new Error("Lỗi khi cập nhật thuộc tính");
+//   }
+// };
+
+export const suaThuocTinh = async (data, userId, token) => {
   try {
     const response = await axios.put(
       `${API_BASE_URL}/updateThuocTinh/${data._id}/${userId}`, // Truyền _id
-      { ThuocTinhID: data.ThuocTinhID, TenThuocTinh: data.TenThuocTinh } // Truyền cả hai trường
+      { ThuocTinhID: data.ThuocTinhID, TenThuocTinh: data.TenThuocTinh }, // Truyền cả hai trường
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
     );
-    return response.data;
+    return response.data; // Trả về dữ liệu đã cập nhật
   } catch (error) {
+    console.error("Lỗi khi cập nhật thuộc tính:", error.message);
     throw new Error("Lỗi khi cập nhật thuộc tính");
   }
 };
 
 
 // Xóa thuộc tính
-export const xoaThuocTinh = async (id) => {
+// export const xoaThuocTinh = async (id) => {
+//   try {
+//     const response = await axios.put(
+//       `${API_BASE_URL}/deleteThuocTinh/${id}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw new Error("Lỗi khi xóa thuộc tính");
+//   }
+// };
+
+export const xoaThuocTinh = async (id, token) => {
   try {
     const response = await axios.put(
-      `${API_BASE_URL}/deleteThuocTinh/${id}`
+      `${API_BASE_URL}/deleteThuocTinh/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
     );
-    return response.data;
+    return response.data; // Trả về phản hồi từ API
   } catch (error) {
+    console.error("Lỗi khi xóa thuộc tính:", error.message);
     throw new Error("Lỗi khi xóa thuộc tính");
   }
 };

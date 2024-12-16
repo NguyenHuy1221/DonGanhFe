@@ -20,14 +20,31 @@ export const getHoaDonsByUserId = async (userId) => {
   }
 };
 
-export const getHoaDonById = async (hoaDonId) => {
+// export const getHoaDonById = async (hoaDonId) => {
+//   try {
+//     const response = await axios.get(
+//       `/api/hoadon/getHoaDonByHoaDonIdFullVersion/${hoaDonId}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Lỗi khi lấy thông tin hóa đơn:", error);
+//     throw new Error("Không thể lấy thông tin hóa đơn");
+//   }
+// };
+
+export const getHoaDonById = async (hoaDonId, token) => {
   try {
     const response = await axios.get(
-      `/api/hoadon/getHoaDonByHoaDonIdFullVersion/${hoaDonId}`
+      `/api/hoadon/getHoaDonByHoaDonIdFullVersion/${hoaDonId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
     );
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy thông tin hóa đơn:", error);
+    console.error("Lỗi khi lấy thông tin hóa đơn:", error.message);
     throw new Error("Không thể lấy thông tin hóa đơn");
   }
 };
@@ -43,13 +60,30 @@ export const getHoaDons = async (userId) => {
 };
 
 // Hàm gọi API cập nhật trạng thái hóa đơn
-export const updateHoaDonStatus = async (id, status) => {
+// export const updateHoaDonStatus = async (id, status) => {
+//   try {
+//     await axios.post(`/api/hoadon/updatetrangthaiHoaDOn/${id}`, {
+//       TrangThai: status,
+//     });
+//   } catch (error) {
+//     console.error("Lỗi khi cập nhật trạng thái:", error);
+//     throw new Error("Cập nhật trạng thái thất bại.");
+//   }
+// };
+export const updateHoaDonStatus = async (id, status, token) => {
   try {
-    await axios.post(`/api/hoadon/updatetrangthaiHoaDOn/${id}`, {
-      TrangThai: status,
-    });
+    await axios.post(
+      `/api/hoadon/updatetrangthaiHoaDOn/${id}`,
+      { TrangThai: status }, // Body dữ liệu
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+          "Content-Type": "application/json", // Xác định kiểu dữ liệu
+        },
+      }
+    );
   } catch (error) {
-    console.error("Lỗi khi cập nhật trạng thái:", error);
+    console.error("Lỗi khi cập nhật trạng thái:", error.message);
     throw new Error("Cập nhật trạng thái thất bại.");
   }
 };

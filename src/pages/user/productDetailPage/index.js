@@ -289,7 +289,7 @@ const ProductDetailPage = () => {
           <div className="col-4 shop-image">
             <img
               src={
-                product.userId.anhDaiDien || "https://via.placeholder.com/80"
+                product.userId?.anhDaiDien || "https://via.placeholder.com/80"
               }
               alt="Shop Avatar"
               className="avatar-img"

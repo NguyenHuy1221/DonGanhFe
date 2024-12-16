@@ -25,9 +25,9 @@ const ChiTietHoaDonUserPage = ({ quayLaiHoaDon, onClickChat }) => {
         setError("Không tìm thấy ID hóa đơn trong localStorage");
         return;
       }
-
+      const token = localStorage.getItem("token");
       // Gọi hàm API đã tách ra
-      const hoaDonData = await getHoaDonById(hoaDonId);
+      const hoaDonData = await getHoaDonById(hoaDonId,token);
       console.log("Dữ liệu hóa đơn:", hoaDonData);
       setHoaDon(hoaDonData);
       // localStorage.removeItem("hoadonId");

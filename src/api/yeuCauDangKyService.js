@@ -1,8 +1,16 @@
 import axios from "axios";
 
 export const fetchYeuCauDangKyData = async () => {
+  const token = localStorage.getItem("token"); // Lấy token từ localStorage
   try {
-    const response = await axios.get("/api/yeucaudangky/getListYeuCauDangKy");
+    const response = await axios.get(
+      "/api/yeucaudangky/getListYeuCauDangKy",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
+      }
+    );
     return response.data; // Trả về dữ liệu yêu cầu đăng ký
   } catch (error) {
     console.error("Lỗi khi tải dữ liệu yêu cầu đăng ký:", error);
@@ -24,11 +32,17 @@ export const fetchYeuCauDangKyByUserId = async (userId) => {
 };
 
 export const updateYeuCauDangKy = async (id, trangThai) => {
+  const token = localStorage.getItem("token"); // Lấy token từ localStorage
   try {
     const response = await axios.put(
       `/api/yeucaudangky/updateYeuCauDangKy/${id}`,
       {
         TrangThai: trangThai,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thêm token vào header
+        },
       }
     );
     return response;
@@ -37,3 +51,4 @@ export const updateYeuCauDangKy = async (id, trangThai) => {
     throw error;
   }
 };
+

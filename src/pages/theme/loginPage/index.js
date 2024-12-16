@@ -8,12 +8,15 @@ import { jwtDecode } from "jwt-decode"; // Sửa lại import
 import "./style.scss";
 import { login, fetchUserById } from "api/userService"; // Thêm getUserById
 import { ROUTER } from "./../../../utils/router";
+import axios from "axios";
 
 const LoginPage = () => {
   const [gmail, setGmail] = useState("");
   const [matKhau, setMatKhau] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,6 +46,34 @@ const LoginPage = () => {
       setErrorMessage("Sai thông tin tài khoản hoặc mật khẩu");
     }
   };
+
+  const handleGoogleLogin = async (googleUser) => {
+    try {
+      // Lấy token từ Google API hoặc từ server sau khi xác thực
+      const { token } = googleUser;
+  
+      // Lưu token vào localStorage
+      localStorage.setItem("token", token);
+  
+      // Giải mã token để lấy userId
+      const decodedToken = jwtDecode(token);
+      const userIdFromToken = decodedToken.data;
+      localStorage.setItem("userId", userIdFromToken);
+  
+      // Lấy thông tin người dùng
+      const user = await fetchUserById(userIdFromToken);
+  
+      if (user.hoKinhDoanh) {
+        navigate(ROUTER.ADMIN.DASHBOARD);
+      } else {
+        navigate(ROUTER.USER.HOME);
+      }
+    } catch (error) {
+      console.error("Đăng nhập Google thất bại:", error);
+      setErrorMessage("Đăng nhập Google thất bại");
+    }
+  };
+  
 
   return (
     <div className="body-login">
@@ -92,7 +123,8 @@ const LoginPage = () => {
           <div className="login-with">
             <p>hoặc đăng nhập với</p>
 
-            <a href="https://imp-model-widely.ngrok-free.app/auth/google">
+            {/* <a href="https://imp-model-widely.ngrok-free.app/auth/google"> */}
+            <a href="http://localhost:5000/auth/google">
               <img src={gg} alt="google" width={40} height={40} />
             </a>
           </div>

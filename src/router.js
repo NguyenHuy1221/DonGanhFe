@@ -13,7 +13,7 @@ import GoogleCallback from "./component/GoogleCallback";
 import PaymentPage from "./pages/user/paymentPage";
 import DashboardPage from "./pages/admin/dashboardPage";
 import AdminLayout from "./pages/theme/adminLayout";
-import TableList from "./pages/admin/TableList";
+import OTP from "./pages/theme/SendOtp";
 import ProductFormPage from "./pages/admin/productFormPage";
 
 const RenderUserRouter = () => {
@@ -77,6 +77,7 @@ const RenderUserRouter = () => {
           />
         ))}
         <Route path={ROUTER.USER.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTER.USER.OTP} element={<OTP />} />
         <Route path={ROUTER.USER.REGISTER} element={<RegisterPage />} />
         <Route path={ROUTER.USER.GOOGLE} element={<GoogleCallback />} />
       </Routes>

@@ -187,7 +187,8 @@ const BienThePage = () => {
 
   const xoaBienTheHandler = async (id) => {
     try {
-      await xoaBienThe(id);
+      const token = localStorage.getItem("token");
+      await xoaBienThe(id,token);
       fetchData();
       message.success("Xóa biến thể thành công");
     } catch (error) {
@@ -228,20 +229,32 @@ const BienThePage = () => {
       };
 
       console.log("Dữ liệu gửi lên server:", dataToSend);
-
+      const token = localStorage.getItem("token");
       if (isEditing) {
         // Gọi API sửa biến thể
-        const response = await suaBienThe({
-          ...dataToSend,
-          id: editRecord._id,
-        });
+        // const response = await suaBienThe({
+        //   ...dataToSend,
+        //   id: editRecord._id,
+        // });
+        const response = await suaBienThe(
+          {
+            ...dataToSend,
+            id: editRecord._id, // Dữ liệu biến thể cần sửa
+          },
+          token // Truyền token vào hàm
+        );
         console.log("Phản hồi từ API khi sửa:", response);
         message.success("Cập nhật biến thể thành công");
       } else {
         // Gọi API thêm biến thể
+        // const response = await themBienThe(
+        //   localStorage.getItem("productId"),
+        //   dataToSend
+        // );
         const response = await themBienThe(
-          localStorage.getItem("productId"),
-          dataToSend
+          localStorage.getItem("productId"), // Lấy productId từ localStorage
+          dataToSend, // Dữ liệu biến thể
+          token // Truyền token vào hàm
         );
         console.log("Phản hồi từ API khi thêm:", response);
         message.success("Thêm biến thể thành công");
@@ -325,9 +338,19 @@ const BienThePage = () => {
       };
   
       // Gửi dữ liệu qua API
+      const token = localStorage.getItem("token");
+      // const response = await axios.post(
+      //   "/api/sanpham/ToHopBienThePhienBanBangTay",
+      //   payload
+      // );
       const response = await axios.post(
         "/api/sanpham/ToHopBienThePhienBanBangTay",
-        payload
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
       );
   
       // Xử lý khi gọi API thành công

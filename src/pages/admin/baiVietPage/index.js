@@ -48,7 +48,9 @@ const BaiVietManager = () => {
 
     setLoading(true);
     try {
-      const data = await getListBaiViet(userId);
+      const token = localStorage.getItem("token");
+
+      const data = await getListBaiViet(userId,token);
       setBaiVietList(data);
     } catch (error) {
       message.error("Lỗi khi tải dữ liệu");
