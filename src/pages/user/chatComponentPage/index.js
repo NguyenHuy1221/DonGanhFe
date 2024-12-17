@@ -41,7 +41,8 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
   const currentUserId = getUserIdFromToken();
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5000", {
+    // const newSocket = io("http://localhost:5000", {
+      const newSocket = io("http://61.14.233.64:5000", {
       transports: ["websocket"],
       auth: { token: localStorage.getItem("token") },
     });
