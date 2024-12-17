@@ -20,7 +20,7 @@ import {
   fetchProductListAdmin,
   deleteProduct,
 } from "../../../api/productService";
-
+import ImportExcel from "../ImportExcelPage";
 import { DeleteOutlined } from "@ant-design/icons";
 import { formatter, numberFormatter } from "../../../utils/fomater";
 
@@ -48,11 +48,10 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     onClickBT(productId);
   };
 
-
   useEffect(() => {
     fetchProducts();
     fetchCategoriesData();
-  },  [currentPage, selectedCategory, stockStatus]);
+  }, [currentPage, selectedCategory, stockStatus]);
 
   const fetchProducts = async () => {
     try {
@@ -74,9 +73,6 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     }
   };
 
-
-
-
   const fetchCategoriesData = async () => {
     try {
       const data = await fetchCategories();
@@ -96,7 +92,7 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     try {
       // await axios.put(`/api/sanpham/deleteSanPham/${id}`);
       const token = localStorage.getItem("token");
-      await deleteProduct(id,token);
+      await deleteProduct(id, token);
       fetchProducts();
       message.success("Xóa sản phẩm thành công");
     } catch (error) {
@@ -124,8 +120,8 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     setIsModalVisible(false);
   };
 
-   // Lọc sản phẩm theo tên
-   const filteredProducts = products.filter((product) =>
+  // Lọc sản phẩm theo tên
+  const filteredProducts = products.filter((product) =>
     product.TenSanPham.toLowerCase().includes(searchName.toLowerCase())
   );
 
@@ -152,8 +148,6 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
       message.error("Không thể cập nhật trạng thái.");
     }
   };
-  
-  
 
   const expandedRowRender = (record) => {
     return (
@@ -165,7 +159,6 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
         </a>
         |<a onClick={() => message.info("Sao chép ID")}>Sao chép</a> |
         <a onClick={() => handleClickBienThe(record)}>Xem biến thể</a> |
-        
         <Popconfirm
           title="Bạn có chắc chắn muốn xóa sản phẩm này không?"
           onConfirm={() => deleteProductHandler(record._id)}
@@ -261,13 +254,21 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
     <>
       <h1>Sản phẩm</h1>
 
-      <Button
-        type="primary"
-        style={{ marginLeft: "16px", marginBottom: "16px" }}
-        onClick={onAddProduct}
+      <div
+        style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}
       >
-        Thêm sản phẩm
-      </Button>
+        {/* Nút Thêm sản phẩm */}
+        <Button
+          type="primary"
+          // style={{ marginRight: "16px" }}
+          onClick={onAddProduct}
+        >
+          Thêm sản phẩm
+        </Button>
+
+        {/* Component ImportExcel */}
+        <ImportExcel onSuccess={fetchProducts} />
+      </div>
 
       <div className="filter-section">
         {/* <Select
@@ -296,7 +297,12 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
         </Button> */}
 
         <div className="custom-search">
-          <Input.Search value={searchName} placeholder="Tìm sản phẩm" style={{ width: 250 }} onChange={(e) => setSearchName(e.target.value)} />
+          <Input.Search
+            value={searchName}
+            placeholder="Tìm sản phẩm"
+            style={{ width: 250 }}
+            onChange={(e) => setSearchName(e.target.value)}
+          />
         </div>
       </div>
 
@@ -328,7 +334,6 @@ const ProductsPage = ({ onAddProduct, onUpdateProduct, onClickBT }) => {
         onChange={(page) => setCurrentPage(page)}
         style={{ marginTop: "16px" }}
       />
-    
     </>
   );
 };

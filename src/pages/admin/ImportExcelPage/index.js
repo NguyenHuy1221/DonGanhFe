@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 import { Button, Table, message, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
-const ImportExcel = () => {
+const ImportExcel = ({ onSuccess }) => {
   const [data, setData] = useState([]); // Dữ liệu sản phẩm
   const [columns, setColumns] = useState([]); // Cột bảng
   const [loading, setLoading] = useState(false); // Trạng thái tải
@@ -75,6 +75,9 @@ const ImportExcel = () => {
         message.success(`${result.products.length} sản phẩm đã được thêm thành công!`);
         setData([]); // Reset dữ liệu sau khi thêm thành công
         setColumns([]);
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         const error = await response.json();
         message.error(error.message || "Lỗi khi thêm sản phẩm!");
@@ -110,7 +113,7 @@ const ImportExcel = () => {
       </Button>
 
       {/* Hiển thị dữ liệu dưới dạng bảng */}
-      <Table
+      {/* <Table
         style={{ marginTop: 20 }}
         columns={columns}
         dataSource={data}
@@ -118,7 +121,7 @@ const ImportExcel = () => {
         pagination={{ pageSize: 10 }}
         bordered
         scroll={{ x: "100%" }}
-      />
+      /> */}
     </div>
   );
 };

@@ -314,9 +314,9 @@ const DashboardPage = () => {
           <Menu.Item key="thongso" icon={<UploadOutlined />}>
             Thông số
           </Menu.Item>
-          <Menu.Item key="excel" icon={<UploadOutlined />}>
+          {/* <Menu.Item key="excel" icon={<UploadOutlined />}>
             Excel
-          </Menu.Item>
+          </Menu.Item> */}
           {user && user.role !== "hokinhdoanh" && (
             <Menu.Item key="userxnkinhdoanh" icon={<UploadOutlined />}>
               Xác nhận kinh doanh user
