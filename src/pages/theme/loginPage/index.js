@@ -18,7 +18,8 @@ const LoginPage = () => {
 
 
   const handleGoogleLogin = () => {
-    const googleAuthURL = "http://localhost:5000/auth/google"; // API mở Google OAuth
+    // const googleAuthURL = "http://localhost:5000/auth/google"; // API mở Google OAuth
+     const googleAuthURL = "http://apps.donganh.vn/auth/google";
     const popup = window.open(
       googleAuthURL,
       "Google Login",
@@ -27,8 +28,8 @@ const LoginPage = () => {
 
     // Lắng nghe message từ popup (trả về từ server)
     window.addEventListener("message", async (event) => {
-      if (event.origin !== "http://localhost:5000") return;
-
+      // if (event.origin !== "http://localhost:5000") return;
+      if (event.origin !== "http://apps.donganh.vn/auth/google") return;
       const { token, userId } = event.data; // Nhận token và userId từ server
       if (token && userId) {
         // Lưu vào localStorage
