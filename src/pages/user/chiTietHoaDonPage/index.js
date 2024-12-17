@@ -27,7 +27,7 @@ const ChiTietHoaDonUserPage = ({ quayLaiHoaDon, onClickChat }) => {
       }
       const token = localStorage.getItem("token");
       // Gọi hàm API đã tách ra
-      const hoaDonData = await getHoaDonById(hoaDonId,token);
+      const hoaDonData = await getHoaDonById(hoaDonId, token);
       console.log("Dữ liệu hóa đơn:", hoaDonData);
       setHoaDon(hoaDonData);
       // localStorage.removeItem("hoadonId");
@@ -41,10 +41,15 @@ const ChiTietHoaDonUserPage = ({ quayLaiHoaDon, onClickChat }) => {
 
   useEffect(() => {
     fetchHoaDon();
-    handleCheckOrderStatus();
+    // handleCheckOrderStatus();
 
   }, [id]);
 
+  useEffect(() => {
+    if (hoaDon && hoaDon.DaThanhToan !== true) {
+      handleCheckOrderStatus();
+    }
+  }, [hoaDon]);
 
   const handleCheckOrderStatus = async () => {
     try {
@@ -136,9 +141,11 @@ const ChiTietHoaDonUserPage = ({ quayLaiHoaDon, onClickChat }) => {
               />
             )}
             <span className="bank-name">{bankInfo.name}</span>
-            <button className="btn-pay" onClick={handleThanhToanClick}>
-              Thanh Toán
-            </button>
+            {!hoaDon.DaThanhToan && (
+              <button className="btn-pay" onClick={handleThanhToanClick}>
+                Thanh Toán
+              </button>
+            )}
           </div>
         </div>
       )}
