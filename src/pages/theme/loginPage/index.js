@@ -17,6 +17,33 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
 
+  const handleGoogleLogin = () => {
+    const googleAuthURL = "http://localhost:5000/auth/google"; // API mở Google OAuth
+    const popup = window.open(
+      googleAuthURL,
+      "Google Login",
+      "width=500,height=600"
+    );
+
+    // Lắng nghe message từ popup (trả về từ server)
+    window.addEventListener("message", async (event) => {
+      if (event.origin !== "http://localhost:5000") return;
+
+      const { token, userId } = event.data; // Nhận token và userId từ server
+      if (token && userId) {
+        // Lưu vào localStorage
+        localStorage.setItem("token", token);
+        const decodedToken = jwtDecode(token);
+        console.log(decodedToken);
+        const userIdFromToken = decodedToken.data;
+        localStorage.setItem("userId", userIdFromToken);
+
+        // Chuyển hướng đến Dashboard
+        navigate("/");
+      }
+    });
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,33 +74,7 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleLogin = async (googleUser) => {
-    try {
-      // Lấy token từ Google API hoặc từ server sau khi xác thực
-      const { token } = googleUser;
-  
-      // Lưu token vào localStorage
-      localStorage.setItem("token", token);
-  
-      // Giải mã token để lấy userId
-      const decodedToken = jwtDecode(token);
-      const userIdFromToken = decodedToken.data;
-      localStorage.setItem("userId", userIdFromToken);
-  
-      // Lấy thông tin người dùng
-      const user = await fetchUserById(userIdFromToken);
-  
-      if (user.hoKinhDoanh) {
-        navigate(ROUTER.ADMIN.DASHBOARD);
-      } else {
-        navigate(ROUTER.USER.HOME);
-      }
-    } catch (error) {
-      console.error("Đăng nhập Google thất bại:", error);
-      setErrorMessage("Đăng nhập Google thất bại");
-    }
-  };
-  
+
 
   return (
     <div className="body-login">
@@ -124,9 +125,10 @@ const LoginPage = () => {
             <p>hoặc đăng nhập với</p>
 
             {/* <a href="https://imp-model-widely.ngrok-free.app/auth/google"> */}
-            <a href="http://localhost:5000/auth/google">
-              <img src={gg} alt="google" width={40} height={40} />
+            <a>
+              <img onClick={handleGoogleLogin} src={gg} alt="google" width={40} height={40} />
             </a>
+            
           </div>
         </form>
       </div>

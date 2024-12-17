@@ -134,7 +134,7 @@ const HeaderNew = () => {
   }, []);
 
   const handleHoKinhDoanhClick = () => {
-    if (user && (user.role === "hokinhdoanh" || user.role === "admin")) {
+    if (user && (user.role === "hokinhdoanh" || user.role === "admin" || user.role === "nhanvien")) {
       navigate("/dashboard"); // Navigate to /dashboard
     } else {
       // Nếu người dùng không phải là hokinhdoanh hoặc admin, có thể hiển thị thông báo hoặc chuyển hướng khác

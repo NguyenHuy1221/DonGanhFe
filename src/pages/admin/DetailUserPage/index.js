@@ -6,9 +6,15 @@ import {
 import "./style.scss";
 
 const defaultPermissions = [
-  { entity: "sanpham", actions: ["them", "sua", "xoa"] },
-  { entity: "khuyenmai", actions: ["them", "sua", "xoa"] },
-  { entity: "hoadon", actions: ["them", "sua", "xoa"] },
+  { entity: "sanpham", actions: ["them", "sua", "xoa",'update', 'xem'] },
+  { entity: "khuyenmai", actions: ["them", "sua", "xoa",'update', 'xem'] },
+  { entity: "hoadon", actions: ["them", "sua", "xoa",'update', 'xem'] },
+  { entity: "baiviet", actions: ["them", "sua", "xoa",'update', 'xem'] },
+  { entity: "thuoctinh", actions: ["them", "sua", "xoa",'update', 'xem'] },
+  { entity: "giatrithuoctinh", actions: ["them", "sua", "xoa",'update', 'xem'] },
+  { entity: "nguoidung", actions: ["them", "sua", "xoa",'update', 'xem'] },
+  { entity: "yeucaudangky", actions: ["them", "sua", "xoa",'update', 'xem'] },
+
 ];
 
 // Đối tượng ánh xạ tên quyền và hành động sang tiếng Việt có dấu
@@ -16,9 +22,17 @@ const translationMap = {
   sanpham: "Sản phẩm",
   khuyenmai: "Khuyến mãi",
   hoadon: "Hóa đơn",
+  baiviet: "Bài viết",
+  thuoctinh: "Thuộc tính",
+  giatrithuoctinh: "Giá trị thuộc tính",
+  nguoidung: "Người dùng",
+  yeucaudangky: "Yêu cầu đăng ký",
   them: "Thêm",
   sua: "Sửa",
   xoa: "Xóa",
+  update: "Cập nhật",
+  xem: "Xem",
+
 };
 
 const DetailUserPage = ({ quayLaiListUser }) => {

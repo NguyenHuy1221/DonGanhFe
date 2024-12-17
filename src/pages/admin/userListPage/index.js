@@ -94,7 +94,7 @@ const UserListPage = ({ onClickUser }) => {
             onChange={(e) => setRoleFilter(e.target.value)}
           >
             <option value="">Tất cả vai trò</option>
-            <option value="admin">Admin</option>
+            {/* <option value="admin">Admin</option> */}
             <option value="hokinhdoanh">Hộ kinh doanh</option>
             <option value="khachhang">Khách hàng</option>
             <option value="nhanvien">Nhân viên</option>
