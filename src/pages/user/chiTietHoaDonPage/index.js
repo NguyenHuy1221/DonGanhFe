@@ -42,7 +42,9 @@ const ChiTietHoaDonUserPage = ({ quayLaiHoaDon, onClickChat }) => {
   useEffect(() => {
     fetchHoaDon();
     handleCheckOrderStatus();
+
   }, [id]);
+
 
   const handleCheckOrderStatus = async () => {
     try {

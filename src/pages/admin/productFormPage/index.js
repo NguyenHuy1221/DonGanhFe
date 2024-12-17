@@ -282,8 +282,8 @@ const ProductFormPage = ({ onQuayLaiProduct }) => {
       formData.append("DonGiaNhap", values.DonGiaNhap);
       formData.append("DonGiaBan", values.DonGiaBan);
       formData.append("SoLuongNhap", values.SoLuongNhap);
-      formData.append("SoLuongHienTai", values.SoLuongHienTai);
-      formData.append("PhanTramGiamGia", values.PhanTramGiamGia);
+      formData.append("SoLuongHienTai", values.SoLuongHienTai || 0);
+      formData.append("PhanTramGiamGia", values.PhanTramGiamGia || 0);
       formData.append("TinhTrang", values.TinhTrang);
       formData.append("MoTa", values.MoTa);
       formData.append("Unit", values.Unit);
@@ -564,12 +564,12 @@ const ProductFormPage = ({ onQuayLaiProduct }) => {
               <Form.Item
                 name="SoLuongHienTai"
                 label="Số Lượng Hiện Tại"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng nhập số lượng hiện tại!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "Vui lòng nhập số lượng hiện tại!",
+                //   },
+                // ]}
               >
                 <InputNumber
                   min={0}

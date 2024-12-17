@@ -505,14 +505,14 @@ const PaymentPage = () => {
           updateResponse = await updateTransactionAPI(transactionId, hoadonIds);
         }
         console.log("Phản hồi từ API cập nhật giao dịch:", updateResponse);
-        // const userChoice = window.confirm(
-        //   "Hóa đơn đã được tạo thành công! Bạn có muốn xem đơn hàng của mình không?"
-        // );
-        // if (userChoice) {
-        //   navigate("/profile"); // Điều hướng đến trang hồ sơ
-        // } else {
-        //   navigate("/"); // Điều hướng đến trang chính
-        // }
+        const userChoice = window.confirm(
+          "Hóa đơn đã được tạo thành công! Bạn có muốn xem đơn hàng của mình không?"
+        );
+        if (userChoice) {
+          navigate("/profile"); // Điều hướng đến trang hồ sơ
+        } else {
+          navigate("/"); // Điều hướng đến trang chính
+        }
       } else {
         alert("Không thể tạo hóa đơn. Phản hồi không hợp lệ.");
       }
