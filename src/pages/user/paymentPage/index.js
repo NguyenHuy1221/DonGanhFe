@@ -102,46 +102,128 @@ const PaymentPage = () => {
     }
   }, [selectedStores, appliedDiscounts]);
 
+  // const calculateTotalAmount = (store) => {
+  //   let total = store.storeProducts.reduce(
+  //     (total, product) => total + product.price * product.quantity,
+  //     0
+  //   );
+
+  //   console.log("Tổng tiền trước khi giảm giá:", total);
+
+  //   const discount = appliedDiscounts[store.storeName]; // Lấy mã giảm giá của cửa hàng hiện tại
+  //   let discountAmount = 0;
+
+  //   if (discount) {
+  //     // Kiểm tra nếu mã giảm giá đủ điều kiện áp dụng
+  //     if (total >= discount.GioiHanGiaTriDuocApDung) {
+  //       discountAmount = discount.giaTriGiam; // Số tiền giảm
+
+  //       // Kiểm tra giới hạn giảm tối đa
+  //       if (discount.GioiHanGiaTriGiamToiDa) {
+  //         discountAmount = Math.min(
+  //           discountAmount,
+  //           // discount.GioiHanGiaTriGiamToiDa
+  //           discount.GiaTriKhuyenMai
+  //         );
+  //         console.log(
+  //           "Giảm giá sau khi áp dụng giới hạn tối đa:",
+  //           discountAmount
+  //         );
+  //       }
+
+  //       total -= discountAmount; // Trừ số tiền giảm vào tổng
+  //       console.log("Tổng tiền sau khi áp dụng giảm giá:", total);
+  //     } else {
+  //       console.log("Tổng tiền không đủ điều kiện áp dụng mã giảm giá.");
+  //     }
+  //   }
+
+  //   const finalAmount = total < 0 ? 0 : total; // Đảm bảo tổng tiền không âm
+  //   console.log("Tổng tiền sau khi áp dụng mã giảm giá:", finalAmount);
+  //   // calculateTotalAmountForAllStores();
+  //   return { finalAmount, discountAmount }; // Trả về cả tổng tiền và số tiền giảm
+  // };
+
+  // const calculateTotalAmount = (store) => {
+  //   let total = store.storeProducts.reduce(
+  //     (total, product) => total + product.price * product.quantity,
+  //     0
+  //   );
+
+  //   console.log("Tổng tiền trước khi giảm giá:", total);
+
+  //   const discount = appliedDiscounts[store.storeName]; // Lấy mã giảm giá của cửa hàng hiện tại
+  //   let discountAmount = 0;
+  //   let isDiscountApplicable = false; // Trạng thái giảm giá có áp dụng được không
+
+  //   if (discount) {
+  //     // Kiểm tra nếu mã giảm giá đủ điều kiện áp dụng
+  //     if (total >= discount.GioiHanGiaTriDuocApDung) {
+  //       isDiscountApplicable = true; // Đủ điều kiện áp dụng giảm giá
+  //       discountAmount = discount.giaTriGiam;
+
+  //       // Kiểm tra giới hạn giảm tối đa
+  //       if (discount.GioiHanGiaTriGiamToiDa) {
+  //         discountAmount = Math.min(discountAmount, discount.GiaTriKhuyenMai);
+  //         console.log(
+  //           "Giảm giá sau khi áp dụng giới hạn tối đa:",
+  //           discountAmount
+  //         );
+  //       }
+
+  //       total -= discountAmount; // Trừ số tiền giảm vào tổng
+  //       console.log("Tổng tiền sau khi áp dụng giảm giá:", total);
+  //     } else {
+  //       console.log("Tổng tiền không đủ điều kiện áp dụng mã giảm giá.");
+  //     }
+  //   }
+
+  //   const finalAmount = total < 0 ? 0 : total; // Đảm bảo tổng tiền không âm
+  //   console.log("Tổng tiền sau khi áp dụng mã giảm giá:", finalAmount);
+
+  //   return { finalAmount, discountAmount, isDiscountApplicable }; // Trả về cả trạng thái giảm giá
+  // };
+
   const calculateTotalAmount = (store) => {
     let total = store.storeProducts.reduce(
       (total, product) => total + product.price * product.quantity,
       0
     );
-
+  
     console.log("Tổng tiền trước khi giảm giá:", total);
-
-    const discount = appliedDiscounts[store.storeName]; // Lấy mã giảm giá của cửa hàng hiện tại
+  
+    // Kiểm tra giá trị của totalAmount
+    if (!store.totalAmount) {
+      store.totalAmount = total; // Gán giá trị nếu chưa có
+    }
+  
+    const discount = appliedDiscounts[store.storeName];
     let discountAmount = 0;
-
+    let isDiscountApplicable = false;
+  
     if (discount) {
-      // Kiểm tra nếu mã giảm giá đủ điều kiện áp dụng
       if (total >= discount.GioiHanGiaTriDuocApDung) {
-        discountAmount = discount.giaTriGiam; // Số tiền giảm
-
-        // Kiểm tra giới hạn giảm tối đa
+        isDiscountApplicable = true;
+        discountAmount = discount.giaTriGiam;
+  
         if (discount.GioiHanGiaTriGiamToiDa) {
-          discountAmount = Math.min(
-            discountAmount,
-            discount.GioiHanGiaTriGiamToiDa
-          );
-          console.log(
-            "Giảm giá sau khi áp dụng giới hạn tối đa:",
-            discountAmount
-          );
+          discountAmount = Math.min(discountAmount, discount.GiaTriKhuyenMai);
+          console.log("Giảm giá sau khi áp dụng giới hạn tối đa:", discountAmount);
         }
-
-        total -= discountAmount; // Trừ số tiền giảm vào tổng
+  
+        total -= discountAmount;
         console.log("Tổng tiền sau khi áp dụng giảm giá:", total);
       } else {
         console.log("Tổng tiền không đủ điều kiện áp dụng mã giảm giá.");
       }
     }
-
-    const finalAmount = total < 0 ? 0 : total; // Đảm bảo tổng tiền không âm
+  
+    const finalAmount = total < 0 ? 0 : total;
     console.log("Tổng tiền sau khi áp dụng mã giảm giá:", finalAmount);
-    // calculateTotalAmountForAllStores();
-    return { finalAmount, discountAmount }; // Trả về cả tổng tiền và số tiền giảm
+  
+    return { finalAmount, discountAmount, isDiscountApplicable };
   };
+  
 
   const calculateTotalDiscount = (stores) => {
     return stores.reduce((totalDiscount, store) => {
@@ -193,10 +275,15 @@ const PaymentPage = () => {
       setLoading(true);
       // const totalAmount = store.storeProducts
       // .reduce((total, product) => total + product.price * product.quantity, 0);
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
 
       const response = await axios.get(
         `/api/khuyenmai/getlistKhuyenMai/${totalAmount}`
-      );
+        , {
+          headers: {
+            Authorization: `Bearer ${token}`, // Truyền token vào headers
+          },
+        });
       setDiscounts(response.data);
     } catch (error) {
       console.error("Error fetching discounts:", error);
@@ -400,6 +487,127 @@ const PaymentPage = () => {
     setSelectedAddress(addressId);
   };
 
+  // const createInvoice = async () => {
+  //   const userId = localStorage.getItem("userId");
+  //   // Kiểm tra giỏ hàng
+  //   if (!selectedStores || selectedStores.length === 0) {
+  //     alert("Giỏ hàng trống hoặc dữ liệu không hợp lệ.");
+  //     return;
+  //   }
+
+  //   let transactionId;
+  //   switch (paymentMethod) {
+  //     case "cash":
+  //       transactionId = "111"; // Thanh toán khi nhận hàng
+  //       break;
+  //     case "vietqr":
+  //       transactionId = "295"; // VietQR
+  //       break;
+  //     case "vnpay":
+  //       transactionId = "297"; // VNPay QR
+  //       break;
+  //     case "atm":
+  //       transactionId = "151"; // ATM Card
+  //       break;
+  //     default:
+  //       alert("Vui lòng chọn phương thức thanh toán.");
+  //       return;
+  //   }
+
+  //   // Gộp tất cả sản phẩm của các cửa hàng vào một mảng chung
+  //   const mergedCart = selectedStores.map((store) => ({
+  //     user: {
+  //       _id: store.storeOwnerId, // ID chủ cửa hàng
+  //     },
+  //     transactionId, // Bạn có thể thay bằng một ID giao dịch thực tế nếu có
+
+  //     sanPhamList: store.storeProducts.map((product) => ({
+  //       chiTietGioHangs: [
+  //         {
+  //           _id: product.id,
+
+  //           idBienThe: {
+  //             _id: product.idBt,
+  //           },
+  //           soLuong: product.quantity,
+  //           donGia: product.price,
+  //           // TongTien: totalAmount,
+  //         },
+  //       ],
+  //       khuyenMaiId: appliedDiscounts[store.storeName]?._id || null,
+  //       giaTriKhuyenMai: calculateTotalDiscount(selectedStores),
+  //     })),
+  //   }));
+
+  //   // Tạo đối tượng hóa đơn
+  //   const invoiceData = {
+  //     userId,
+  //     diaChiMoi: {
+  //       tinhThanhPho: tinhThanhPho || "", // Nếu không có giá trị sẽ dùng mặc định
+  //       quanHuyen: quanHuyen || "",
+  //       phuongXa: phuongXa || "",
+  //       duongThon: duongThon || "",
+  //       Name: displayedAddress.name || "",
+  //       SoDienThoai: displayedAddress.phone || "",
+  //     },
+  //     ghiChu: "Giao hàng vào sáng mai",
+
+  //     mergedCart: {
+  //       mergedCart: mergedCart, // Chứa danh sách tất cả cửa hàng và sản phẩm
+  //     },
+  //   };
+
+  //   console.log(
+  //     "Dữ liệu hóa đơn trước khi gửi:",
+  //     JSON.stringify(invoiceData, null, 2)
+  //   );
+
+  //   // Gửi dữ liệu đến API tạo hóa đơn
+
+  //   try {
+  //     const createInvoiceResponse = await createInvoiceAPI(invoiceData);
+
+  //     console.log("Phản hồi từ API tạo hóa đơn:", createInvoiceResponse);
+  //     if (
+  //       createInvoiceResponse &&
+  //       createInvoiceResponse.message === "Tạo hóa đơn thành công" &&
+  //       createInvoiceResponse.hoadon &&
+  //       createInvoiceResponse.hoadon.length > 0
+  //     ) {
+  //       // alert("Hóa đơn đã được tạo thành công!");
+
+  //       const hoadonIds = createInvoiceResponse.hoadon.map((hd) => hd._id);
+
+  //       let updateResponse;
+
+  //       if (transactionId === "111") {
+  //         // Gọi API updateTransactionAPICOD nếu thanh toán bằng tiền mặt
+  //         updateResponse = await updateTransactionAPICOD(
+  //           transactionId,
+  //           hoadonIds
+  //         );
+  //       } else {
+  //         // Gọi API updateTransactionAPI cho các phương thức khác
+  //         updateResponse = await updateTransactionAPI(transactionId, hoadonIds);
+  //       }
+  //       console.log("Phản hồi từ API cập nhật giao dịch:", updateResponse);
+  //       const userChoice = window.confirm(
+  //         "Hóa đơn đã được tạo thành công! Bạn có muốn xem đơn hàng của mình không?"
+  //       );
+  //       if (userChoice) {
+  //         navigate("/profile"); // Điều hướng đến trang hồ sơ
+  //       } else {
+  //         navigate("/"); // Điều hướng đến trang chính
+  //       }
+  //     } else {
+  //       alert("Không thể tạo hóa đơn. Phản hồi không hợp lệ.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Lỗi khi tạo hóa đơn:", error);
+  //     alert("Không thể tạo hóa đơn. Vui lòng thử lại.");
+  //   }
+  // };
+
   const createInvoice = async () => {
     const userId = localStorage.getItem("userId");
     // Kiểm tra giỏ hàng
@@ -407,7 +615,7 @@ const PaymentPage = () => {
       alert("Giỏ hàng trống hoặc dữ liệu không hợp lệ.");
       return;
     }
-
+  
     let transactionId;
     switch (paymentMethod) {
       case "cash":
@@ -426,33 +634,35 @@ const PaymentPage = () => {
         alert("Vui lòng chọn phương thức thanh toán.");
         return;
     }
-
-    // Gộp tất cả sản phẩm của các cửa hàng vào một mảng chung
-    const mergedCart = selectedStores.map((store) => ({
-      user: {
-        _id: store.storeOwnerId, // ID chủ cửa hàng
-      },
-      transactionId, // Bạn có thể thay bằng một ID giao dịch thực tế nếu có
-    
-      sanPhamList: store.storeProducts.map((product) => ({
-        chiTietGioHangs: [
-          {
-            _id: product.id,
-
-            idBienThe: {
-              _id: product.idBt,
-            },
-            soLuong: product.quantity,
-            donGia: product.price,
-            // TongTien: totalAmount, 
-          },
-        ],
-        khuyenMaiId: appliedDiscounts[store.storeName]?._id || null,
-        giaTriKhuyenMai: calculateTotalDiscount(selectedStores),
   
-      })),
-    }));
-
+    // Gộp tất cả sản phẩm của các cửa hàng vào một mảng chung
+    const mergedCart = selectedStores.map((store) => {
+      const storeDiscount = appliedDiscounts[store.storeName]; // Mã giảm giá của cửa hàng
+  
+      return {
+        user: {
+          _id: store.storeOwnerId, // ID chủ cửa hàng
+        },
+        transactionId, // Bạn có thể thay bằng một ID giao dịch thực tế nếu có
+  
+        sanPhamList: store.storeProducts.map((product) => ({
+          chiTietGioHangs: [
+            {
+              _id: product.id,
+              idBienThe: {
+                _id: product.idBt,
+              },
+              soLuong: product.quantity,
+              donGia: product.price,
+              // TongTien: totalAmount,
+            },
+          ],
+          khuyenMaiId: storeDiscount ? storeDiscount._id : null, // Chỉ áp dụng mã giảm giá nếu có
+          giaTriKhuyenMai: storeDiscount ? calculateTotalDiscount([store]) : 0, // Tính giảm giá riêng cho cửa hàng
+        })),
+      };
+    });
+  
     // Tạo đối tượng hóa đơn
     const invoiceData = {
       userId,
@@ -465,22 +675,21 @@ const PaymentPage = () => {
         SoDienThoai: displayedAddress.phone || "",
       },
       ghiChu: "Giao hàng vào sáng mai",
-
+  
       mergedCart: {
         mergedCart: mergedCart, // Chứa danh sách tất cả cửa hàng và sản phẩm
       },
     };
-
+  
     console.log(
       "Dữ liệu hóa đơn trước khi gửi:",
       JSON.stringify(invoiceData, null, 2)
     );
-
+  
     // Gửi dữ liệu đến API tạo hóa đơn
-
     try {
       const createInvoiceResponse = await createInvoiceAPI(invoiceData);
-
+  
       console.log("Phản hồi từ API tạo hóa đơn:", createInvoiceResponse);
       if (
         createInvoiceResponse &&
@@ -488,12 +697,10 @@ const PaymentPage = () => {
         createInvoiceResponse.hoadon &&
         createInvoiceResponse.hoadon.length > 0
       ) {
-        // alert("Hóa đơn đã được tạo thành công!");
-
         const hoadonIds = createInvoiceResponse.hoadon.map((hd) => hd._id);
-
+  
         let updateResponse;
-
+  
         if (transactionId === "111") {
           // Gọi API updateTransactionAPICOD nếu thanh toán bằng tiền mặt
           updateResponse = await updateTransactionAPICOD(
@@ -522,6 +729,7 @@ const PaymentPage = () => {
     }
   };
 
+  
   const handleConfirmPayment = () => {
     if (displayedAddress) {
       createInvoice();
@@ -1071,7 +1279,7 @@ const PaymentPage = () => {
           </div>
         </div>
       </div>
-      <Dialog open={opeenMGG} onClose={handleCloseMGG} maxWidth="sm" fullWidth>
+      {/* <Dialog open={opeenMGG} onClose={handleCloseMGG} maxWidth="sm" fullWidth>
         <DialogTitle>Áp dụng mã giảm giá</DialogTitle>
         <div className="discount-list">
           {loading ? (
@@ -1079,75 +1287,20 @@ const PaymentPage = () => {
               <CircularProgress />
             </div>
           ) : discounts.length > 0 ? (
-            // discounts.map((discount) => (
-            //   <div key={discount._id} className="discount-card">
-            //     <div className="discount-left">
-            //       <span className="discount-percent">
-            //         {discount.giaTriGiam / 1000}k
-            //       </span>
-            //       <span className="discount-off">OFF</span>
-            //       <span className="discount-usage">
-            //         {discount.TongSoLuongDuocTao} LƯỢT
-            //       </span>
-            //     </div>
-            //     <div className="discount-right">
-            //       <div className="discount-code">{discount.TenKhuyenMai}</div>
-            //       <div className="discount-dates">
-            //         Áp dụng từ{" "}
-            //         {new Date(discount.NgayBatDau).toLocaleDateString()} -{" "}
-            //         {new Date(discount.NgayKetThuc).toLocaleDateString()}
-            //       </div>
-            //       <div style={{ display: "flex", gap: "10px" }}>
-            //         <button
-            //           className="copy-button"
-            //           onClick={() =>
-            //             navigator.clipboard.writeText(discount.TenKhuyenMai)
-            //           }
-            //         >
-            //           <i className="fa fa-clone"></i>
-            //         </button>
-            //         <button
-            //           className="apply-button"
-            //           onClick={() => {
-            //             if (selectedStore) {
-            //               console.log(
-            //                 "Áp dụng mã giảm giá cho cửa hàng:",
-            //                 selectedStore.storeName
-            //               );
-            //               handleApplyDiscount(
-            //                 discount,
-            //                 selectedStore.storeName
-            //               ); // Áp dụng mã giảm giá cho cửa hàng đã chọn
-            //             } else {
-            //               console.log("Chưa chọn cửa hàng.");
-            //             }
-            //           }}
-            //           // onClick={() => {
-            //           //   // Log cửa hàng đang áp dụng mã giảm giá
-            //           //   const storeName = selectedStores[0].storeName; // Lấy tên cửa hàng đầu tiên, bạn có thể thay đổi logic này để chọn đúng cửa hàng
-            //           //   console.log("Store name đang chọn:", storeName);
-            //           //   handleApplyDiscount(discount, storeName); // Áp dụng mã giảm giá cho cửa hàng tương ứng
-            //           // }}
-            //           // onClick={() => handleApplyDiscount(discount)} // Áp dụng mã giảm giá
-            //         >
-            //           Áp dụng
-            //         </button>
-            //       </div>
-            //     </div>
-            //   </div>
-            // ))
             discounts.map((discount) => {
               const now = new Date(); // Ngày hiện tại
               const startDate = new Date(discount.NgayBatDau);
               const endDate = new Date(discount.NgayKetThuc);
-            
+
               const isExpired = now > endDate; // Đã hết hạn
               const isNotStarted = now < startDate; // Chưa bắt đầu
-            
+
               return (
                 <div key={discount._id} className="discount-card">
                   <div className="discount-left">
-                    <span className="discount-percent">{discount.giaTriGiam / 1000}k</span>
+                    <span className="discount-percent">
+                      {discount.giaTriGiam / 1000}k
+                    </span>
                     <span className="discount-off">OFF</span>
                     <span className="discount-usage">
                       {discount.TongSoLuongDuocTao} LƯỢT
@@ -1156,8 +1309,8 @@ const PaymentPage = () => {
                   <div className="discount-right">
                     <div className="discount-code">{discount.TenKhuyenMai}</div>
                     <div className="discount-dates">
-                      Áp dụng từ{" "}
-                      {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
+                      Áp dụng từ {startDate.toLocaleDateString()} -{" "}
+                      {endDate.toLocaleDateString()}
                     </div>
                     <div style={{ display: "flex", gap: "10px" }}>
                       <button
@@ -1168,29 +1321,153 @@ const PaymentPage = () => {
                       >
                         <i className="fa fa-clone"></i>
                       </button>
+                   
                       <button
                         className="apply-button"
-                        onClick={() => {
-                          if (selectedStore) {
-                            console.log(
-                              "Áp dụng mã giảm giá cho cửa hàng:",
-                              selectedStore.storeName
-                            );
-                            handleApplyDiscount(discount, selectedStore.storeName);
-                          } else {
-                            console.log("Chưa chọn cửa hàng.");
-                          }
-                        }}
-                        disabled={isExpired || isNotStarted} // Vô hiệu hóa nếu hết hạn hoặc chưa bắt đầu
+                        onClick={() =>
+                          handleApplyDiscount(discount, selectedStore.storeName)
+                        }
+                        disabled={
+                          isExpired || // Đã hết hạn
+                          isNotStarted || // Chưa bắt đầu
+                          selectedStore?.totalAmount <
+                            discount.GioiHanGiaTriDuocApDung // Không đạt giá trị tối thiểu
+                        }
                         style={{
-                          backgroundColor: isExpired || isNotStarted ? "#ccc" : "#007bff",
-                          cursor: isExpired || isNotStarted ? "not-allowed" : "pointer",
+                          backgroundColor:
+                            isExpired ||
+                            isNotStarted ||
+                            selectedStore?.totalAmount <
+                              discount.GioiHanGiaTriDuocApDung
+                              ? "#ccc" // Màu xám nếu không đủ điều kiện
+                              : "#007bff", // Màu xanh nếu đủ điều kiện
+                          cursor:
+                            isExpired ||
+                            isNotStarted ||
+                            selectedStore?.totalAmount <
+                              discount.GioiHanGiaTriDuocApDung
+                              ? "not-allowed" // Con trỏ không cho phép nhấn
+                              : "pointer", // Con trỏ bình thường
                         }}
                       >
                         {isExpired
                           ? "Hết hạn"
                           : isNotStarted
                           ? "Chưa bắt đầu"
+                          : selectedStore?.totalAmount <
+                            discount.GioiHanGiaTriDuocApDung
+                          ? `Tối thiểu ${discount.GioiHanGiaTriDuocApDung}đ`
+                          : "Áp dụng"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              Không có mã giảm giá nào.
+            </div>
+          )}
+        </div>
+      </Dialog> */}
+
+      <Dialog open={opeenMGG} onClose={handleCloseMGG} maxWidth="sm" fullWidth>
+        <DialogTitle>Áp dụng mã giảm giá</DialogTitle>
+        <div className="discount-list">
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              <CircularProgress />
+            </div>
+          ) : discounts.length > 0 ? (
+            discounts.map((discount) => {
+              const now = new Date(); // Ngày hiện tại
+              const startDate = new Date(discount.NgayBatDau);
+              const endDate = new Date(discount.NgayKetThuc);
+
+              const isExpired = now > endDate; // Đã hết hạn
+              const isNotStarted = now < startDate; // Chưa bắt đầu
+
+              // Kiểm tra điều kiện giảm giá
+              const isDiscountApplicable =
+                !isExpired &&
+                !isNotStarted &&
+                selectedStore?.totalAmount >= discount.GioiHanGiaTriDuocApDung;
+
+              return (
+                <div
+                  key={discount._id}
+                  className={`discount-card ${
+                    !isDiscountApplicable ? "disabled" : ""
+                  }`}
+                >
+                  <div className="discount-left">
+                    <span className="discount-percent">
+                      {discount.giaTriGiam / 1000}k
+                    </span>
+                    <span className="discount-off">OFF</span>
+                    <span className="discount-usage">
+                      {discount.TongSoLuongDuocTao} LƯỢT
+                    </span>
+                  </div>
+                  <div className="discount-right">
+                    <div className="discount-code">{discount.TenKhuyenMai}</div>
+                    <div className="discount-dates">
+                      Áp dụng từ {startDate.toLocaleDateString()} -{" "}
+                      {endDate.toLocaleDateString()}
+                    </div>
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <button
+                        className="copy-button"
+                        onClick={() =>
+                          navigator.clipboard.writeText(discount.TenKhuyenMai)
+                        }
+                      >
+                        <i className="fa fa-clone"></i>
+                      </button>
+
+                      <button
+                        className="apply-button"
+                        onClick={() =>
+                          handleApplyDiscount(discount, selectedStore.storeName)
+                        }
+                        disabled={
+                          isExpired || // Đã hết hạn
+                          isNotStarted || // Chưa bắt đầu
+                          selectedStore?.totalAmount < discount.GioiHanGiaTriDuocApDung // Không đạt giá trị tối thiểu
+                        }
+                        // disabled={false}
+                        style={{
+                          backgroundColor:
+                            isExpired ||
+                            isNotStarted ||
+                            selectedStore?.totalAmount <
+                              discount.GioiHanGiaTriDuocApDung
+                              ? "#ccc" // Màu xám nếu không đủ điều kiện
+                              : "#007bff", // Màu xanh nếu đủ điều kiện
+                          cursor:
+                            isExpired ||
+                            isNotStarted ||
+                            selectedStore?.totalAmount <
+                              discount.GioiHanGiaTriDuocApDung
+                              ? "not-allowed" // Con trỏ không cho phép nhấn
+                              : "pointer", // Con trỏ bình thường
+                        }}
+                      >
+                        {console.log("Tổng tiền:", selectedStore?.totalAmount)}{" "}
+                        {/* Log tổng tiền */}
+                        {console.log(
+                          "Giới hạn giá trị áp dụng giảm giá:",
+                          discount.GioiHanGiaTriDuocApDung
+                        )}{" "}
+                        {/* Log giới hạn giá trị áp dụng giảm giá */}
+                        {isExpired
+                          ? "Hết hạn"
+                          : isNotStarted
+                          ? "Chưa bắt đầu"
+                          : selectedStore?.totalAmount <
+                            discount.GioiHanGiaTriDuocApDung
+                          ? `Tối thiểu ${discount.GioiHanGiaTriDuocApDung}đ`
                           : "Áp dụng"}
                       </button>
                     </div>

@@ -1,8 +1,13 @@
 import axios from "axios";
+const token = localStorage.getItem("token");
 
 export const fetchHoaDon = async () => {
   try {
-    const response = await axios.get("/api/hoadon/getlistHoaDon");
+    const response = await axios.get("/api/hoadon/getlistHoaDon" , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -12,7 +17,11 @@ export const fetchHoaDon = async () => {
 
 export const getHoaDonsByUserId = async (userId) => {
   try {
-    const response = await axios.get(`/api/hoadon/getHoaDonByUserId/${userId}`);
+    const response = await axios.get(`/api/hoadon/getHoaDonByUserId/${userId}` , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi lấy danh sách hóa đơn:", error);
@@ -41,7 +50,11 @@ export const getHoaDonById = async (hoaDonId, token) => {
           Authorization: `Bearer ${token}`, // Thêm token vào header
         },
       }
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi lấy thông tin hóa đơn:", error.message);
@@ -51,7 +64,11 @@ export const getHoaDonById = async (hoaDonId, token) => {
 
 export const getHoaDons = async (userId) => {
   try {
-    const response = await axios.get(`/api/hoadon/getlistHoaDon/${userId}`);
+    const response = await axios.get(`/api/hoadon/getlistHoaDon/${userId}` , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi lấy danh sách hóa đơn:", error);
@@ -93,7 +110,11 @@ export const createInvoiceAPI = async (invoiceData) => {
     const response = await axios.post(
       "/api/hoadon/createUserDiaChivaThongTinGiaoHang",
       invoiceData
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data; // Trả về dữ liệu từ API
   } catch (error) {
     console.error("Lỗi khi tạo hóa đơn:", error);
@@ -110,7 +131,11 @@ export const updateTransactionAPI = async (transactionId, hoadonIds) => {
         transactionId,
         hoadon: hoadonIds,
       }
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data; // Trả về dữ liệu từ API
   } catch (error) {
     console.error("Lỗi khi cập nhật giao dịch:", error);
@@ -127,7 +152,11 @@ export const updateTransactionAPICOD = async (transactionId, hoadonIds) => {
         transactionId,
         hoadon: hoadonIds,
       }
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data; // Trả về dữ liệu từ API
   } catch (error) {
     console.error("Lỗi khi cập nhật giao dịch:", error);

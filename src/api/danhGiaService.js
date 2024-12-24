@@ -1,11 +1,15 @@
 import axios from "axios";
 
 const API_URL = "/api/danhgia";
-
+const token = localStorage.getItem("token");
 export const getListDanhGiaInSanPhamById = async (IDSanPham, userId) => {
   try {
     const response = await axios.get(
-      `${API_URL}/getListDanhGiaInSanPhamById/${IDSanPham}/${userId}`
+      `${API_URL}/getListDanhGiaInSanPhamById/${IDSanPham}/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
 
     console.log("Đánh giá :", response.data);
@@ -19,7 +23,11 @@ export const getListDanhGiaInSanPhamById = async (IDSanPham, userId) => {
 export const getDanhGiaForAdmin = async (userId) => {
   try {
     const response = await axios.get(
-      `/api/danhgia/getListDanhGiaAdmin/${userId}`
+      `/api/danhgia/getListDanhGiaAdmin/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -36,6 +44,10 @@ export const addPhanHoi = async (currentDanhGiaId, userId, binhLuan) => {
       {
         userId,
         BinhLuan: binhLuan,
+      } , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
       }
     );
     return response.data;
@@ -55,7 +67,11 @@ export const updatePhanHoi = async (
     const response = await axios.post(
       `/api/danhgia/updatePhanHoi/${currentDanhGiaId}/${currentPhanHoiId}`,
       { BinhLuan: binhLuan }
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi cập nhật phản hồi:", error);
@@ -66,7 +82,11 @@ export const updatePhanHoi = async (
 // Hàm gọi API xóa phản hồi
 export const deletePhanHoi = async (danhGiaId, phanHoiId) => {
   try {
-    await axios.delete(`/api/danhgia/deletePhanHoi/${danhGiaId}/${phanHoiId}`);
+    await axios.delete(`/api/danhgia/deletePhanHoi/${danhGiaId}/${phanHoiId}` , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
   } catch (error) {
     console.error("Lỗi khi xóa phản hồi:", error);
     throw new Error("Không thể xóa phản hồi");

@@ -12,14 +12,14 @@ import nha from "../../../image/nha.png";
 import girl1 from "../../../image/girl1.jpg";
 import girl2 from "../../../image/girl2.jpg";
 import { fetchUserById } from "api/userService";
-import { getDanhMucList } from '../../../api/danhMucService';
-import { getBanners } from '../../../api/bannerService';
+import { getDanhMucList } from "../../../api/danhMucService";
+import { getBanners } from "../../../api/bannerService";
 
 import { IoCartOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { fetchCartById } from "api/cartService";
-
+import { message } from "antd";
 
 const HeaderNew = () => {
   const location = useLocation();
@@ -55,52 +55,50 @@ const HeaderNew = () => {
     fetchCategories();
   }, []);
 
+  // const fetchCartData = async () => {
+  //   try {
+  //     const userId = localStorage.getItem("userId");
+  //     if (!userId) {
+  //       console.log("User chưa đăng nhập.");
+  //       setTotalItemCount(0);
+  //       return;
+  //     }
 
-  const fetchCartData = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        console.log("User chưa đăng nhập.");
-        setTotalItemCount(0);
-        return;
-      }
+  //     const cartData = await fetchCartById(userId);
 
-      const cartData = await fetchCartById(userId);
+  //     if (
+  //       !cartData.mergedCart ||
+  //       !Array.isArray(cartData.mergedCart) ||
+  //       cartData.mergedCart.length === 0
+  //     ) {
+  //       console.log("Giỏ hàng rỗng hoặc không hợp lệ.");
+  //       setTotalItemCount(0);
+  //       return;
+  //     }
 
-      if (
-        !cartData.mergedCart ||
-        !Array.isArray(cartData.mergedCart) ||
-        cartData.mergedCart.length === 0
-      ) {
-        console.log("Giỏ hàng rỗng hoặc không hợp lệ.");
-        setTotalItemCount(0);
-        return;
-      }
+  //     // Tính tổng số lượng sản phẩm
+  //     const totalCount = cartData.mergedCart.reduce(
+  //       (total, store) =>
+  //         total +
+  //         store.sanPhamList.reduce(
+  //           (subTotal, product) =>
+  //             subTotal +
+  //             product.chiTietGioHang.reduce((sum, item) => sum + item.soLuong, 0),
+  //           0
+  //         ),
+  //       0
+  //     );
 
-      // Tính tổng số lượng sản phẩm
-      const totalCount = cartData.mergedCart.reduce(
-        (total, store) =>
-          total +
-          store.sanPhamList.reduce(
-            (subTotal, product) =>
-              subTotal +
-              product.chiTietGioHang.reduce((sum, item) => sum + item.soLuong, 0),
-            0
-          ),
-        0
-      );
+  //     setTotalItemCount(totalCount);
+  //   } catch (error) {
+  //     console.error("Lỗi khi lấy giỏ hàng:", error);
+  //     setTotalItemCount(0);
+  //   }
+  // };
 
-      setTotalItemCount(totalCount);
-    } catch (error) {
-      console.error("Lỗi khi lấy giỏ hàng:", error);
-      setTotalItemCount(0);
-    }
-  };
-
-  useEffect(() => {
-    fetchCartData();
-  }, []); // Chỉ chạy một lần khi header được render
-
+  // useEffect(() => {
+  //   fetchCartData();
+  // }, []); // Chỉ chạy một lần khi header được render
 
   // const fetchCategories = () => {
   //   axios
@@ -120,21 +118,39 @@ const HeaderNew = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const data = await getBanners(); // Gọi hàm API
-        setBanners(data); // Cập nhật state với dữ liệu trả về
-      } catch (error) {
-        console.error("Error fetching banners:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchBanners = async () => {
+  //     try {
+  //       const data = await getBanners(); // Gọi hàm API
+  //       setBanners(data); // Cập nhật state với dữ liệu trả về
+  //     } catch (error) {
+  //       console.error("Error fetching banners:", error);
+  //     }
+  //   };
 
+  //   fetchBanners(); // Gọi hàm fetch banners khi component mount
+  // }, []);
+  useEffect(() => {
     fetchBanners(); // Gọi hàm fetch banners khi component mount
   }, []);
+  const fetchBanners = async () => {
+    try {
+      const bannersData = await getBanners();
+      setBanners(bannersData);
+    } catch (error) {
+      console.error("Error fetching banners:", error);
+      message.error("Không thể tải danh sách banner");
+      setBanners([]);
+    }
+  };
 
   const handleHoKinhDoanhClick = () => {
-    if (user && (user.role === "hokinhdoanh" || user.role === "admin" || user.role === "nhanvien")) {
+    if (
+      user &&
+      (user.role === "hokinhdoanh" ||
+        user.role === "admin" ||
+        user.role === "nhanvien")
+    ) {
       navigate("/dashboard"); // Navigate to /dashboard
     } else {
       // Nếu người dùng không phải là hokinhdoanh hoặc admin, có thể hiển thị thông báo hoặc chuyển hướng khác
@@ -203,8 +219,8 @@ const HeaderNew = () => {
                 <>
                   {/* <AiOutlineUser /> Đăng nhập */}
                   <Link to="/login">
-                  <AiOutlineUser /> Đăng nhập
-                </Link>
+                    <AiOutlineUser /> Đăng nhập
+                  </Link>
                 </>
               )}
             </a>
@@ -242,7 +258,7 @@ const HeaderNew = () => {
                     className="count"
                     style={{ top: 0, position: "absolute", right: 0 }}
                   >
-                     {totalItemCount}
+                    {totalItemCount}
                   </span>
                 </span>
               </Link>
@@ -339,12 +355,17 @@ const HeaderNew = () => {
 
             <li className="children fixed-item-2">
               <a>
-                <img style={{ width: 28, marginRight: 6 }} src={"https://foodmap.asia/assets/images/svg/icon-my-farm-white.svg"} alt="" />
+                <img
+                  style={{ width: 28, marginRight: 6 }}
+                  src={
+                    "https://foodmap.asia/assets/images/svg/icon-my-farm-white.svg"
+                  }
+                  alt=""
+                />
                 <span>Thông tin</span>
               </a>
             </li>
           </ul>
-
         </div>
       </div>
 
@@ -361,33 +382,47 @@ const HeaderNew = () => {
                   data-bs-ride="carousel"
                 >
                   <div className="carousel-indicators">
-                    {banners.map((banner, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        data-bs-target="#carouselExampleIndicators"
-                        data-bs-slide-to={index}
-                        className={index === 0 ? "active" : ""}
-                        aria-current={index === 0 ? "true" : "false"}
-                        aria-label={`Slide ${index + 1}`}
-                      ></button>
-                    ))}
+                    {Array.isArray(banners) && banners.length > 0 ? (
+                      banners.map((banner, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          data-bs-target="#carouselExampleIndicators"
+                          data-bs-slide-to={index}
+                          className={index === 0 ? "active" : ""}
+                          aria-current={index === 0 ? "true" : "false"}
+                          aria-label={`Slide ${index + 1}`}
+                        ></button>
+                      ))
+                    ) : (
+                      <p>No Banners Available</p> // Thêm fallback nếu `banners` rỗng
+                    )}
                   </div>
                   <div className="carousel-inner">
-                    {banners.map((banner, index) => (
-                      <div
-                        key={index}
-                        className={`carousel-item ${
-                          index === 0 ? "active" : ""
-                        }`}
-                      >
+                    {banners.length > 0 ? (
+                      banners.map((banner, index) => (
+                        <div
+                          key={index}
+                          className={`carousel-item ${
+                            index === 0 ? "active" : ""
+                          }`}
+                        >
+                          <img
+                            src={banner.hinhAnh}
+                            className="d-block w-100"
+                            alt={`Banner ${index + 1}`}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="carousel-item active">
                         <img
-                          src={banner.hinhAnh}
+                          src="https://via.placeholder.com/800x400?text=No+Banner+Available"
                           className="d-block w-100"
-                          alt={`Banner ${index + 1}`}
+                          alt="No Banners"
                         />
                       </div>
-                    ))}
+                    )}
                   </div>
                   <div
                     className="carousel-control-prev"
@@ -417,17 +452,27 @@ const HeaderNew = () => {
               <div className="col-3 bn2">
                 <div className="row">
                   <div className="col-12 ctbn1">
-                    <img src="https://shop.donganh.vn/wp-content/uploads/2024/07/cai-don-ganh.jpg" alt="Image 1" className="img-fluid" />
+                    <img
+                      src="https://shop.donganh.vn/wp-content/uploads/2024/07/cai-don-ganh.jpg"
+                      alt="Image 1"
+                      className="img-fluid"
+                    />
                   </div>
                 </div>
                 <div className="row">
                   <div className="col-12 ctbn2">
-                    <img src= "https://shop.donganh.vn/wp-content/uploads/2024/07/chinh-sach-thanh-toan-the-gioi-thep-group.jpg" className="img-fluid" />
+                    <img
+                      src="https://shop.donganh.vn/wp-content/uploads/2024/07/chinh-sach-thanh-toan-the-gioi-thep-group.jpg"
+                      className="img-fluid"
+                    />
                   </div>
                 </div>
                 <div className="row">
                   <div className="col-12 ctbn3">
-                    <img src= "https://shop.donganh.vn/wp-content/uploads/2024/07/Chinh-sach-van-chuyen-giao-nhan-hang-hoa.jpg" className="img-fluid" />
+                    <img
+                      src="https://shop.donganh.vn/wp-content/uploads/2024/07/Chinh-sach-van-chuyen-giao-nhan-hang-hoa.jpg"
+                      className="img-fluid"
+                    />
                   </div>
                 </div>
               </div>

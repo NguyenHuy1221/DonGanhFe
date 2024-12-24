@@ -2,16 +2,25 @@ import axios from "axios";
 
 // Thiết lập URL API
 const API_URL = "/api/sanpham"; // Địa chỉ base URL cho API
+const token = localStorage.getItem("token");
 
 // Lấy danh sách biến thể theo sản phẩm
 export const layDanhSachSanPham = async (sanPhamId) => {
-  const response = await axios.get(`${API_URL}/findSanPhambyID/${sanPhamId}`);
+  const response = await axios.get(`${API_URL}/findSanPhambyID/${sanPhamId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`, // Truyền token vào headers
+    },
+  });
   return response.data; // Giả sử dữ liệu trả về là một mảng
 };
 
 // Lấy danh sách biến thể theo sản phẩm
 export const layDanhSachBienThe = async (sanPhamId) => {
-  const response = await axios.get(`${API_URL}/getlistBienTheAdmin/${sanPhamId}`);
+  const response = await axios.get(`${API_URL}/getlistBienTheAdmin/${sanPhamId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`, // Truyền token vào headers
+    },
+  });
   return response.data; // Giả sử dữ liệu trả về là một mảng
 };
 // Thêm biến thể

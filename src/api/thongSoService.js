@@ -1,4 +1,5 @@
 import axios from "axios";
+const token = localStorage.getItem("token");
 
 // Lấy dữ liệu doanh thu với các tham số lọc
 export const fetchRevenueData = async (userId, filterParams) => {
@@ -11,7 +12,11 @@ export const fetchRevenueData = async (userId, filterParams) => {
 
     const response = await axios.get(
       `/api/doanhthu/getData/${userId}/?${params.toString()}`
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data; // Trả về dữ liệu API
   } catch (error) {
     console.error("Lỗi khi tải dữ liệu doanh thu:", error);

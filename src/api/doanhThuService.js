@@ -1,13 +1,18 @@
 import axios from "axios";
+const token = localStorage.getItem("token");
 
 // Hàm lấy doanh thu từ API
 export const getDoanhThu = async (userId, filter) => {
   try {
+    const token = localStorage.getItem("token"); // Lấy token từ localStorage
     const response = await axios.get(`/api/doanhthu/GetDoanhThu12/${userId}`, {
       params: {
         fromDate: filter.startDate,
         toDate: filter.endDate,
         filter: filter.transactionType,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
       },
     });
 

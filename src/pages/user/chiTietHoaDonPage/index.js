@@ -53,8 +53,14 @@ const ChiTietHoaDonUserPage = ({ quayLaiHoaDon, onClickChat }) => {
 
   const handleCheckOrderStatus = async () => {
     try {
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
+
       const response = await axios.get(
-        `/api/hoadon/Checkdonhangbaokim/${hoaDonId}`
+        `/api/hoadon/Checkdonhangbaokim/${hoaDonId}` , {
+          headers: {
+            Authorization: `Bearer ${token}`, // Truyền token vào headers
+          },
+        }
       );
       if (response.data.message === "Đơn hàng đã hết hạn") {
         setShowExtendDialog(true);
@@ -68,8 +74,14 @@ const ChiTietHoaDonUserPage = ({ quayLaiHoaDon, onClickChat }) => {
 
   const handleExtendOrder = async () => {
     try {
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
+
       const response = await axios.post(
-        `/api/hoadon/updateTransactionHoaDon/${hoaDonId}`
+        `/api/hoadon/updateTransactionHoaDon/${hoaDonId}` , {
+          headers: {
+            Authorization: `Bearer ${token}`, // Truyền token vào headers
+          },
+        }
       );
       alert("Đơn hàng đã được gia hạn thành công!");
       setShowExtendDialog(false);

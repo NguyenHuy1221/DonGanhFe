@@ -97,53 +97,120 @@ const BaiVietManager = () => {
     setFileList([]);
   };
 
+  // const handleCreateSubmit = async (values) => {
+  //   console.log("dcmmmm");
+  //   const userId = localStorage.getItem("userId");
+  //   const formData = new FormData();
+  //   formData.append("userId", userId);
+  //   formData.append("tieude", values.tieude);
+  //   formData.append("noidung", values.noidung);
+  //   formData.append("tags", values.tags || "");
+
+  //   // Tải ảnh cũ từ URL và thêm vào FormData
+  //   const oldFilesPromises = fileList
+  //     .filter((file) => file.url) // Chỉ lấy ảnh cũ (có URL)
+  //     .map(async (file) => {
+  //       const response = await fetch(file.url); // Tải ảnh từ URL
+  //       const blob = await response.blob(); // Chuyển ảnh thành Blob
+  //       const fileName = file.url.split("/").pop(); // Lấy tên file từ URL
+  //       return new File([blob], fileName, { type: blob.type }); // Tạo file từ Blob
+  //     });
+
+  //   // Chờ tải xong toàn bộ ảnh cũ
+  //   const oldFiles = await Promise.all(oldFilesPromises);
+
+  //   // Thêm ảnh cũ vào FormData
+  //   oldFiles.forEach((file) => {
+  //     formData.append("files", file);
+  //   });
+
+  //   // Thêm ảnh mới vào FormData
+  //   fileList
+  //     .filter((file) => file.originFileObj) // Chỉ lấy ảnh mới (File object)
+  //     .forEach((file) => {
+  //       formData.append("files", file.originFileObj);
+  //     });
+
+  //   // Log kiểm tra dữ liệu FormData
+  //   for (let pair of formData.entries()) {
+  //     console.log(pair[0], pair[1]);
+  //   }
+
+  //   try {
+  //     // const response = editingId
+  //     //   ? await axios.put(`/api/baiviet/updateBaiViet/${editingId}`, formData)
+  //     //   : await axios.post("/api/baiviet/createBaiViet", formData);
+
+  //     const response = editingId
+  //       ? await updateBaiViet(editingId, formData) // Sử dụng API cập nhật
+  //       : await createBaiViet(formData); // Sử dụng API tạo mới
+
+  //     message.success(response.message);
+  //     fetchBaiVietList(); // Tải lại danh sách bài viết sau khi tạo hoặc cập nhật
+  //     handleCancel(); // Đóng modal
+  //   } catch (error) {
+  //     console.error("Error submitting form:", error);
+  //     message.error("Lỗi khi tạo hoặc cập nhật bài viết");
+  //   }
+  // };
+
   const handleCreateSubmit = async (values) => {
+    console.log("dcmmmm");
     const userId = localStorage.getItem("userId");
     const formData = new FormData();
     formData.append("userId", userId);
     formData.append("tieude", values.tieude);
     formData.append("noidung", values.noidung);
     formData.append("tags", values.tags || "");
-
+  
     // Tải ảnh cũ từ URL và thêm vào FormData
     const oldFilesPromises = fileList
       .filter((file) => file.url) // Chỉ lấy ảnh cũ (có URL)
       .map(async (file) => {
-        const response = await fetch(file.url); // Tải ảnh từ URL
-        const blob = await response.blob(); // Chuyển ảnh thành Blob
-        const fileName = file.url.split("/").pop(); // Lấy tên file từ URL
-        return new File([blob], fileName, { type: blob.type }); // Tạo file từ Blob
+        try {
+          const response = await fetch(file.url); // Tải ảnh từ URL
+          if (!response.ok) {
+            throw new Error(`Failed to fetch ${file.url}`);
+          }
+          const blob = await response.blob(); // Chuyển ảnh thành Blob
+          const fileName = file.url.split("/").pop(); // Lấy tên file từ URL
+          return new File([blob], fileName, { type: blob.type }); // Tạo file từ Blob
+        } catch (error) {
+          console.error("Error fetching old image:", error);
+          message.error(`Lỗi khi tải ảnh cũ: ${file.url}`);
+          return null; // Trả về null nếu không tải được ảnh
+        }
       });
-
+  
     // Chờ tải xong toàn bộ ảnh cũ
     const oldFiles = await Promise.all(oldFilesPromises);
-
+    
+    // Lọc các ảnh tải thành công (không phải null)
+    const validOldFiles = oldFiles.filter((file) => file !== null);
+  
     // Thêm ảnh cũ vào FormData
-    oldFiles.forEach((file) => {
+    validOldFiles.forEach((file) => {
       formData.append("files", file);
     });
-
+  
     // Thêm ảnh mới vào FormData
     fileList
       .filter((file) => file.originFileObj) // Chỉ lấy ảnh mới (File object)
       .forEach((file) => {
         formData.append("files", file.originFileObj);
       });
-
+  
     // Log kiểm tra dữ liệu FormData
     for (let pair of formData.entries()) {
       console.log(pair[0], pair[1]);
     }
-
+  
     try {
-      // const response = editingId
-      //   ? await axios.put(`/api/baiviet/updateBaiViet/${editingId}`, formData)
-      //   : await axios.post("/api/baiviet/createBaiViet", formData);
-
+      // Cập nhật hoặc tạo mới bài viết
       const response = editingId
         ? await updateBaiViet(editingId, formData) // Sử dụng API cập nhật
         : await createBaiViet(formData); // Sử dụng API tạo mới
-
+  
       message.success(response.message);
       fetchBaiVietList(); // Tải lại danh sách bài viết sau khi tạo hoặc cập nhật
       handleCancel(); // Đóng modal
@@ -153,6 +220,7 @@ const BaiVietManager = () => {
     }
   };
 
+  
   const handleDelete = (id) => {
     deleteBaiViet(id)
       .then(() => {

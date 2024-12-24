@@ -216,8 +216,11 @@ const CategoriesPage = () => {
   
       if (isEditing) {
         console.log("Cập nhật danh mục với ID:", currentCategoryId);
+        const token = localStorage.getItem("token"); // Lấy token từ localStorage
+
         const headers = {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`, 
         };
         await axios.put(`/api/danhmuc/updateDanhMucCha/${currentCategoryId}`, formData, { headers });
         message.success("Cập nhật danh mục thành công");

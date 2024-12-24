@@ -286,11 +286,11 @@ const DashboardPage = () => {
           <Menu.Item key="chat" icon={<UploadOutlined />}>
             Nhắn tin
           </Menu.Item>
-          {/* {user && user.role !== "hokinhdoanh" && (
+          {user && user.role !== "hokinhdoanh" && (
             <Menu.Item key="banner" icon={<UploadOutlined />}>
               Banner
             </Menu.Item>
-          )} */}
+          )}
           {/* <Menu.Item key="banner" icon={<UploadOutlined />}>
             Banner
           </Menu.Item> */}

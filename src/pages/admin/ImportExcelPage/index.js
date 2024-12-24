@@ -61,13 +61,17 @@ const ImportExcel = ({ onSuccess }) => {
       message.warning("Không có dữ liệu để thêm!");
       return;
     }
+    const token = localStorage.getItem("token"); // Lấy token từ localStorage
 
     setLoading(true);
     try {
       const response = await fetch("/api/sanpham/createSanPhamExcel", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ products: data }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+        body: JSON.stringify({ products: data }), // Dữ liệu truyền đi
       });
 
       if (response.ok) {

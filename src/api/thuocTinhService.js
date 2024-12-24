@@ -1,11 +1,16 @@
 import axios from "axios";
 
 const API_BASE_URL = "/api/thuoctinh";
+const token = localStorage.getItem("token");
 
 // Lấy danh sách thuộc tính
 export const layDanhSachThuocTinh = async (userId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getlistThuocTinh/${userId}`);
+    const response = await axios.get(`${API_BASE_URL}/getlistThuocTinh/${userId}` , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     throw new Error("Lỗi khi lấy danh sách thuộc tính");
@@ -107,6 +112,10 @@ export const findThuocTinh = async (query) => {
     // Gửi query với các tham số có giá trị
     const response = await axios.get("/api/thuocTinh/findThuocTinh", {
       params: query,
+    } , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
     });
     return response.data;
   } catch (error) {

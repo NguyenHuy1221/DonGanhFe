@@ -1,10 +1,15 @@
 import axios from "axios";
+const token = localStorage.getItem("token");
 
 // Hàm lấy danh sách cuộc trò chuyện
 export const getListConversations = async (userId) => {
   try {
     const response = await axios.get(
-      `/api/chatsocket/getlistconversation12/${userId}`
+      `/api/chatsocket/getlistconversation12/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
     return response.data || []; // Trả về dữ liệu nếu có hoặc mảng rỗng
   } catch (error) {
@@ -31,7 +36,11 @@ export const createConversation = async (senderId, receiverId) => {
 export const getListConversationsForCurrentUser = async (currentUserId) => {
   try {
     const response = await axios.get(
-      `/api/chatsocket/getlistconversation12/${currentUserId}`
+      `/api/chatsocket/getlistconversation12/${currentUserId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -61,6 +70,11 @@ export const uploadFile = async (file) => {
       {
         headers: {
           "Content-Type": "multipart/form-data",
+        },
+      }
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
         },
       }
     );

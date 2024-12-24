@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = "/api/khuyenmai";
 const API_URL = "/api/khuyenmaimanage";
+const token = localStorage.getItem("token");
 
 // export const layDanhSachKhuyenMai = async () => {
 //   try {
@@ -123,7 +124,11 @@ export const deleteKhuyenMai = async (id, token) => {
 
 export const layDanhSachLoaiKhuyenMai = async () => {
   try {
-    const response = await axios.get(`${API_URL}/getlistLoaiKhuyenMai`);
+    const response = await axios.get(`${API_URL}/getlistLoaiKhuyenMai` , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     throw new Error("Lỗi khi lấy danh sách khuyễn mãi");

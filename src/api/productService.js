@@ -1,9 +1,13 @@
 import axios from "axios";
-
+const token = localStorage.getItem("token");
 export const fetchProductListAdmin = async (userId) => {
   try {
     const response = await axios.get(
-      `api/sanpham/getlistSanPhamAdmin/${userId}`
+      `api/sanpham/getlistSanPhamAdmin/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
     return response.data; // Trả về danh sách sản phẩm
   } catch (error) {
@@ -14,7 +18,11 @@ export const fetchProductListAdmin = async (userId) => {
 
 export const fetchProductsById = async (_id) => {
   try {
-    const response = await axios.get(`/api/sanpham/findSanPhambyID/${_id}`);
+    const response = await axios.get(`/api/sanpham/findSanPhambyID/${_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -24,7 +32,11 @@ export const fetchProductsById = async (_id) => {
 
 export const fetchProducts = async () => {
   try {
-    const response = await axios.get("/api/sanpham/getlistSanPham");
+    const response = await axios.get("/api/sanpham/getlistSanPham", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -51,7 +63,11 @@ export const fetchProducts = async () => {
 
 export const fetchProductsByDanhMuc = async (IDDanhMuc) => {
   try {
-    const response = await axios.get(`/api/sanpham/findSanPham/${IDDanhMuc}`);
+    const response = await axios.get(`/api/sanpham/findSanPham/${IDDanhMuc}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     const products = response.data;
 
     // Lọc sản phẩm không có TinhTrang là "Đã xóa"
@@ -69,7 +85,11 @@ export const fetchProductsByDanhMuc = async (IDDanhMuc) => {
 
 export const fetchBienThe = async (id) => {
   try {
-    const response = await axios.get(`/api/sanpham/getlistBienThe/${id}`);
+    const response = await axios.get(`/api/sanpham/getlistBienThe/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error("Error fetching product variants:", error);
@@ -79,7 +99,11 @@ export const fetchBienThe = async (id) => {
 
 export const sapXepSanPhamTheoGia = async () => {
   try {
-    const response = await axios.get("/api/sanpham/sapXepSanPhamTheoGia");
+    const response = await axios.get("/api/sanpham/sapXepSanPhamTheoGia", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error products:", error);
@@ -90,7 +114,11 @@ export const sapXepSanPhamTheoGia = async () => {
 export const sapXepSanPhamTheoGiaGiamDan = async () => {
   try {
     const response = await axios.get(
-      "/api/sanpham/sapXepSanPhamTheoGiaGiamDan"
+      "/api/sanpham/sapXepSanPhamTheoGiaGiamDan", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -101,7 +129,11 @@ export const sapXepSanPhamTheoGiaGiamDan = async () => {
 
 export const sapXepSanPhamTheoNgayTao = async () => {
   try {
-    const response = await axios.get("/api/sanpham/sapXepSanPhamTheoNgayTao");
+    const response = await axios.get("/api/sanpham/sapXepSanPhamTheoNgayTao", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error products:", error);
@@ -112,7 +144,11 @@ export const sapXepSanPhamTheoNgayTao = async () => {
 export const sapXepSanPhamNgayTaoGiamDan = async () => {
   try {
     const response = await axios.get(
-      "/api/sanpham/sapXepSanPhamNgayTaoGiamDan"
+      "/api/sanpham/sapXepSanPhamNgayTaoGiamDan", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
     return response.data;
   } catch (error) {
@@ -123,7 +159,11 @@ export const sapXepSanPhamNgayTaoGiamDan = async () => {
 
 export const sapXepSanPhamBanChayNhat = async () => {
   try {
-    const response = await axios.get("/api/sanpham/sapXepSanPhamBanChayNhat");
+    const response = await axios.get("/api/sanpham/sapXepSanPhamBanChayNhat", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error products:", error);
@@ -133,7 +173,11 @@ export const sapXepSanPhamBanChayNhat = async () => {
 
 export const sapXepSanPhamCoGiamGia = async () => {
   try {
-    const response = await axios.get("/api/sanpham/sapXepSanPhamCoGiamGia");
+    const response = await axios.get("/api/sanpham/sapXepSanPhamCoGiamGia", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error products:", error);
@@ -236,7 +280,11 @@ export const updateThuocTinh = async (sanPhamId, data) => {
     const response = await axios.put(
       `/api/sanpham/updateThuocTinhForSanPham/${sanPhamId}`,
       data
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi cập nhật thuộc tính:", error);
@@ -250,7 +298,11 @@ export const addThuocTinh = async (sanPhamId, data) => {
     const response = await axios.post(
       `/api/sanpham/addThuocTinhForSanPham/${sanPhamId}`,
       data
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi thêm thuộc tính:", error);

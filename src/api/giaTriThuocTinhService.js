@@ -1,12 +1,17 @@
 import axios from "axios";
 
 const API_BASE_URL = "/api/thuoctinhgiatri";
+const token = localStorage.getItem("token");
 
 export const layDanhSachThuocTinhGiaTri = async (userId) => {
   try {
     const response = await axios.get(
       `${API_BASE_URL}/getlistThuocTinhGiaTri/${userId}`
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     throw new Error("Lỗi khi lấy danh sách thuộc tính giá trị");
@@ -113,7 +118,11 @@ export const xoaThuocTinhGiaTri = async (id, token) => {
 export const getGiaTriThuocTinh = async (id) => {
   try {
     const response = await axios.get(
-      `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}`
+      `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}` , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      }
     );
     return response.data; // Trả về dữ liệu nhận được từ API
   } catch (error) {

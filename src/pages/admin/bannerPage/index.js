@@ -23,8 +23,16 @@ const BannerManagement = () => {
   // Lấy danh sách banner từ API
   const fetchBanners = async () => {
     try {
-      const response = await axios.get("/api/banner/banners");
-      setBanners(response.data);
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
+      const response = await axios.get("/api/banner/getAllBannersAdmin", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
+      // Kiểm tra và gán mảng banners
+      setBanners(
+        Array.isArray(response.data.banners) ? response.data.banners : []
+      );
     } catch (error) {
       message.error("Lấy danh sách banner thất bại");
     }
@@ -51,41 +59,71 @@ const BannerManagement = () => {
     setIsModalVisible(true);
   };
 
+  const addNewBanner = async (formData) => {
+    try {
+      await axios.post("/api/banner/addBanners", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      message.success("Thêm banner thành công");
+      fetchBanners(); // Cập nhật danh sách banner
+      setIsModalVisible(false); // Đóng modal
+    } catch (error) {
+      console.error("Error adding banner:", error);
+      message.error("Thêm banner thất bại");
+    }
+  };
+
   // Xử lý submit form
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append("hinhAnh", values.hinhAnh);
-
-      // Nếu có file được chọn, thêm vào formData
+  
       if (values.file && values.file.fileList.length > 0) {
         formData.append("file", values.file.fileList[0].originFileObj);
       }
-
+  
       if (isEditing) {
-        await axios.put(`/api/banner/banners/${currentBannerId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        // Gửi API chỉnh sửa banner
+        await axios.put(
+          `/api/banner/updateBanner/${currentBannerId}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
         message.success("Cập nhật banner thành công");
       } else {
-        await axios.post("/api/banner/banners", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        message.success("Thêm banner thành công");
+        // Thêm mới banner
+        await addNewBanner(formData);
       }
-
-      fetchBanners();
-      setIsModalVisible(false);
+  
+      fetchBanners(); // Cập nhật lại danh sách
+      setIsModalVisible(false); // Đóng modal
     } catch (error) {
+      console.error("Error saving banner:", error);
       message.error("Lưu banner thất bại");
     }
   };
 
+  
+  
+
   // Xóa banner
   const handleDelete = async (bannerId) => {
     try {
-      await axios.delete(`/api/banner/banners/${bannerId}`);
+      const token = localStorage.getItem("token");
+      await axios.delete(`/api/banner/deleteBanner/${bannerId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Truyền token vào headers
+        },
+      });
       message.success("Xóa banner thành công");
       fetchBanners();
     } catch (error) {
@@ -140,7 +178,12 @@ const BannerManagement = () => {
       >
         Thêm Banner
       </Button>
-      <Table columns={columns} dataSource={banners} rowKey="_id" />
+      <Table
+        columns={columns}
+        dataSource={banners}
+        rowKey={(record) => record._id || record.idbanner}
+        pagination={{ pageSize: 5 }} // Thêm phân trang
+      />
 
       <Modal
         title={isEditing ? "Chỉnh Sửa Banner" : "Thêm Banner"}

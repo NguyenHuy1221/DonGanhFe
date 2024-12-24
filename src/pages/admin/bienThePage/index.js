@@ -130,8 +130,14 @@ const BienThePage = () => {
 
   const fetchGiaTriThuocTinh = async (id) => {
     try {
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
+
       const response = await axios.get(
-        `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}`
+        `/api/thuoctinhgiatri/findThuocTinhGiaTri/${id}` , {
+          headers: {
+            Authorization: `Bearer ${token}`, // Truyền token vào headers
+          },
+        }
       );
       setThuocTinhGiaTri(response.data); // Không lọc, lấy tất cả giá trị
       return response.data;
@@ -309,9 +315,14 @@ const BienThePage = () => {
   const xoaThuocTinhHandler = async (record) => {
     try {
       const parentId = record.key.split("-")[0];
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
 
       await axios.delete(
-        `/api/sanpham/deleteThuocTinhForSanPham/${duLieuSanPham._id}/${parentId}/${record._id}`
+        `/api/sanpham/deleteThuocTinhForSanPham/${duLieuSanPham._id}/${parentId}/${record._id}` , {
+          headers: {
+            Authorization: `Bearer ${token}`, // Truyền token vào headers
+          },
+        }
       ); // Gọi API xóa thuộc tính
       message.success("Xóa thuộc tính thành công");
       fetchData(); // Lấy lại dữ liệu sau khi xóa

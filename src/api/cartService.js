@@ -1,8 +1,13 @@
 import axios from "axios";
+const token = localStorage.getItem("token");
 
 export const fetchCartById = async (_id) => {
   try {
-    const response = await axios.get(`/api/cart/gioHang/user/${_id}`);
+    const response = await axios.get(`/api/cart/gioHang/user/${_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching cart:", error);
@@ -15,6 +20,10 @@ export const addToCart = async (userId, productDetails) => {
     const response = await axios.post("/api/cart/gioHang", {
       userId,
       chiTietGioHang: [productDetails],
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
     });
     return response.data;
   } catch (error) {
@@ -28,6 +37,10 @@ export const updateCart = async (cartId, updatedCartItems) => {
     // Đảm bảo đường dẫn API chính xác
     const response = await axios.put(`/api/cart/gioHang/${cartId}`, {
       chiTietGioHang: updatedCartItems, // Gửi đúng dữ liệu cần thiết
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
     });
 
     // Trả về dữ liệu từ API
@@ -56,6 +69,10 @@ export const deleteCartItem = async (cartId, idBienThe) => {
   try {
     await axios.delete(`/api/cart/gioHang/${cartId}`, {
       data: { idBienThe },
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
     });
   } catch (error) {
     console.error("Error deleting item from cart:", error);

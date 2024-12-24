@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./style.scss";
 import { useLocation } from "react-router-dom";
-import { getHoaDonsByUserId } from '../../../api/hoaDonService';
+import { getHoaDonsByUserId } from "../../../api/hoaDonService";
 
-const HoaDonUserPage = ({ onShowChiTietHoaDon  }) => {
+const HoaDonUserPage = ({ onShowChiTietHoaDon }) => {
   const [hoaDons, setHoaDons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,7 +25,7 @@ const HoaDonUserPage = ({ onShowChiTietHoaDon  }) => {
 
   const handleViewDetails = (hoaDonId) => {
     localStorage.setItem("hoadonId", hoaDonId); // Lưu ID hóa đơn
-    onShowChiTietHoaDon (); // Gọi hàm callback từ ProfilePage
+    onShowChiTietHoaDon(); // Gọi hàm callback từ ProfilePage
   };
 
   const fetchHoaDons = async (userId) => {
@@ -41,8 +41,6 @@ const HoaDonUserPage = ({ onShowChiTietHoaDon  }) => {
       setLoading(false);
     }
   };
-
-  
 
   if (loading) return <p>Đang tải dữ liệu...</p>;
   if (error) return <p>{error}</p>;
@@ -63,7 +61,13 @@ const HoaDonUserPage = ({ onShowChiTietHoaDon  }) => {
           {hoaDons.map((hoaDon) => (
             <tr key={hoaDon._id}>
               <td>{new Date(hoaDon.NgayTao).toLocaleDateString()}</td>
-              <td>{hoaDon.TongTien.toLocaleString()} VND</td>
+              {/* <td>{hoaDon.TongTien.toLocaleString()} VND</td> */}
+              <td>
+                {hoaDon.TongTien - hoaDon.SoTienKhuyenMai > 0
+                  ? (hoaDon.TongTien - hoaDon.SoTienKhuyenMai).toLocaleString()
+                  : 0}{" "}
+                VND
+              </td>
               <td>
                 <span className={`status_new-${hoaDon.TrangThai}`}>
                   {hoaDon.TrangThai === 0
@@ -77,12 +81,14 @@ const HoaDonUserPage = ({ onShowChiTietHoaDon  }) => {
                     : "Hủy đơn hàng"}
                 </span>
               </td>
-              
+
               <td className="actions-cell">
-               
-              <button className="btn detail" onClick={() => handleViewDetails(hoaDon._id)}>
-              Xem chi tiết
-            </button>
+                <button
+                  className="btn detail"
+                  onClick={() => handleViewDetails(hoaDon._id)}
+                >
+                  Xem chi tiết
+                </button>
               </td>
             </tr>
           ))}

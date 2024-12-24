@@ -1,7 +1,7 @@
 import axios from "axios";
+const token = localStorage.getItem("token"); // Lấy token từ localStorage
 
 export const fetchYeuCauDangKyData = async () => {
-  const token = localStorage.getItem("token"); // Lấy token từ localStorage
   try {
     const response = await axios.get(
       "/api/yeucaudangky/getListYeuCauDangKy",
@@ -23,7 +23,11 @@ export const fetchYeuCauDangKyByUserId = async (userId) => {
   try {
     const response = await axios.get(
       `/api/yeucaudangky/getYeuCauDangKyByUserId/${userId}`
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi lấy yêu cầu đăng ký:", error);

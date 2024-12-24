@@ -1,4 +1,5 @@
 import axios from "axios";
+const token = localStorage.getItem("token"); // Lấy token từ localStorage
 
 // Hàm lấy danh sách yêu cầu rút tiền
 // export const fetchAdminYeuCauRutTien = async () => {

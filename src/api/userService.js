@@ -1,4 +1,5 @@
 import axios from "axios";
+const token = localStorage.getItem("token"); // Lấy token từ localStorage
 
 export const loginGoogle = async () => {
   try {
@@ -48,7 +49,11 @@ export const login = async (gmail, matKhau) => {
 
 export const fetchUserById = async (_id) => {
   try {
-    const response = await axios.get(`/api/user/showUserID/${_id}`);
+    const response = await axios.get(`/api/user/showUserID/${_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error logging in:", error);
@@ -58,7 +63,11 @@ export const fetchUserById = async (_id) => {
 
 export const showDiaChiByIdUser = async (userId) => {
   try {
-    const response = await axios.get(`/api/diachi/getDiaChiByUserId/${userId}`);
+    const response = await axios.get(`/api/diachi/getDiaChiByUserId/${userId}` , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching address by user ID:", error);
@@ -71,7 +80,11 @@ export const creatDiaChi = async (userId, address) => {
     const response = await axios.post(
       `/api/diachi/createDiaChi/${userId}`,
       address
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     console.error("Error creating address:", error);
@@ -84,6 +97,10 @@ export const updateUserDiaChi = async (userId, newAddress) => {
     const response = await axios.put("api/user/updateUserDiaChi", {
       UserID: userId,
       diaChiMoi: newAddress,
+    } , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
     });
     return response.data;
   } catch (error) {
@@ -100,9 +117,10 @@ export const uploadProfileImage = async (userId, formData) => {
       {
         headers: {
           "Content-Type": "multipart/form-data", // Đảm bảo rằng nội dung được gửi là multipart
+          Authorization: `Bearer ${token}`,
         },
       }
-    );
+      );
 
     // Trả về URL ảnh mới sau khi tải lên thành công
     return response.data;
@@ -117,7 +135,11 @@ export const updateUserProfile = async (userId, profileData) => {
     const response = await axios.put(
       `/api/user/updateUser12/${userId}`,
       profileData
-    );
+      , {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
+      });
     return response.data;
   } catch (error) {
     console.error("Lỗi khi cập nhật hồ sơ:", error);
@@ -140,9 +162,22 @@ export const updateUserRoleAndPermissions = async (userId, data, token) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    } , {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
     })
     .then((response) => response.data)
     .catch((error) => {
       throw error.response?.data || "Có lỗi xảy ra";
     });
+};
+
+export const deleteAddressById = async (userId, diaChiId) => {
+  const response = await axios.delete(`/api/diachi/deleteDiaChi/${userId}/${diaChiId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`, // Truyền token vào headers
+    },
+  });
+  return response.data;
 };
