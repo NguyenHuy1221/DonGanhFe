@@ -24,6 +24,10 @@ export const createConversation = async (senderId, receiverId) => {
     const response = await axios.post("/api/chatsocket/Createconversation", {
       sender_id: senderId,
       receiver_id: receiverId,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Truyền token vào headers
+      },
     });
     return response.data;
   } catch (error) {

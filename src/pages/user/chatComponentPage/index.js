@@ -97,9 +97,14 @@ function ChatComponent({ isChatMo, toggleChatMo }) {
 
   const createConversation = async (senderId, receiverId) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.post("/api/chatsocket/Createconversation", {
         sender_id: senderId,
         receiver_id: receiverId,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Truyền token vào headers
+        },
       });
       console.log("Cuộc trò chuyện mới:", response.data);
 
